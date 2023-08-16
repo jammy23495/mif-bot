@@ -36,6 +36,7 @@ async function train() {
     for (let index = 0; index < jsonArray.length; index++) {
         let subject = jsonArray[index].Subject ? jsonArray[index].Subject : "";
         let question = jsonArray[index].Question ? jsonArray[index].Question.replaceAll("\"", "\'") : "";
+        question = question.replaceAll("�", "");
         let ROW_ID = jsonArray[index].Row_Number;
         let ID = jsonArray[index].Post_ID;
         let answer = jsonArray[index].Comment;
@@ -167,7 +168,6 @@ app.get('/ask/:question', async (req, res) => {
     let response = await qna(req.params.question);
     res.send(response)
 })
-
 
 app.listen(port, async () => {
     await train();
