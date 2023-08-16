@@ -36,16 +36,16 @@ async function train() {
         let question = jsonArray[index].Question ? jsonArray[index].Question : "";
         let ROW_ID = jsonArray[index].Row_Number;
         let ID = jsonArray[index].Post_ID;
-        let answer = jsonArray[index].Comment && jsonArray[index].Comment !== "NULL" ? jsonArray[index].Comment : "Not able to find answers for this post/query";
+        let answer = jsonArray[index].Comment;
         let likes = jsonArray[index].LikeCount ? jsonArray[index].LikeCount : 0;
         let comments = jsonArray[index].CommentCount ? jsonArray[index].CommentCount : 0;
         let post_url = jsonArray[index].Post_URL ? jsonArray[index].Post_URL : "https://www.google.com";
-        let post_date = jsonArray[index].Comment_On && jsonArray[index].Comment_On !== "NULL" ? jsonArray[index].Comment_On : "2000-01-01";
+        let post_date = jsonArray[index].Comment_On;
         let post_date_string = moment(post_date, "YYYY-MM-DD").format('MMMM Do YYYY');
-        let answered_by = jsonArray[index].Comment_By && jsonArray[index].Comment_By !== "NULL" ? jsonArray[index].Comment_By : "Bot";
+        let answered_by = jsonArray[index].Comment_By;
 
-        let newanswer = answer + `???{"ID":"${ID}","Answered_By":"${answered_by}","likes":${likes},"comments":${comments},"post_url":"${post_url}","post_date":"${post_date_string}","subject":"${subject}","question":"${question}"}`
-        
+        let newanswer = answer + `???{"ID":"${ID}","Answered_By":"${answered_by}","likes":${likes},"comments":${comments},"post_url":"${post_url}","post_date":"${post_date_string}","subject":"${subject}","question":"${question}","answer":"${answer}"}`
+
         let intent = ROW_ID + "_intent_" + subject.replaceAll(" ", "_")
 
         manager.addDocument(language, subject, intent);
@@ -82,8 +82,10 @@ async function qna(question) {
                     console.log(`${allAnswers.length} valid answer(s)\n`)
                     for (let i = 0; i < allAnswers.length; i++) {
                         let ans = await generateAnswer(allAnswers[i].answer)
-                        let isBot = ans.jsonString.Answered_By !== "Bot" || ans.jsonString.Answered_By !== "NULL" ? false : true;
-                        ans.isBot = isBot
+                        let isBotFound = isBot(ans.jsonString.Answered_By)
+                        let isCommented = isNULL(ans.jsonString.Answered_By)
+                        ans.isBot = isBotFound
+                        ans.isCommented = isCommented
                         console.log(ans)
                         finalAnswers.push(ans)
                     }
@@ -130,17 +132,36 @@ async function qna(question) {
 }
 
 async function generateAnswer(answer) {
+    console.log(answer)
     let position = answer.lastIndexOf("???")
     let slicedString = answer.slice(position)
     answer = answer.slice(0, position)
+    answer = isNULL(answer) ? "No comments found on this post/query!" : answer
     let jsonString = JSON.parse(slicedString.split("???").pop())
-    // let Summarizer = new SummarizerManager(answer, 5);
-    // let answer_summary = Summarizer.getSummaryByFrequency().summary;
-    let answer_summary = answer;
+    let answer_summary = ""
+    try {
+        let Summarizer = new SummarizerManager(answer, 5);
+        answer_summary = Summarizer.getSummaryByFrequency().summary;
+    } catch (error) {
+        console.log(error)
+        answer_summary = answer;
+    }
+
     return {
         answer_summary: answer_summary,
         jsonString: jsonString
     }
+
+}
+
+function isNULL(property) {
+    if (property === "NULL") return true
+    else return false
+}
+
+function isBot(property) {
+    if (property === "Bot") return true
+    else return false
 }
 
 app.get('/', async (req, res) => {
