@@ -3,18 +3,16 @@ const {
 } = require('node-nlp');
 const moment = require('moment');
 const csv = require('csvtojson')
-const prompt = require('prompt-sync')({
-    sigint: true
-});
+let {
+    isBot,
+    isNULL,
+    getRandomFallbackAnswers
+} = require("./utils")
 let SummarizerManager = require("node-summarizer").SummarizerManager;
 const express = require('express')
 const app = express()
 const port = 3000
 app.use(express.static('ui'))
-
-const fallBackAnswers = ["I am sorry, I don't understand this. Please ask me something related to forum.",
-    "I am sorry, I don't understand this. Maybe the experts can help you. Please check with designated Subject Matter Expert."
-]
 
 
 //Initializing the NLPManager
@@ -28,11 +26,6 @@ const manager = new NlpManager({
 });
 
 let language = "en"
-
-function getRandomFallbackAnswers() {
-    let randomNumber = Math.floor(Math.random() * fallBackAnswers.length);
-    return fallBackAnswers[randomNumber]
-}
 
 
 //Train MIF Dataset
@@ -165,15 +158,6 @@ async function generateAnswer(answer) {
 
 }
 
-function isNULL(property) {
-    if (property === "NULL") return true
-    else return false
-}
-
-function isBot(property) {
-    if (property === "Bot") return true
-    else return false
-}
 
 app.get('/', async (req, res) => {
     res.sendFile(ui / index.html)
