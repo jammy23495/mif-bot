@@ -1,99 +1,99 @@
 Row_Number,Post_ID,FeedType,Subject,Question,Category,Comment,Comment_By,Comment_On,LikeCount,ViewCount,CommentCount
-1,Bot_0,Bot,Hi,Hi,,Hey there!,Bot,01-01-2000,0,0,0
-2,Bot_1,Bot,Hi,Hi,,Hello! How can I assist you?,Bot,02-01-2000,0,0,0
-3,Bot_2,Bot,Hi,Hi,,"Hi, how's it going?",Bot,03-01-2000,0,0,0
-4,Bot_3,Bot,Hi,Hi,,"Hey, nice to see you!",Bot,04-01-2000,0,0,0
-5,Bot_4,Bot,Hi,Hi,,Hi there! What can I do for you today?,Bot,05-01-2000,0,0,0
-6,Bot_5,Bot,Hi,Hi,,Hello! Hope you're having a great day!,Bot,06-01-2000,0,0,0
-7,Bot_6,Bot,Hey,Hey,,Hey there!,Bot,07-01-2000,0,0,0
-8,Bot_7,Bot,Hey,Hey,,Hello! How can I assist you?,Bot,08-01-2000,0,0,0
-9,Bot_8,Bot,Hey,Hey,,"Hi, how's it going?",Bot,09-01-2000,0,0,0
-10,Bot_9,Bot,Hey,Hey,,"Hey, nice to see you!",Bot,10-01-2000,0,0,0
-11,Bot_10,Bot,Hey,Hey,,Hi there! What can I do for you today?,Bot,11-01-2000,0,0,0
-12,Bot_11,Bot,Hey,Hey,,Hello! Hope you're having a great day!,Bot,12-01-2000,0,0,0
-13,Bot_12,Bot,Howdy,Howdy,,Hey there!,Bot,13-01-2000,0,0,0
-14,Bot_13,Bot,Howdy,Howdy,,Hello! How can I assist you?,Bot,14-01-2000,0,0,0
-15,Bot_14,Bot,Howdy,Howdy,,"Hi, how's it going?",Bot,15-01-2000,0,0,0
-16,Bot_15,Bot,Howdy,Howdy,,"Hey, nice to see you!",Bot,16-01-2000,0,0,0
-17,Bot_16,Bot,Howdy,Howdy,,Hi there! What can I do for you today?,Bot,17-01-2000,0,0,0
-18,Bot_17,Bot,Howdy,Howdy,,Hello! Hope you're having a great day!,Bot,18-01-2000,0,0,0
-19,Bot_18,Bot,Hello,Hello,,Hey there!,Bot,19-01-2000,0,0,0
-20,Bot_19,Bot,Hello,Hello,,Hello! How can I assist you?,Bot,20-01-2000,0,0,0
-21,Bot_20,Bot,Hello,Hello,,"Hi, how's it going?",Bot,21-01-2000,0,0,0
-22,Bot_21,Bot,Hello,Hello,,"Hey, nice to see you!",Bot,22-01-2000,0,0,0
-23,Bot_22,Bot,Hello,Hello,,Hi there! What can I do for you today?,Bot,23-01-2000,0,0,0
-24,Bot_23,Bot,Hello,Hello,,Hello! Hope you're having a great day!,Bot,24-01-2000,0,0,0
-25,Bot_24,Bot,Hi there,Hi there,,Hey there!,Bot,25-01-2000,0,0,0
-26,Bot_25,Bot,Hi there,Hi there,,Hello! How can I assist you?,Bot,26-01-2000,0,0,0
-27,Bot_26,Bot,Hi there,Hi there,,"Hi, how's it going?",Bot,27-01-2000,0,0,0
-28,Bot_27,Bot,Hi there,Hi there,,"Hey, nice to see you!",Bot,28-01-2000,0,0,0
-29,Bot_28,Bot,Hi there,Hi there,,Hi there! What can I do for you today?,Bot,29-01-2000,0,0,0
-30,Bot_29,Bot,Hi there,Hi there,,Hello! Hope you're having a great day!,Bot,30-01-2000,0,0,0
-31,Bot_30,Bot,Greetings,Greetings,,Hey there!,Bot,31-01-2000,0,0,0
-32,Bot_31,Bot,Greetings,Greetings,,Hello! How can I assist you?,Bot,01-02-2000,0,0,0
-33,Bot_32,Bot,Greetings,Greetings,,"Hi, how's it going?",Bot,02-02-2000,0,0,0
-34,Bot_33,Bot,Greetings,Greetings,,"Hey, nice to see you!",Bot,03-02-2000,0,0,0
-35,Bot_34,Bot,Greetings,Greetings,,Hi there! What can I do for you today?,Bot,04-02-2000,0,0,0
-36,Bot_35,Bot,Greetings,Greetings,,Hello! Hope you're having a great day!,Bot,05-02-2000,0,0,0
-37,Bot_36,Bot,Goodbye,Goodbye,,Goodbye! Feel free to come back anytime.,Bot,06-02-2000,0,0,0
-38,Bot_37,Bot,Goodbye,Goodbye,,See you later! Have a wonderful day.,Bot,07-02-2000,0,0,0
-39,Bot_38,Bot,Goodbye,Goodbye,,Talk to you soon! Take care.,Bot,08-02-2000,0,0,0
-40,Bot_39,Bot,Goodbye,Goodbye,,It was nice chatting with you too. Have a great day!,Bot,09-02-2000,0,0,0
-41,Bot_40,Bot,See you later,See you later,,Goodbye! Feel free to come back anytime.,Bot,10-02-2000,0,0,0
-42,Bot_41,Bot,See you later,See you later,,See you later! Have a wonderful day.,Bot,11-02-2000,0,0,0
-43,Bot_42,Bot,See you later,See you later,,Talk to you soon! Take care.,Bot,12-02-2000,0,0,0
-44,Bot_43,Bot,See you later,See you later,,It was nice chatting with you too. Have a great day!,Bot,13-02-2000,0,0,0
-45,Bot_44,Bot,Talk to you soon,Talk to you soon,,Goodbye! Feel free to come back anytime.,Bot,14-02-2000,0,0,0
-46,Bot_45,Bot,Talk to you soon,Talk to you soon,,See you later! Have a wonderful day.,Bot,15-02-2000,0,0,0
-47,Bot_46,Bot,Talk to you soon,Talk to you soon,,Talk to you soon! Take care.,Bot,16-02-2000,0,0,0
-48,Bot_47,Bot,Talk to you soon,Talk to you soon,,It was nice chatting with you too. Have a great day!,Bot,17-02-2000,0,0,0
-49,Bot_48,Bot,It was nice chatting with you,It was nice chatting with you,,Goodbye! Feel free to come back anytime.,Bot,18-02-2000,0,0,0
-50,Bot_49,Bot,It was nice chatting with you,It was nice chatting with you,,See you later! Have a wonderful day.,Bot,19-02-2000,0,0,0
-51,Bot_50,Bot,It was nice chatting with you,It was nice chatting with you,,Talk to you soon! Take care.,Bot,20-02-2000,0,0,0
-52,Bot_51,Bot,It was nice chatting with you,It was nice chatting with you,,It was nice chatting with you too. Have a great day!,Bot,21-02-2000,0,0,0
-53,Bot_52,Bot,Good morning,Good morning,,Good morning! What can I do for you?,Bot,22-02-2000,0,0,0
-54,Bot_53,Bot,Good night,Good night,,Good night! Sweet Dreams!,Bot,23-02-2000,0,0,0
-55,Bot_54,Bot,What's up?,What's up?,,"Not much, just here to chat with you.",Bot,24-02-2000,0,0,0
-56,Bot_55,Bot,What's up?,What's up?,,My day is going well. How about yours?,Bot,25-02-2000,0,0,0
-57,Bot_56,Bot,What's up?,What's up?,,Nothing much is new. What about you?,Bot,26-02-2000,0,0,0
-58,Bot_57,Bot,How's your day?,How's your day?,,"Not much, just here to chat with you.",Bot,27-02-2000,0,0,0
-59,Bot_58,Bot,How's your day?,How's your day?,,My day is going well. How about yours?,Bot,28-02-2000,0,0,0
-60,Bot_59,Bot,How's your day?,How's your day?,,Nothing much is new. What about you?,Bot,29-02-2000,0,0,0
-61,Bot_60,Bot,What's new?,What's new?,,"Not much, just here to chat with you.",Bot,01-03-2000,0,0,0
-62,Bot_61,Bot,What's new?,What's new?,,My day is going well. How about yours?,Bot,02-03-2000,0,0,0
-63,Bot_62,Bot,What's new?,What's new?,,Nothing much is new. What about you?,Bot,03-03-2000,0,0,0
-64,Bot_63,Bot,Thank you,Thank you,,No problem. Always ready to help you.,Bot,04-03-2000,0,0,0
-65,Bot_64,Bot,Thanks,Thanks,,No problem. Always ready to help you.,Bot,05-03-2000,0,0,0
-66,Bot_65,Bot,Could you please provide more information?,Could you please provide more information?,,Certainly! I'd be happy to provide more information. Ask your question?,Bot,06-03-2000,0,0,0
-67,Bot_66,Bot,Could you please provide more information?,Could you please provide more information?,,Of course! Feel free to ask your question.,Bot,07-03-2000,0,0,0
-68,Bot_67,Bot,May I ask a question?,May I ask a question?,,Certainly! I'd be happy to provide more information.,Bot,08-03-2000,0,0,0
-69,Bot_68,Bot,May I ask a question?,May I ask a question?,,Of course! Feel free to ask your question.,Bot,09-03-2000,0,0,0
-70,Bot_69,Bot,May I ask a question?,May I ask a question?,,Absolutely! I'll be happy to elaborate on any topic.,Bot,10-03-2000,0,0,0
-71,Bot_70,Bot,Could you elaborate on that?,Could you elaborate on that?,,Certainly! I'd be happy to provide more information.,Bot,11-03-2000,0,0,0
-72,Bot_71,Bot,Could you elaborate on that?,Could you elaborate on that?,,Of course! Feel free to ask your question.,Bot,12-03-2000,0,0,0
-73,Bot_72,Bot,Good Evening,Good Evening,,Good Evening. How can I help you?,Bot,13-03-2000,0,0,0
-74,Bot_73,Bot,Could you elaborate on that?,Could you elaborate on that?,,Absolutely! I'll be happy to elaborate on that topic.,Bot,14-03-2000,0,0,0
-75,Bot_74,Bot,I feel demotivated.,I feel demotivated.,,Remember that every great journey starts with a small step. Keep moving forward!,Bot,15-03-2000,0,0,0
-76,Bot_75,Bot,I feel demotivated.,I feel demotivated.,,Challenges are what make life interesting. Embrace them and stay motivated!,Bot,16-03-2000,0,0,0
-77,Bot_76,Bot,I feel demotivated.,I feel demotivated.,,"Believe in yourself, for you are capable of achieving incredible things!",Bot,17-03-2000,0,0,0
-78,Bot_77,Bot,I feel demotivated.,I feel demotivated.,,Your dreams are within reach. Stay focused and motivated to turn them into reality.,Bot,18-03-2000,0,0,0
-79,Bot_78,Bot,I feel sad,I feel sad,,Don't be discouraged by setbacks. They are stepping stones to success. Keep going!,Bot,19-03-2000,0,0,0
-80,Bot_79,Bot,I feel demotivated.,I feel demotivated.,,Don't be discouraged by setbacks. They are stepping stones to success. Keep going!,Bot,20-03-2000,0,0,0
-81,Bot_80,Bot,How can I stay motivated?,How can I stay motivated?,,Remember that every great journey starts with a small step. Keep moving forward!,Bot,21-03-2000,0,0,0
-82,Bot_81,Bot,How can I stay motivated?,How can I stay motivated?,,Challenges are what make life interesting. Embrace them and stay motivated!,Bot,22-03-2000,0,0,0
-83,Bot_82,Bot,How can I stay motivated?,How can I stay motivated?,,"Believe in yourself, for you are capable of achieving incredible things!",Bot,23-03-2000,0,0,0
-84,Bot_83,Bot,How can I stay motivated?,How can I stay motivated?,,Your dreams are within reach. Stay focused and motivated to turn them into reality.,Bot,24-03-2000,0,0,0
-85,Bot_84,Bot,How can I stay motivated?,How can I stay motivated?,,Don't be discouraged by setbacks. They are stepping stones to success. Keep going!,Bot,25-03-2000,0,0,0
-86,Bot_85,Bot,I need some motivation.,I need some motivation.,,Remember that every great journey starts with a small step. Keep moving forward!,Bot,26-03-2000,0,0,0
-87,Bot_86,Bot,I need some motivation.,I need some motivation.,,Challenges are what make life interesting. Embrace them and stay motivated!,Bot,27-03-2000,0,0,0
-88,Bot_87,Bot,I need some motivation.,I need some motivation.,,"Believe in yourself, for you are capable of achieving incredible things!",Bot,28-03-2000,0,0,0
-89,Bot_88,Bot,I need some motivation.,I need some motivation.,,Your dreams are within reach. Stay focused and motivated to turn them into reality.,Bot,29-03-2000,0,0,0
-90,Bot_89,Bot,I need some motivation.,I need some motivation.,,Don't be discouraged by setbacks. They are stepping stones to success. Keep going!,Bot,30-03-2000,0,0,0
-91,Bot_90,Bot,"Feeling low, any motivational words?","Feeling low, any motivational words?",,Remember that every great journey starts with a small step. Keep moving forward!,Bot,31-03-2000,0,0,0
-92,Bot_91,Bot,"Feeling low, any motivational words?","Feeling low, any motivational words?",,Challenges are what make life interesting. Embrace them and stay motivated!,Bot,01-04-2000,0,0,0
-93,Bot_92,Bot,"Feeling low, any motivational words?","Feeling low, any motivational words?",,"Believe in yourself, for you are capable of achieving incredible things!",Bot,02-04-2000,0,0,0
-94,Bot_93,Bot,"Feeling low, any motivational words?","Feeling low, any motivational words?",,Your dreams are within reach. Stay focused and motivated to turn them into reality.,Bot,03-04-2000,0,0,0
-95,Bot_94,Bot,"Feeling low, any motivational words?","Feeling low, any motivational words?",,Don't be discouraged by setbacks. They are stepping stones to success. Keep going!,Bot,04-04-2000,0,0,0
+1,Bot_0,Bot,Hi,Hi,NULL,Hey there!,NULL,NULL,0,0,0
+2,Bot_1,Bot,Hi,Hi,NULL,Hello! How can I assist you?,NULL,NULL,0,0,0
+3,Bot_2,Bot,Hi,Hi,NULL,"Hi, how's it going?",NULL,NULL,0,0,0
+4,Bot_3,Bot,Hi,Hi,NULL,"Hey, nice to see you!",NULL,NULL,0,0,0
+5,Bot_4,Bot,Hi,Hi,NULL,Hi there! What can I do for you today?,NULL,NULL,0,0,0
+6,Bot_5,Bot,Hi,Hi,NULL,Hello! Hope you're having a great day!,NULL,NULL,0,0,0
+7,Bot_6,Bot,Hey,Hey,NULL,Hey there!,NULL,NULL,0,0,0
+8,Bot_7,Bot,Hey,Hey,NULL,Hello! How can I assist you?,NULL,NULL,0,0,0
+9,Bot_8,Bot,Hey,Hey,NULL,"Hi, how's it going?",NULL,NULL,0,0,0
+10,Bot_9,Bot,Hey,Hey,NULL,"Hey, nice to see you!",NULL,NULL,0,0,0
+11,Bot_10,Bot,Hey,Hey,NULL,Hi there! What can I do for you today?,NULL,NULL,0,0,0
+12,Bot_11,Bot,Hey,Hey,NULL,Hello! Hope you're having a great day!,NULL,NULL,0,0,0
+13,Bot_12,Bot,Howdy,Howdy,NULL,Hey there!,NULL,NULL,0,0,0
+14,Bot_13,Bot,Howdy,Howdy,NULL,Hello! How can I assist you?,NULL,NULL,0,0,0
+15,Bot_14,Bot,Howdy,Howdy,NULL,"Hi, how's it going?",NULL,NULL,0,0,0
+16,Bot_15,Bot,Howdy,Howdy,NULL,"Hey, nice to see you!",NULL,NULL,0,0,0
+17,Bot_16,Bot,Howdy,Howdy,NULL,Hi there! What can I do for you today?,NULL,NULL,0,0,0
+18,Bot_17,Bot,Howdy,Howdy,NULL,Hello! Hope you're having a great day!,NULL,NULL,0,0,0
+19,Bot_18,Bot,Hello,Hello,NULL,Hey there!,NULL,NULL,0,0,0
+20,Bot_19,Bot,Hello,Hello,NULL,Hello! How can I assist you?,NULL,NULL,0,0,0
+21,Bot_20,Bot,Hello,Hello,NULL,"Hi, how's it going?",NULL,NULL,0,0,0
+22,Bot_21,Bot,Hello,Hello,NULL,"Hey, nice to see you!",NULL,NULL,0,0,0
+23,Bot_22,Bot,Hello,Hello,NULL,Hi there! What can I do for you today?,NULL,NULL,0,0,0
+24,Bot_23,Bot,Hello,Hello,NULL,Hello! Hope you're having a great day!,NULL,NULL,0,0,0
+25,Bot_24,Bot,Hi there,Hi there,NULL,Hey there!,NULL,NULL,0,0,0
+26,Bot_25,Bot,Hi there,Hi there,NULL,Hello! How can I assist you?,NULL,NULL,0,0,0
+27,Bot_26,Bot,Hi there,Hi there,NULL,"Hi, how's it going?",NULL,NULL,0,0,0
+28,Bot_27,Bot,Hi there,Hi there,NULL,"Hey, nice to see you!",NULL,NULL,0,0,0
+29,Bot_28,Bot,Hi there,Hi there,NULL,Hi there! What can I do for you today?,NULL,NULL,0,0,0
+30,Bot_29,Bot,Hi there,Hi there,NULL,Hello! Hope you're having a great day!,NULL,NULL,0,0,0
+31,Bot_30,Bot,Greetings,Greetings,NULL,Hey there!,NULL,NULL,0,0,0
+32,Bot_31,Bot,Greetings,Greetings,NULL,Hello! How can I assist you?,NULL,NULL,0,0,0
+33,Bot_32,Bot,Greetings,Greetings,NULL,"Hi, how's it going?",NULL,NULL,0,0,0
+34,Bot_33,Bot,Greetings,Greetings,NULL,"Hey, nice to see you!",NULL,NULL,0,0,0
+35,Bot_34,Bot,Greetings,Greetings,NULL,Hi there! What can I do for you today?,NULL,NULL,0,0,0
+36,Bot_35,Bot,Greetings,Greetings,NULL,Hello! Hope you're having a great day!,NULL,NULL,0,0,0
+37,Bot_36,Bot,Goodbye,Goodbye,NULL,Goodbye! Feel free to come back anytime.,NULL,NULL,0,0,0
+38,Bot_37,Bot,Goodbye,Goodbye,NULL,See you later! Have a wonderful day.,NULL,NULL,0,0,0
+39,Bot_38,Bot,Goodbye,Goodbye,NULL,Talk to you soon! Take care.,NULL,NULL,0,0,0
+40,Bot_39,Bot,Goodbye,Goodbye,NULL,It was nice chatting with you too. Have a great day!,NULL,NULL,0,0,0
+41,Bot_40,Bot,See you later,See you later,NULL,Goodbye! Feel free to come back anytime.,NULL,NULL,0,0,0
+42,Bot_41,Bot,See you later,See you later,NULL,See you later! Have a wonderful day.,NULL,NULL,0,0,0
+43,Bot_42,Bot,See you later,See you later,NULL,Talk to you soon! Take care.,NULL,NULL,0,0,0
+44,Bot_43,Bot,See you later,See you later,NULL,It was nice chatting with you too. Have a great day!,NULL,NULL,0,0,0
+45,Bot_44,Bot,Talk to you soon,Talk to you soon,NULL,Goodbye! Feel free to come back anytime.,NULL,NULL,0,0,0
+46,Bot_45,Bot,Talk to you soon,Talk to you soon,NULL,See you later! Have a wonderful day.,NULL,NULL,0,0,0
+47,Bot_46,Bot,Talk to you soon,Talk to you soon,NULL,Talk to you soon! Take care.,NULL,NULL,0,0,0
+48,Bot_47,Bot,Talk to you soon,Talk to you soon,NULL,It was nice chatting with you too. Have a great day!,NULL,NULL,0,0,0
+49,Bot_48,Bot,It was nice chatting with you,It was nice chatting with you,NULL,Goodbye! Feel free to come back anytime.,NULL,NULL,0,0,0
+50,Bot_49,Bot,It was nice chatting with you,It was nice chatting with you,NULL,See you later! Have a wonderful day.,NULL,NULL,0,0,0
+51,Bot_50,Bot,It was nice chatting with you,It was nice chatting with you,NULL,Talk to you soon! Take care.,NULL,NULL,0,0,0
+52,Bot_51,Bot,It was nice chatting with you,It was nice chatting with you,NULL,It was nice chatting with you too. Have a great day!,NULL,NULL,0,0,0
+53,Bot_52,Bot,Good morning,Good morning,NULL,Good morning! What can I do for you?,NULL,NULL,0,0,0
+54,Bot_53,Bot,Good night,Good night,NULL,Good night! Sweet Dreams!,NULL,NULL,0,0,0
+55,Bot_54,Bot,What's up?,What's up?,NULL,"Not much, just here to chat with you.",NULL,NULL,0,0,0
+56,Bot_55,Bot,What's up?,What's up?,NULL,My day is going well. How about yours?,NULL,NULL,0,0,0
+57,Bot_56,Bot,What's up?,What's up?,NULL,Nothing much is new. What about you?,NULL,NULL,0,0,0
+58,Bot_57,Bot,How's your day?,How's your day?,NULL,"Not much, just here to chat with you.",NULL,NULL,0,0,0
+59,Bot_58,Bot,How's your day?,How's your day?,NULL,My day is going well. How about yours?,NULL,NULL,0,0,0
+60,Bot_59,Bot,How's your day?,How's your day?,NULL,Nothing much is new. What about you?,NULL,NULL,0,0,0
+61,Bot_60,Bot,What's new?,What's new?,NULL,"Not much, just here to chat with you.",NULL,NULL,0,0,0
+62,Bot_61,Bot,What's new?,What's new?,NULL,My day is going well. How about yours?,NULL,NULL,0,0,0
+63,Bot_62,Bot,What's new?,What's new?,NULL,Nothing much is new. What about you?,NULL,NULL,0,0,0
+64,Bot_63,Bot,Thank you,Thank you,NULL,No problem. Always ready to help you.,NULL,NULL,0,0,0
+65,Bot_64,Bot,Thanks,Thanks,NULL,No problem. Always ready to help you.,NULL,NULL,0,0,0
+66,Bot_65,Bot,Could you please provide more information?,Could you please provide more information?,NULL,Certainly! I'd be happy to provide more information. Ask your question?,NULL,NULL,0,0,0
+67,Bot_66,Bot,Could you please provide more information?,Could you please provide more information?,NULL,Of course! Feel free to ask your question.,NULL,NULL,0,0,0
+68,Bot_67,Bot,May I ask a question?,May I ask a question?,NULL,Certainly! I'd be happy to provide more information.,NULL,NULL,0,0,0
+69,Bot_68,Bot,May I ask a question?,May I ask a question?,NULL,Of course! Feel free to ask your question.,NULL,NULL,0,0,0
+70,Bot_69,Bot,May I ask a question?,May I ask a question?,NULL,Absolutely! I'll be happy to elaborate on any topic.,NULL,NULL,0,0,0
+71,Bot_70,Bot,Could you elaborate on that?,Could you elaborate on that?,NULL,Certainly! I'd be happy to provide more information.,NULL,NULL,0,0,0
+72,Bot_71,Bot,Could you elaborate on that?,Could you elaborate on that?,NULL,Of course! Feel free to ask your question.,NULL,NULL,0,0,0
+73,Bot_72,Bot,Good Evening,Good Evening,NULL,Good Evening. How can I help you?,NULL,NULL,0,0,0
+74,Bot_73,Bot,Could you elaborate on that?,Could you elaborate on that?,NULL,Absolutely! I'll be happy to elaborate on that topic.,NULL,NULL,0,0,0
+75,Bot_74,Bot,I feel demotivated.,I feel demotivated.,NULL,Remember that every great journey starts with a small step. Keep moving forward!,NULL,NULL,0,0,0
+76,Bot_75,Bot,I feel demotivated.,I feel demotivated.,NULL,Challenges are what make life interesting. Embrace them and stay motivated!,NULL,NULL,0,0,0
+77,Bot_76,Bot,I feel demotivated.,I feel demotivated.,NULL,"Believe in yourself, for you are capable of achieving incredible things!",NULL,NULL,0,0,0
+78,Bot_77,Bot,I feel demotivated.,I feel demotivated.,NULL,Your dreams are within reach. Stay focused and motivated to turn them into reality.,NULL,NULL,0,0,0
+79,Bot_78,Bot,I feel sad,I feel sad,NULL,Don't be discouraged by setbacks. They are stepping stones to success. Keep going!,NULL,NULL,0,0,0
+80,Bot_79,Bot,I feel demotivated.,I feel demotivated.,NULL,Don't be discouraged by setbacks. They are stepping stones to success. Keep going!,NULL,NULL,0,0,0
+81,Bot_80,Bot,How can I stay motivated?,How can I stay motivated?,NULL,Remember that every great journey starts with a small step. Keep moving forward!,NULL,NULL,0,0,0
+82,Bot_81,Bot,How can I stay motivated?,How can I stay motivated?,NULL,Challenges are what make life interesting. Embrace them and stay motivated!,NULL,NULL,0,0,0
+83,Bot_82,Bot,How can I stay motivated?,How can I stay motivated?,NULL,"Believe in yourself, for you are capable of achieving incredible things!",NULL,NULL,0,0,0
+84,Bot_83,Bot,How can I stay motivated?,How can I stay motivated?,NULL,Your dreams are within reach. Stay focused and motivated to turn them into reality.,NULL,NULL,0,0,0
+85,Bot_84,Bot,How can I stay motivated?,How can I stay motivated?,NULL,Don't be discouraged by setbacks. They are stepping stones to success. Keep going!,NULL,NULL,0,0,0
+86,Bot_85,Bot,I need some motivation.,I need some motivation.,NULL,Remember that every great journey starts with a small step. Keep moving forward!,NULL,NULL,0,0,0
+87,Bot_86,Bot,I need some motivation.,I need some motivation.,NULL,Challenges are what make life interesting. Embrace them and stay motivated!,NULL,NULL,0,0,0
+88,Bot_87,Bot,I need some motivation.,I need some motivation.,NULL,"Believe in yourself, for you are capable of achieving incredible things!",NULL,NULL,0,0,0
+89,Bot_88,Bot,I need some motivation.,I need some motivation.,NULL,Your dreams are within reach. Stay focused and motivated to turn them into reality.,NULL,NULL,0,0,0
+90,Bot_89,Bot,I need some motivation.,I need some motivation.,NULL,Don't be discouraged by setbacks. They are stepping stones to success. Keep going!,NULL,NULL,0,0,0
+91,Bot_90,Bot,"Feeling low, any motivational words?","Feeling low, any motivational words?",NULL,Remember that every great journey starts with a small step. Keep moving forward!,NULL,NULL,0,0,0
+92,Bot_91,Bot,"Feeling low, any motivational words?","Feeling low, any motivational words?",NULL,Challenges are what make life interesting. Embrace them and stay motivated!,NULL,NULL,0,0,0
+93,Bot_92,Bot,"Feeling low, any motivational words?","Feeling low, any motivational words?",NULL,"Believe in yourself, for you are capable of achieving incredible things!",NULL,NULL,0,0,0
+94,Bot_93,Bot,"Feeling low, any motivational words?","Feeling low, any motivational words?",NULL,Your dreams are within reach. Stay focused and motivated to turn them into reality.,NULL,NULL,0,0,0
+95,Bot_94,Bot,"Feeling low, any motivational words?","Feeling low, any motivational words?",NULL,Don't be discouraged by setbacks. They are stepping stones to success. Keep going!,NULL,NULL,0,0,0
 96,1,Post,DEVELOPMENT OF AUTONOMOUS FAST INTERCEPT BOAT,1. ?Background.  Several emerging/disruptive technologies have penetrated into the defense forces. Amongst these autonomous systems have reached a state of maturity and several AI based technologies in the domain of “Autonomous Vessels” have proliferated into the navies across the world. Autonomous vessels apart from having a huge cost advantage also have a clear edge over manned vessels due to their flexibility for deployment on short notice and negligible operational risk to human life.        Present Status.      2.    In order to harness the potential of these emerging technologies  DIT had partnered with M/s GSL for development of an Autonomous Fat Interceptor Boat.  The design of the boat for autonomous operation has been jointly developed by DIT and BEL. In order to achieve the autonomous capability  the interfacing of waterjets and engine had to be modified to achieve navigation computer control on buckets and nozzles. Further   the boat is equipped with several sensors and is ale to relay live stream from the sensors to ground control station. Sensors installed on the boat are as follows: -            a. Radar            b. LiDAR            c. EO Camera            d. IMU            e. Maritime Broadband Radio      3.     Trials of the boat under diffrent sea state/ environmnetal conditions and marine traffic are being progressively undertake to fine tune the algorithms. It is planned to achieve remote control of the boat from ground station over extended ranges of more than 50 Kms. ?        3.   Way ahead.  The boat is capable of avoiding static and dynamic collision in dense marine traffic. COLREGS are being incorporated into the navigation algorithms post consultation with ND School. Remote control of the boat has been demonstrated from Naval Headquarters.  As part of Phase III  following is planned: -          (a)  Integration of LiDAR to nav computer for auto-parking/ along side approach          (b) installation of SAT com terminal          (c) Installation of SONAR        ,Information Technology,  A very good initiative towards self reliance on autonomous systems. This initiative will also open a domain of autonomous systems in IN for further exploitation. The experience gathered for setting up first of its kind system will definately assist navy to go a leap further into Autonomous sytems and their integrration with existing systems/equipment/vessels. ,Admin-00066,2023-04-12 16:09:51.3633333 +00:00,6,11,2
 97,1,Post,DEVELOPMENT OF AUTONOMOUS FAST INTERCEPT BOAT,1. ?Background.  Several emerging/disruptive technologies have penetrated into the defense forces. Amongst these autonomous systems have reached a state of maturity and several AI based technologies in the domain of “Autonomous Vessels” have proliferated into the navies across the world. Autonomous vessels apart from having a huge cost advantage also have a clear edge over manned vessels due to their flexibility for deployment on short notice and negligible operational risk to human life.        Present Status.      2.    In order to harness the potential of these emerging technologies  DIT had partnered with M/s GSL for development of an Autonomous Fat Interceptor Boat.  The design of the boat for autonomous operation has been jointly developed by DIT and BEL. In order to achieve the autonomous capability  the interfacing of waterjets and engine had to be modified to achieve navigation computer control on buckets and nozzles. Further   the boat is equipped with several sensors and is ale to relay live stream from the sensors to ground control station. Sensors installed on the boat are as follows: -            a. Radar            b. LiDAR            c. EO Camera            d. IMU            e. Maritime Broadband Radio      3.     Trials of the boat under diffrent sea state/ environmnetal conditions and marine traffic are being progressively undertake to fine tune the algorithms. It is planned to achieve remote control of the boat from ground station over extended ranges of more than 50 Kms. ?        3.   Way ahead.  The boat is capable of avoiding static and dynamic collision in dense marine traffic. COLREGS are being incorporated into the navigation algorithms post consultation with ND School. Remote control of the boat has been demonstrated from Naval Headquarters.  As part of Phase III  following is planned: -          (a)  Integration of LiDAR to nav computer for auto-parking/ along side approach          (b) installation of SAT com terminal          (c) Installation of SONAR        ,Information Technology,Efforts are in hand to give the boat the capability of autonomous entering/leaving harbour and also to make the navigation suite more robust,Admin-00274,2023-04-26 17:17:19.8300000 +00:00,6,11,2
 98,2,Post, LIFECYCLE MANAGEMENT OF IT INFRASTRUCTURE IN INDIAN NAVY,The attached document proposes a comprehensive model for life cycle/ obsolescence management of IT infrastructure in Indian Navy. ,Information Technology,  The attachment is not available. Can you please attach it? ,ADMIN,2023-04-12 16:09:51.3633333 +00:00,2,5,1

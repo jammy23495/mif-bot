@@ -44,7 +44,7 @@ async function train() {
         let post_date_string = moment(post_date, "YYYY-MM-DD").format('MMMM Do YYYY');
         let answered_by = jsonArray[index].Comment_By && jsonArray[index].Comment_By !== "NULL" ? jsonArray[index].Comment_By : "Bot";
 
-        let newanswer = answer + `???{"ID":"${ID}","Answered_By":"${answered_by}","likes":${likes},"comments":${comments},"post_url":"${post_url}","post_date":"${post_date_string}","subject":"${subject}"}`
+        let newanswer = answer + `???{"ID":"${ID}","Answered_By":"${answered_by}","likes":${likes},"comments":${comments},"post_url":"${post_url}","post_date":"${post_date_string}","subject":"${subject}","question":"${question}"}`
         
         let intent = ROW_ID + "_intent_" + subject.replaceAll(" ", "_")
 
