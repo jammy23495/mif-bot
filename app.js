@@ -12,6 +12,10 @@ const app = express()
 const port = 3000
 app.use(express.static('ui'))
 
+const fallBackAnswers = ["I am sorry, I don't understand this. Please ask me something related to forum.",
+    "I am sorry, I don't understand this. Maybe the experts can help you. Please check with designated Subject Matter Expert."
+]
+
 
 //Initializing the NLPManager
 const manager = new NlpManager({
@@ -25,6 +29,11 @@ const manager = new NlpManager({
 
 let language = "en"
 
+function getRandomFallbackAnswers() {
+    let randomNumber = Math.floor(Math.random() * fallBackAnswers.length);
+    return fallBackAnswers[randomNumber]
+}
+
 
 //Train MIF Dataset
 async function train() {
@@ -33,7 +42,7 @@ async function train() {
     //Create Intents and Utterances from Greet
     for (let index = 0; index < jsonArray.length; index++) {
         let subject = jsonArray[index].Subject ? jsonArray[index].Subject : "";
-        let question = jsonArray[index].Question ? jsonArray[index].Question.replaceAll("�", ".") : "";
+        let question = jsonArray[index].Question ? jsonArray[index].Question.replaceAll("\"", "\'") : "";
         let ROW_ID = jsonArray[index].Row_Number;
         let ID = jsonArray[index].Post_ID;
         let answer = jsonArray[index].Comment;
@@ -44,7 +53,7 @@ async function train() {
         let post_date_string = moment(post_date, "YYYY-MM-DD").format('MMMM Do YYYY');
         let answered_by = jsonArray[index].Comment_By;
 
-        let newanswer = answer + `???{"ID":"${ID}","Answered_By":"${answered_by}","likes":${likes},"comments":${comments},"post_url":"${post_url}","post_date":"${post_date_string}","subject":"${subject}","question":"${question.toString()}","answer":"${answer}"}`
+        let newanswer = answer + `???{"ID":"${ID}","Answered_By":"${answered_by}","likes":${likes},"comments":${comments},"post_url":"${post_url}","post_date":"${post_date_string}","subject":"${subject}","question":"${question}","answer":"${answer}"}`
 
         let intent = ROW_ID + "_intent_" + subject.replaceAll(" ", "_")
 
@@ -92,8 +101,8 @@ async function qna(question) {
                 }
             } else {
                 finalAnswers.push({
-                    "answer_summary": "I am sorry, I don't know about this. Please connect with our Subject Matter expert.",
-                    "isBot": true,
+                    "answer_summary": getRandomFallbackAnswers(),
+                    "isGreet": true,
                     "props": {
                         "ID": "null",
                         "Answered_By": "Bot"
@@ -102,8 +111,8 @@ async function qna(question) {
             }
         } else {
             finalAnswers.push({
-                "answer_summary": "I am sorry, I don't know about this. Please connect with our Subject Matter expert.",
-                "isBot": true,
+                "answer_summary": getRandomFallbackAnswers(),
+                "isGreet": true,
                 "props": {
                     "ID": "null",
                     "Answered_By": "Bot"
@@ -115,10 +124,10 @@ async function qna(question) {
             "response": response
         };
     } else {
-        console.log("I am sorry, I don't know about this")
+        console.log(getRandomFallbackAnswers())
         finalAnswers.push({
-            "answer_summary": "I am sorry, I don't know about this. Please connect with our Subject Matter expert.",
-            "isBot": true,
+            "answer_summary": getRandomFallbackAnswers(),
+            "isGreet": true,
             "props": {
                 "ID": "null",
                 "Answered_By": "Bot"
@@ -137,14 +146,16 @@ async function generateAnswer(answer) {
     let slicedString = answer.slice(position)
     answer = answer.slice(0, position)
     answer = isNULL(answer) ? "No comments found on this post/query!" : answer
+    let answersCount = answer.split(/[.?!]/g).filter(Boolean).length;
+
     let props = JSON.parse(slicedString.split("???").pop())
     let answer_summary = ""
-    try {
+
+    if (answersCount < 5) {
+        answer_summary = answer
+    } else {
         let Summarizer = new SummarizerManager(answer, 5);
         answer_summary = Summarizer.getSummaryByFrequency().summary;
-    } catch (error) {
-        console.log(error)
-        answer_summary = answer;
     }
 
     return {

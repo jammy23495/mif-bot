@@ -1,40 +1,40 @@
 Row_Number,Post_ID,FeedType,Subject,Question,Category,Comment,Comment_By,Comment_On,LikeCount,ViewCount,CommentCount
-1,Bot_0,Bot,Hi,Hi,NULL,Hey there!,Bot,NULL,0,0,0
+1,Bot_0,Bot,Hi,Hi,NULL,Hey there! What are you looking for in the forum?,Bot,NULL,0,0,0
 2,Bot_1,Bot,Hi,Hi,NULL,Hello! How can I assist you?,Bot,NULL,0,0,0
-3,Bot_2,Bot,Hi,Hi,NULL,"Hi, how's it going?",Bot,NULL,0,0,0
-4,Bot_3,Bot,Hi,Hi,NULL,"Hey, nice to see you!",Bot,NULL,0,0,0
+3,Bot_2,Bot,Hi,Hi,NULL,"Hi, how's it going? What are you looking for in the forum?",Bot,NULL,0,0,0
+4,Bot_3,Bot,Hi,Hi,NULL,"Hey, nice to see you! What are you looking for in the forum?",Bot,NULL,0,0,0
 5,Bot_4,Bot,Hi,Hi,NULL,Hi there! What can I do for you today?,Bot,NULL,0,0,0
-6,Bot_5,Bot,Hi,Hi,NULL,Hello! Hope you're having a great day!,Bot,NULL,0,0,0
-7,Bot_6,Bot,Hey,Hey,NULL,Hey there!,Bot,NULL,0,0,0
+6,Bot_5,Bot,Hi,Hi,NULL,Hello! Hope you're having a great day!What are you looking for in the forum?,Bot,NULL,0,0,0
+7,Bot_6,Bot,Hey,Hey,NULL,Hey there! What are you looking for in the forum?,Bot,NULL,0,0,0
 8,Bot_7,Bot,Hey,Hey,NULL,Hello! How can I assist you?,Bot,NULL,0,0,0
-9,Bot_8,Bot,Hey,Hey,NULL,"Hi, how's it going?",Bot,NULL,0,0,0
-10,Bot_9,Bot,Hey,Hey,NULL,"Hey, nice to see you!",Bot,NULL,0,0,0
+9,Bot_8,Bot,Hey,Hey,NULL,"Hi, how's it going? What are you looking for in the forum?",Bot,NULL,0,0,0
+10,Bot_9,Bot,Hey,Hey,NULL,"Hey, nice to see you! What are you looking for in the forum?",Bot,NULL,0,0,0
 11,Bot_10,Bot,Hey,Hey,NULL,Hi there! What can I do for you today?,Bot,NULL,0,0,0
-12,Bot_11,Bot,Hey,Hey,NULL,Hello! Hope you're having a great day!,Bot,NULL,0,0,0
-13,Bot_12,Bot,Howdy,Howdy,NULL,Hey there!,Bot,NULL,0,0,0
+12,Bot_11,Bot,Hey,Hey,NULL,Hello! Hope you're having a great day! What are you looking for in the forum?,Bot,NULL,0,0,0
+13,Bot_12,Bot,Howdy,Howdy,NULL,Hey there! What are you looking for in the forum?,Bot,NULL,0,0,0
 14,Bot_13,Bot,Howdy,Howdy,NULL,Hello! How can I assist you?,Bot,NULL,0,0,0
-15,Bot_14,Bot,Howdy,Howdy,NULL,"Hi, how's it going?",Bot,NULL,0,0,0
-16,Bot_15,Bot,Howdy,Howdy,NULL,"Hey, nice to see you!",Bot,NULL,0,0,0
+15,Bot_14,Bot,Howdy,Howdy,NULL,"Hi, how's it going? What are you looking for in the forum?",Bot,NULL,0,0,0
+16,Bot_15,Bot,Howdy,Howdy,NULL,"Hey, nice to see you! What are you looking for in the forum?",Bot,NULL,0,0,0
 17,Bot_16,Bot,Howdy,Howdy,NULL,Hi there! What can I do for you today?,Bot,NULL,0,0,0
-18,Bot_17,Bot,Howdy,Howdy,NULL,Hello! Hope you're having a great day!,Bot,NULL,0,0,0
-19,Bot_18,Bot,Hello,Hello,NULL,Hey there!,Bot,NULL,0,0,0
+18,Bot_17,Bot,Howdy,Howdy,NULL,Hello! Hope you're having a great day! What are you looking for in the forum?,Bot,NULL,0,0,0
+19,Bot_18,Bot,Hello,Hello,NULL,Hey there! What are you looking for in the forum?,Bot,NULL,0,0,0
 20,Bot_19,Bot,Hello,Hello,NULL,Hello! How can I assist you?,Bot,NULL,0,0,0
-21,Bot_20,Bot,Hello,Hello,NULL,"Hi, how's it going?",Bot,NULL,0,0,0
-22,Bot_21,Bot,Hello,Hello,NULL,"Hey, nice to see you!",Bot,NULL,0,0,0
+21,Bot_20,Bot,Hello,Hello,NULL,"Hi, how's it going? What are you looking for in the forum?",Bot,NULL,0,0,0
+22,Bot_21,Bot,Hello,Hello,NULL,"Hey, nice to see you! What are you looking for in the forum?",Bot,NULL,0,0,0
 23,Bot_22,Bot,Hello,Hello,NULL,Hi there! What can I do for you today?,Bot,NULL,0,0,0
-24,Bot_23,Bot,Hello,Hello,NULL,Hello! Hope you're having a great day!,Bot,NULL,0,0,0
-25,Bot_24,Bot,Hi there,Hi there,NULL,Hey there!,Bot,NULL,0,0,0
+24,Bot_23,Bot,Hello,Hello,NULL,Hello! Hope you're having a great day! What are you looking for in the forum?,Bot,NULL,0,0,0
+25,Bot_24,Bot,Hi there,Hi there,NULL,Hey there! What are you looking for in the forum?,Bot,NULL,0,0,0
 26,Bot_25,Bot,Hi there,Hi there,NULL,Hello! How can I assist you?,Bot,NULL,0,0,0
-27,Bot_26,Bot,Hi there,Hi there,NULL,"Hi, how's it going?",Bot,NULL,0,0,0
-28,Bot_27,Bot,Hi there,Hi there,NULL,"Hey, nice to see you!",Bot,NULL,0,0,0
+27,Bot_26,Bot,Hi there,Hi there,NULL,"Hi, how's it going? What are you looking for in the forum?",Bot,NULL,0,0,0
+28,Bot_27,Bot,Hi there,Hi there,NULL,"Hey, nice to see you! What are you looking for in the forum?",Bot,NULL,0,0,0
 29,Bot_28,Bot,Hi there,Hi there,NULL,Hi there! What can I do for you today?,Bot,NULL,0,0,0
-30,Bot_29,Bot,Hi there,Hi there,NULL,Hello! Hope you're having a great day!,Bot,NULL,0,0,0
-31,Bot_30,Bot,Greetings,Greetings,NULL,Hey there!,Bot,NULL,0,0,0
+30,Bot_29,Bot,Hi there,Hi there,NULL,Hello! Hope you're having a great day! What are you looking for in the forum?,Bot,NULL,0,0,0
+31,Bot_30,Bot,Greetings,Greetings,NULL,Hey there! What are you looking for in the forum?,Bot,NULL,0,0,0
 32,Bot_31,Bot,Greetings,Greetings,NULL,Hello! How can I assist you?,Bot,NULL,0,0,0
-33,Bot_32,Bot,Greetings,Greetings,NULL,"Hi, how's it going?",Bot,NULL,0,0,0
-34,Bot_33,Bot,Greetings,Greetings,NULL,"Hey, nice to see you!",Bot,NULL,0,0,0
+33,Bot_32,Bot,Greetings,Greetings,NULL,"Hi, how's it going? What are you looking for in the forum?",Bot,NULL,0,0,0
+34,Bot_33,Bot,Greetings,Greetings,NULL,"Hey, nice to see you! What are you looking for in the forum?",Bot,NULL,0,0,0
 35,Bot_34,Bot,Greetings,Greetings,NULL,Hi there! What can I do for you today?,Bot,NULL,0,0,0
-36,Bot_35,Bot,Greetings,Greetings,NULL,Hello! Hope you're having a great day!,Bot,NULL,0,0,0
+36,Bot_35,Bot,Greetings,Greetings,NULL,Hello! Hope you're having a great day! What are you looking for in the forum?,Bot,NULL,0,0,0
 37,Bot_36,Bot,Goodbye,Goodbye,NULL,Goodbye! Feel free to come back anytime.,Bot,NULL,0,0,0
 38,Bot_37,Bot,Goodbye,Goodbye,NULL,See you later! Have a wonderful day.,Bot,NULL,0,0,0
 39,Bot_38,Bot,Goodbye,Goodbye,NULL,Talk to you soon! Take care.,Bot,NULL,0,0,0
@@ -263,6 +263,6 @@ Row_Number,Post_ID,FeedType,Subject,Question,Category,Comment,Comment_By,Comment
 262,1132,Query,Sub optimal ranges of Visionmaster,Sub optimal ranges of Visionmaster Sub optimal ranges of Visionmaster Sub optimal ranges of Visionmaster Sub optimal ranges of Visionmaster  Sub optimal ranges of Visionmaster Sub optimal ranges of Visionmaster Sub optimal ranges of Visionmaster ,Information Technology,NULL,NULL,NULL,0,0,0
 263,1133,Query,Sub optimal ranges of Visionmaster, Sub optimal ranges of Visionmaster Sub optimal ranges of Visionmaster Sub optimal ranges of Visionmaster Sub optimal ranges of Visionmaster Sub optimal ranges of Visionmaster Sub optimal ranges of Visionmaster Sub optimal ranges of Visionmaster Sub optimal ranges of Visionmaster Sub optimal ranges of Visionmaster Sub optimal ranges of Visionmaster Sub optimal ranges of Visionmaster Sub optimal ranges of Visionmaster Sub optimal ranges of Visionmaster Sub optimal ranges of Visionmaster Sub optimal ranges of Visionmaster Sub optimal ranges of Visionmaster Sub optimal ranges of Visionmaster Sub optimal ranges of Visionmaster Sub optimal ranges of Visionmaster Sub optimal ranges of Visionmaster Sub optimal ranges of Visionmaster Sub optimal ranges of Visionmaster Sub optimal ranges of Visionmaster Sub optimal ranges of Visionmaster Sub optimal ranges of Visionmaster Sub optimal ranges of Visionmaster Sub optimal ranges of Visionmaster Sub optimal ranges of Visionmaster Sub optimal ranges of Visionmaster Sub optimal ranges of Visionmaster,Information Technology,NULL,NULL,NULL,0,0,0
 264,1134,Query,Policy on Vibration Limits for Main Propulsion.,Policy on Vibration Limits for Main Propulsion. Policy on Vibration Limits for Main Propulsion. Policy on Vibration Limits for Main Propulsion. Policy on Vibration Limits for Main Propulsion. Policy on Vibration Limits for Main Propulsion. Policy on Vibration Limits for Main Propulsion. Policy on Vibration Limits for Main Propulsion. ,Information Technology,NULL,NULL,NULL,0,0,0
-265,1135,Post,Sub optimal ranges of Visionmaster post ,Sub optimal ranges of Visionmaster post Sub optimal ranges of Visionmaster post Sub optimal ranges of Visionmaster post Sub optimal ranges of Visionmaster post  Sub optimal ranges of Visionmaster post ,Information Technology,NULL,NULL,NULL,0,0,0
+265,1135,Post,Sub optimal ranges of Visionmaster post ,Sub optimal ranges of Visionmaster post Sub optimal ranges of Visionmaster post Sub optimal ranges of Visionmaster post Sub optimal ranges of Visionmaster post  Sub optimal ranges of Visionmaster post ,Information Technology,Hey,NULL,NULL,1,0,3
 266,1136,Post,Policy on Vibration Limits for Main Propulsion post 2 ,Policy on Vibration Limits for Main PPolicy on Vibration Limits for Main Propulsion post 2  Policy on Vibration Limits for Main Propulsion post 2  ropulsion post 2   Policy on Vibration Limits for Main Propulsion post 2  ,Communication System,NULL,NULL,NULL,0,0,0
 267,1137,Query,Sub optimal ranges of Visionmaster test 42Mb,Sub optimal ranges of Visionmaster test 42Mb Sub optimal ranges of Visionmaster test 42Mb Sub optimal ranges of Visionmaster test 42Mb Sub optimal ranges of Visionmaster test 42Mb Sub optimal ranges of Visionmaster test 42Mb ,Information Technology,mumbai,ADMIN,2023-06-24 12:59:52.6700000 +00:00,0,0,1
