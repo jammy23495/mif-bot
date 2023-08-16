@@ -33,7 +33,7 @@ async function train() {
     //Create Intents and Utterances from Greet
     for (let index = 0; index < jsonArray.length; index++) {
         let subject = jsonArray[index].Subject ? jsonArray[index].Subject : "";
-        let question = jsonArray[index].Question ? jsonArray[index].Question : "";
+        let question = jsonArray[index].Question ? jsonArray[index].Question.replaceAll("�", ".") : "";
         let ROW_ID = jsonArray[index].Row_Number;
         let ID = jsonArray[index].Post_ID;
         let answer = jsonArray[index].Comment;
@@ -44,7 +44,7 @@ async function train() {
         let post_date_string = moment(post_date, "YYYY-MM-DD").format('MMMM Do YYYY');
         let answered_by = jsonArray[index].Comment_By;
 
-        let newanswer = answer + `???{"ID":"${ID}","Answered_By":"${answered_by}","likes":${likes},"comments":${comments},"post_url":"${post_url}","post_date":"${post_date_string}","subject":"${subject}","question":"${question}","answer":"${answer}"}`
+        let newanswer = answer + `???{"ID":"${ID}","Answered_By":"${answered_by}","likes":${likes},"comments":${comments},"post_url":"${post_url}","post_date":"${post_date_string}","subject":"${subject}","question":"${question.toString()}","answer":"${answer}"}`
 
         let intent = ROW_ID + "_intent_" + subject.replaceAll(" ", "_")
 
@@ -82,9 +82,9 @@ async function qna(question) {
                     console.log(`${allAnswers.length} valid answer(s)\n`)
                     for (let i = 0; i < allAnswers.length; i++) {
                         let ans = await generateAnswer(allAnswers[i].answer)
-                        let isBotFound = isBot(ans.jsonString.Answered_By)
-                        let isCommented = isNULL(ans.jsonString.Answered_By)
-                        ans.isBot = isBotFound
+                        let isGreet = isBot(ans.props.Answered_By)
+                        let isCommented = isNULL(ans.props.Answered_By)
+                        ans.isGreet = isGreet
                         ans.isCommented = isCommented
                         console.log(ans)
                         finalAnswers.push(ans)
@@ -94,7 +94,7 @@ async function qna(question) {
                 finalAnswers.push({
                     "answer_summary": "I am sorry, I don't know about this. Please connect with our Subject Matter expert.",
                     "isBot": true,
-                    "jsonString": {
+                    "props": {
                         "ID": "null",
                         "Answered_By": "Bot"
                     }
@@ -104,7 +104,7 @@ async function qna(question) {
             finalAnswers.push({
                 "answer_summary": "I am sorry, I don't know about this. Please connect with our Subject Matter expert.",
                 "isBot": true,
-                "jsonString": {
+                "props": {
                     "ID": "null",
                     "Answered_By": "Bot"
                 }
@@ -119,7 +119,7 @@ async function qna(question) {
         finalAnswers.push({
             "answer_summary": "I am sorry, I don't know about this. Please connect with our Subject Matter expert.",
             "isBot": true,
-            "jsonString": {
+            "props": {
                 "ID": "null",
                 "Answered_By": "Bot"
             }
@@ -137,7 +137,7 @@ async function generateAnswer(answer) {
     let slicedString = answer.slice(position)
     answer = answer.slice(0, position)
     answer = isNULL(answer) ? "No comments found on this post/query!" : answer
-    let jsonString = JSON.parse(slicedString.split("???").pop())
+    let props = JSON.parse(slicedString.split("???").pop())
     let answer_summary = ""
     try {
         let Summarizer = new SummarizerManager(answer, 5);
@@ -149,7 +149,7 @@ async function generateAnswer(answer) {
 
     return {
         answer_summary: answer_summary,
-        jsonString: jsonString
+        props: props
     }
 
 }
