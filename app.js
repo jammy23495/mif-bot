@@ -8,11 +8,16 @@ let {
     isNULL,
     getRandomFallbackAnswers
 } = require("./utils")
+
 let SummarizerManager = require("node-summarizer").SummarizerManager;
 const express = require('express')
 const app = express()
 const port = 3000
 app.use(express.static('ui'))
+var cors = require('cors')
+app.use(cors({
+    origin: '*'
+}))
 
 
 //Initializing the NLPManager
