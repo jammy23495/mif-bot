@@ -39,6 +39,7 @@ async function train() {
 
     //Create Intents and Utterances from Greet
     for (let index = 0; index < jsonArray.length; index++) {
+        let topic = jsonArray[index].Topic ? jsonArray[index].Topic : "";
         let subject = jsonArray[index].Subject ? jsonArray[index].Subject : "";
         let question = jsonArray[index].Question ? jsonArray[index].Question.replaceAll("\"", "\'") : "";
         question = question.replaceAll("�", "");
@@ -54,7 +55,7 @@ async function train() {
 
         let newanswer = answer + `???{"ID":"${ID}","Answered_By":"${answered_by}","likes":${likes},"comments":${comments},"post_url":"${post_url}","post_date":"${post_date_string}","subject":"${subject}","question":"${question}","answer":"${answer}"}`
 
-        let intent = ROW_ID + "_intent_" + subject.replaceAll(" ", "_")
+        let intent = ROW_ID + `_${topic}` + "_intent_" + subject.replaceAll(" ", "_")
 
         manager.addDocument(language, "Summarize " + subject, intent);
         manager.addDocument(language, "Tell me something about " + subject, intent);
@@ -77,21 +78,35 @@ async function train() {
 async function qna(question) {
     //Generating Response
     const response = await manager.process('en', question);
+
     let finalAnswers = []
-    if (response.answer) {
-        if (response.classifications.length > 0) {
+
+    //Check the greet response (topic)
+    if (response && response.intent && response.answer && response.intent.toLowerCase().includes("greet")) {
+        let answer = await generateAnswer(response.answer)
+        finalAnswers.push({
+            "answer_summary": answer.answer_summary,
+            "props": answer.props,
+            "isGreet": true
+        })
+    }
+    // For other topics rather than greet
+    else {
+        //Classifcations found
+        if (response && response.classifications && response.classifications.length > 0) {
             let classifications = response.classifications;
             let validClassifications = classifications.filter((e) => {
-                return e.score >= 0.1
+                return e.score > 0.1 && !e.intent.toLowerCase().includes("greet")
             })
-            console.log("Valid Classification: " + JSON.stringify(validClassifications))
-            if (validClassifications.length > 0) {
+            //Valid Classifications found
+            if (validClassifications && validClassifications.length > 0) {
                 let allAnswers = []
                 for (let i = 0; i < validClassifications.length; i++) {
                     let newUtterance = await manager.findAllAnswers("en", validClassifications[i].intent)
                     allAnswers.push(newUtterance[0]);
                 }
-                if (allAnswers.length > 0) {
+                //Get all answers
+                if (allAnswers && allAnswers.length > 0) {
                     console.log(`${allAnswers.length} valid answer(s)\n`)
                     for (let i = 0; i < allAnswers.length; i++) {
                         let ans = await generateAnswer(allAnswers[i].answer)
@@ -99,11 +114,21 @@ async function qna(question) {
                         let isCommented = isNULL(ans.props.Answered_By)
                         ans.isGreet = isGreet
                         ans.isCommented = isCommented
-                        console.log(ans)
                         finalAnswers.push(ans)
                     }
+                } else {
+                    console.log("No Answer found for Valid Classification!")
+                    finalAnswers.push({
+                        "answer_summary": getRandomFallbackAnswers(),
+                        "isGreet": true,
+                        "props": {
+                            "ID": "null",
+                            "Answered_By": "Bot"
+                        }
+                    })
                 }
             } else {
+                console.log("No Valid Classifications found!")
                 finalAnswers.push({
                     "answer_summary": getRandomFallbackAnswers(),
                     "isGreet": true,
@@ -113,7 +138,9 @@ async function qna(question) {
                     }
                 })
             }
+
         } else {
+            console.log("No Classifications found!")
             finalAnswers.push({
                 "answer_summary": getRandomFallbackAnswers(),
                 "isGreet": true,
@@ -123,25 +150,11 @@ async function qna(question) {
                 }
             })
         }
-        return {
-            "data": finalAnswers,
-            "response": response
-        };
-    } else {
-        console.log(getRandomFallbackAnswers())
-        finalAnswers.push({
-            "answer_summary": getRandomFallbackAnswers(),
-            "isGreet": true,
-            "props": {
-                "ID": "null",
-                "Answered_By": "Bot"
-            }
-        })
-        return {
-            "data": finalAnswers,
-            "response": response
-        };
     }
+    return {
+        "data": finalAnswers,
+        "response": response
+    };
 }
 
 async function generateAnswer(answer) {
