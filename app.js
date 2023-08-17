@@ -57,12 +57,19 @@ async function train() {
 
         let intent = ROW_ID + `_${topic}` + "_intent_" + subject.replaceAll(" ", "_")
 
+        manager.addDocument(language, subject, intent);
         manager.addDocument(language, "Summarize " + subject, intent);
         manager.addDocument(language, "Tell me something about " + subject, intent);
+
+        manager.addDocument(language, answered_by, intent);
         manager.addDocument(language, "Show me the comments given by " + answered_by, intent);
         manager.addDocument(language, "Show me the posts given by " + answered_by, intent);
+
+        manager.addDocument(language, post_date, intent);
         manager.addDocument(language, "Show me the queries posted on " + post_date, intent);
         manager.addDocument(language, "Show me the comments answered on " + post_date, intent);
+
+        manager.addDocument(language, post_date_string, intent);
         manager.addDocument(language, "Show me the queries posted on " + post_date_string, intent);
         manager.addDocument(language, "Show me the comments answered on " + post_date_string, intent);
 
