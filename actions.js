@@ -1,42 +1,113 @@
-const {
-    NlpManager
-} = require('node-nlp');
-const moment = require('moment');
-const csv = require('csvtojson')
-const prompt = require('prompt-sync')({
-    sigint: true
-});
-let SummarizerManager = require("node-summarizer").SummarizerManager;
-const express = require('express')
-const app = express()
-const port = 3000
-app.use(express.static('ui'))
+var _ = require('underscore');
 
+async function loadActions(manager, jsonArray, classifications) {
+    //Entities
+    manager.addNerAfterLastCondition('en', 'answered_by', 'by');
+    manager.addNerAfterLastCondition('en', 'post_number', 'in');
+    manager.addNerAfterLastCondition('en', 'post_number', 'post');
+    manager.addNerRuleOptionTexts('en', 'post_type', 'post', ["Posts", "post", "posts", "Post"]);
+    manager.addNerRuleOptionTexts('en', 'post_type', 'comment', ["Comment", "comment", "Comments", "comments"]);
+    manager.addNerRuleOptionTexts('en', 'post_type', 'likes', ["Likes", "likes", "Like", "like"]);
 
-//Initializing the NLPManager
-const manager = new NlpManager({
-    languages: ['en'],
-    forceNER: true,
-    nlu: {
-        useNoneFeature: false
-    },
-    threshold: 0.1
-});
+    //-------------------------------------------showCommentsByName------------------------------------------------------------
 
-async function train() {
+    //Documents
+    manager.addDocument('en', 'Show me the comments given by @answered_by', "intent_showCommentsByName");
 
-    manager.addDocument('en', 'what is the weather?', 'weather');
-    manager.addAnswer('en', 'weather', 'the weather is');
-    manager.addAction('weather', 'getWeather', ['jenil'], function weather(input, name) {
-        console.log(name)
-        return `${JSON.stringify(input)} sunny`
+    //Action
+    manager.addAction("intent_showCommentsByName", 'showCommentsByName', [], async (data) => {
+        if (data && data.entities.length > 0) {
+            let entities = data.entities;
+            entities.filter(async (ent) => {
+                if (ent.entity === "answered_by") {
+                    jsonArray.filter(async (c) => {
+                        if (c.Comment_By.toLowerCase().includes(ent.sourceText.toLowerCase())) {
+                            let intent = c.Row_Number + `_${c.Topic}` + "_intent_" + c.Subject.replaceAll(" ", "_")
+                            classifications.push({
+                                "intent": intent,
+                                "score": 0.5
+                            })
+                        } else {
+                            data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showCommentsByNameError" : "intent_action_showCommentsByName", "I am sorry! I cannot find the posts/queries by this person")
+                        }
+                    })
+                } else {
+                    data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showCommentsByNameError" : "intent_action_showCommentsByName", "I am sorry! I cannot find the posts/queries by this person")
+                }
+            })
+        }
+        data.classifications = classifications;
     });
 
-    await manager.train();
+    //-------------------------------------------showCountBasedOnPostType------------------------------------------------------------
 
-    console.log(await manager.process("en", "what is the weather?"))
+    //Documents
+    manager.addDocument('en', 'How many @post_type are there in MIF?', "intent_showCountBasedOnPostType")
+    manager.addDocument('en', 'What are the number of @post_type available in MIF?', "intent_showCountBasedOnPostType")
+
+    //Actions
+    manager.addAction("intent_showCountBasedOnPostType", 'showCountBasedOnPostType', [], async (data) => {
+        if (data && data.entities.length > 0) {
+            let entities = data.entities;
+            entities.filter(async (ent) => {
+                if (ent.entity === "post_type") {
+                    //Check for Posts
+                    if (ent.option === "post") {
+                        let uniquePosts = _.keys(_.countBy(jsonArray, function (data) {
+                            if (!data.Post_ID.includes("Bot"))
+                                return data.Post_ID;
+                        }));
+                        data = generateActionDataResponse(data, "intent_action_showCountBasedOnPostType", `I found ${uniquePosts.length} ${ent.sourceText} in MIF`)
+                    }
+                    //Check for Comments
+                    else if (ent.option === "comment") {
+                        let numberOfComments = jsonArray.filter((e) => {
+                            return !e.Post_ID.includes("Bot")
+                        })
+                        data = generateActionDataResponse(data, "intent_action_showCountBasedOnPostType", `I found ${numberOfComments.length} ${ent.sourceText} in MIF`)
+                    }
+                }
+            })
+        }
+        data.classifications = classifications;
+    })
+
+    //-------------------------------------------showCountBasedOnPostTypeAndPostNumber------------------------------------------------------------
+
+    //Documents
+    manager.addDocument('en', 'How many @post_type are there on post @post_number?', "intent_showCountBasedOnPostTypeAndPostNumber")
+
+    //Actions
+    manager.addAction("intent_showCountBasedOnPostTypeAndPostNumber", 'showCountBasedOnPostTypeAndPostNumber', [], async (data) => {
+        if (data && data.entities.length > 0) {
+            let entities = data.entities;
+            let post_type = entities.filter((e) => {
+                return e.entity === "post_type"
+            })[0]
+            let post_number = entities.filter((e) => {
+                return e.entity === "post_number"
+            })[0]
+            let numberOfPosts = jsonArray.filter((e) => {
+                return !e.Post_ID.includes("Bot") && e.Post_ID === post_number.sourceText.replace(/[^0-9]/g, "");
+            })[0]
+
+            //For comments
+            if (post_type.option === "comment") {
+                data = generateActionDataResponse(data, "intent_action_showCountBasedOnPostTypeAndPostNumber", `There are ${numberOfPosts.CommentCount} comments on post ${post_number.sourceText.replace(/[^0-9]/g, "")} in MIF`)
+            } else if (post_type.option === "likes") {
+                data = generateActionDataResponse(data, "intent_action_showCountBasedOnPostTypeAndPostNumber", `There are ${numberOfPosts.LikeCount} likes on post ${post_number.sourceText.replace(/[^0-9]/g, "")} in MIF`)
+            }
+        }
+        data.classifications = classifications;
+    })
 }
 
+async function generateActionDataResponse(data, intent, answer) {
+    data.intent = intent
+    data.answer = answer + "???{}"
+    return data;
+}
 
-
-train()
+module.exports = {
+    loadActions
+}

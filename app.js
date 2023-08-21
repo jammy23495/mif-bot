@@ -1,6 +1,10 @@
 const {
     NlpManager
 } = require('node-nlp');
+
+const {
+    dockStart
+} = require('@nlpjs/basic');
 const moment = require('moment');
 const csv = require('csvtojson')
 let {
@@ -8,6 +12,9 @@ let {
     isNULL,
     getRandomFallbackAnswers
 } = require("./utils")
+let {
+    loadActions
+} = require("./actions")
 
 let SummarizerManager = require("node-summarizer").SummarizerManager;
 const express = require('express')
@@ -18,17 +25,24 @@ var cors = require('cors')
 app.use(cors({
     origin: '*'
 }))
+let manager;
 
+(async () => {
+    const dock = await dockStart({
+        settings: {
+            nlp: {
+                forceNER: true,
+                languages: ['en'],
+                executeActionsBeforeAnswers: true
+            }
+        },
+        use: ['Basic', 'LangEn'],
+    });
 
-//Initializing the NLPManager
-const manager = new NlpManager({
-    languages: ['en'],
-    forceNER: true,
-    nlu: {
-        useNoneFeature: false
-    },
-    threshold: 0.1
-});
+    manager = dock.get('nlp');
+
+})();
+
 
 let language = "en"
 
@@ -36,6 +50,7 @@ let language = "en"
 //Train MIF Dataset
 async function train() {
     const jsonArray = await csv().fromFile("./mif.csv");
+    let classifications = []
 
     //Create Intents and Utterances from Greet
     for (let index = 0; index < jsonArray.length; index++) {
@@ -45,7 +60,7 @@ async function train() {
         question = question.replaceAll("�", "");
         let ROW_ID = jsonArray[index].Row_Number;
         let ID = jsonArray[index].Post_ID;
-        let answer = jsonArray[index].Comment;
+        let answer = jsonArray[index].Comment.replaceAll("\"", "\'");
         let likes = jsonArray[index].LikeCount ? jsonArray[index].LikeCount : 0;
         let comments = jsonArray[index].CommentCount ? jsonArray[index].CommentCount : 0;
         let post_url = jsonArray[index].Post_URL ? jsonArray[index].Post_URL : "https://www.google.com";
@@ -61,20 +76,13 @@ async function train() {
         manager.addDocument(language, "Summarize " + subject, intent);
         manager.addDocument(language, "Tell me something about " + subject, intent);
 
-        manager.addDocument(language, answered_by, intent);
-        manager.addDocument(language, "Show me the comments given by " + answered_by, intent);
-        manager.addDocument(language, "Show me the posts given by " + answered_by, intent);
-
-        manager.addDocument(language, post_date, intent);
-        manager.addDocument(language, "Show me the queries posted on " + post_date, intent);
-        manager.addDocument(language, "Show me the comments answered on " + post_date, intent);
-
-        manager.addDocument(language, post_date_string, intent);
-        manager.addDocument(language, "Show me the queries posted on " + post_date_string, intent);
-        manager.addDocument(language, "Show me the comments answered on " + post_date_string, intent);
 
         manager.addAnswer(language, intent, newanswer);
     }
+
+
+    //Load Actions & Entities
+    await loadActions(manager, jsonArray, classifications)
 
     // Train and save the model.
     await manager.train();
@@ -89,7 +97,7 @@ async function qna(question) {
     let finalAnswers = []
 
     //Check the greet response (topic)
-    if (response && response.intent && response.answer && response.intent.toLowerCase().includes("greet")) {
+    if (response && response.intent && response.answer && (response.intent.toLowerCase().includes("greet") || response.intent.toLowerCase().includes("action"))) {
         let answer = await generateAnswer(response.answer)
         finalAnswers.push({
             "answer_summary": answer.answer_summary,
@@ -116,6 +124,7 @@ async function qna(question) {
                 if (allAnswers && allAnswers.length > 0) {
                     console.log(`${allAnswers.length} valid answer(s)\n`)
                     for (let i = 0; i < allAnswers.length; i++) {
+                        console.log(`Answer: ${i+1}`)
                         let ans = await generateAnswer(allAnswers[i].answer)
                         let isGreet = isBot(ans.props.Answered_By)
                         let isCommented = isNULL(ans.props.Answered_By)
