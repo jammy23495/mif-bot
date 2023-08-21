@@ -100,6 +100,30 @@ async function loadActions(manager, jsonArray, classifications) {
         }
         data.classifications = classifications;
     })
+
+    //-------------------------------------------showListOfCategories------------------------------------------------------------
+
+    //Documents
+    manager.addDocument('en', 'Give me the list of categories', "intent_showListOfCategories")
+    manager.addDocument('en', 'Provide me the list of categories', "intent_showListOfCategories")
+    manager.addDocument('en', 'What are the categories available?', "intent_showListOfCategories")
+
+    //Actions
+    manager.addAction("intent_showListOfCategories", 'showListOfCategories', [], async (data) => {
+        if (data) {
+            let uniqueCategories = _.keys(_.countBy(jsonArray, function (data) {
+                if (!data.Post_ID.includes("Bot"))
+                    return data.FeedType
+            }));
+            uniqueCategories = uniqueCategories.filter((e) => {
+                return e && e !== "undefined"
+            })
+            data = generateActionDataResponse(data, "intent_action_showListOfCategories", `There are ${uniqueCategories.length} categories in MIF such as ${uniqueCategories.toString()}`)
+
+        }
+        data.classifications = classifications;
+    })
+
 }
 
 async function generateActionDataResponse(data, intent, answer) {
