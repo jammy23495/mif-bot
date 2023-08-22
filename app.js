@@ -75,6 +75,7 @@ async function train() {
         manager.addDocument(language, subject, intent);
         manager.addDocument(language, "Summarize " + subject, intent);
         manager.addDocument(language, "Tell me something about " + subject, intent);
+        manager.addDocument(language, "Is there any post related to " + subject, intent);
 
 
         manager.addAnswer(language, intent, newanswer);
