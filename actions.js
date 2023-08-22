@@ -21,6 +21,7 @@ async function loadActions(manager, jsonArray, classifications) {
 
         //Action
         manager.addAction("intent_showCommentsByName", 'showCommentsByName', [], async (data) => {
+            classifications = []
             if (data && data.entities.length > 0) {
                 let entities = data.entities;
                 entities.filter(async (ent) => {
@@ -98,6 +99,7 @@ async function loadActions(manager, jsonArray, classifications) {
 
         //Documents
         manager.addDocument('en', 'How many @post_field are there in post @post_number?', "intent_showCountBasedOnPostTypeAndPostNumber")
+        manager.addDocument('en', 'How many @post_field are there on post @post_number?', "intent_showCountBasedOnPostTypeAndPostNumber")
         manager.slotManager.addSlot('intent_showCountBasedOnPostTypeAndPostNumber', 'post_number', true, { en: 'For which post, you want to see the {{post_type}}?' });
 
         //Actions

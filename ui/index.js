@@ -65,13 +65,13 @@ angular.module("myapp", [])
                     console.log(botAnswer)
                     appendMessage(BOT_NAME, BOT_IMG, "left", botAnswer);
                 } else {
-                    botAnswer += `I have found ${data.length} post(s)/queries related to your query, here are the details: <br><br>`
+                    botAnswer += `I have found ${data.length} comments related to your query, here are the details: <br><br>`
                     for (let i = 0; i < data.length; i++) {
-                        botAnswer += data[i].props.Answered_By !== "NULL" ? `<p>As posted by <b>${data[i].props.Answered_By}</b> ` : ""
+                        botAnswer += data[i].props.Answered_By !== "NULL" ? `<p>As commented by <b>${data[i].props.Answered_By}</b> ` : ""
                         botAnswer += data[i].props.post_date !== "NULL" && data[i].props.post_date !== "Invalid date" ? `on <b>${data[i].props.post_date}</b>, </p>` : "</p>";
-                        botAnswer += `<br><p><b>Subject: </b> ${data[i].props.subject}</p>`
-                        botAnswer += `<br><p><b>Question: </b> ${data[i].props.question}</p>`
-                        botAnswer += data[i].props.answer === "NULL" ? `<br><p><b>Comment: </b> <span style="color:red">"${data[i].answer_summary}"</span></p>` : `<br><p><b>Comment: </b> "${data[i].answer_summary}"</p>`
+                        // botAnswer += `<br><p><b>Subject: </b> ${data[i].props.subject}</p>`
+                        // botAnswer += `<br><p><b>Question: </b> ${data[i].props.question}</p>`
+                        botAnswer += data[i].props.answer === "NULL" ? `<br><p> <span style="color:red">"${data[i].answer_summary}"</span></p>` : `<br><p> "${data[i].answer_summary}"</p>`
 
                         botAnswer += `<br><span>Click on the below link to view the post</span> <br> <a href="${data[i].props.post_url !== "null" ? data[i].props.post_url : "#"}" target="_blank"> View Post</a>`
 
