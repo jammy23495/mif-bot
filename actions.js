@@ -75,7 +75,7 @@ async function loadActions(manager, jsonArray, classifications) {
     //-------------------------------------------showCountBasedOnPostTypeAndPostNumber------------------------------------------------------------
 
     //Documents
-    manager.addDocument('en', 'How many @post_type are there on post @post_number?', "intent_showCountBasedOnPostTypeAndPostNumber")
+    manager.addDocument('en', 'How many @post_type are there in post @post_number?', "intent_showCountBasedOnPostTypeAndPostNumber")
 
     //Actions
     manager.addAction("intent_showCountBasedOnPostTypeAndPostNumber", 'showCountBasedOnPostTypeAndPostNumber', [], async (data) => {
