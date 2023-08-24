@@ -13,8 +13,9 @@ let SummarizerManager = require("node-summarizer").SummarizerManager;
 
 //QNA
 async function qna(question, manager) {
-    
+    //Load NLP Manager
     manager.load()
+
     //Generating Response
     const response = await manager.process('en', question);
 
