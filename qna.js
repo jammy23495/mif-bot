@@ -4,10 +4,6 @@ let {
     getRandomFallbackAnswers
 } = require("./utils")
 
-let {
-    loadActions
-} = require("./actions")
-
 
 let SummarizerManager = require("node-summarizer").SummarizerManager;
 
