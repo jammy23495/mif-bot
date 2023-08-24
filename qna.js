@@ -1,15 +1,19 @@
-
 let {
     isBot,
     isNULL,
     getRandomFallbackAnswers
 } = require("./utils")
 
+let {
+    loadActions
+} = require("./actions")
+
 
 let SummarizerManager = require("node-summarizer").SummarizerManager;
 
 //QNA
 async function qna(question, manager) {
+    
     manager.load()
     //Generating Response
     const response = await manager.process('en', question);
@@ -17,8 +21,8 @@ async function qna(question, manager) {
     let finalAnswers = []
 
     //Check the greet response (topic)
-    if (response && response.intent && response.answer && (response.intent.toLowerCase().includes("greet") || response.intent.toLowerCase().includes("action"))) {
-        let answer = await generateAnswer(response.answer)
+    if (response && response.intent && (response.intent.toLowerCase().includes("greet") || response.intent.toLowerCase().includes("action"))) {
+        let answer = await generateAnswer(response.answer || "I am sorry, I don't know the answer. Please ask questions related to forum.")
         finalAnswers.push({
             "answer_summary": answer.answer_summary,
             "props": answer.props,
@@ -94,27 +98,35 @@ async function qna(question, manager) {
 }
 
 async function generateAnswer(answer) {
-    console.log(answer)
-    let position = answer.lastIndexOf("???")
-    let slicedString = answer.slice(position)
-    answer = answer.slice(0, position)
-    answer = isNULL(answer) ? "No comments found on this post/query!" : answer
-    let answersCount = answer.split(/[.?!]/g).filter(Boolean).length;
+    try {
+        console.log(answer)
+        let position = answer.lastIndexOf("???")
+        let slicedString = answer.slice(position)
+        answer = answer.slice(0, position)
+        answer = isNULL(answer) ? "No comments found on this post/query!" : answer
+        let answersCount = answer.split(/[.?!]/g).filter(Boolean).length;
 
-    let props = JSON.parse(slicedString.split("???").pop())
-    let answer_summary = ""
+        let props = JSON.parse(slicedString.split("???").pop())
+        let answer_summary = ""
 
-    if (answersCount < 5) {
-        answer_summary = answer
-    } else {
-        let Summarizer = new SummarizerManager(answer, 5);
-        answer_summary = Summarizer.getSummaryByFrequency().summary;
+        if (answersCount < 5) {
+            answer_summary = answer
+        } else {
+            let Summarizer = new SummarizerManager(answer, 5);
+            answer_summary = Summarizer.getSummaryByFrequency().summary;
+        }
+
+        return {
+            answer_summary: answer_summary,
+            props: props
+        }
+    } catch (error) {
+        return {
+            answer_summary: "I am sorry! I don't know about this. Please ask questions related to forum.",
+            props: {}
+        }
     }
 
-    return {
-        answer_summary: answer_summary,
-        props: props
-    }
 
 }
 
