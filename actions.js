@@ -60,19 +60,23 @@ async function loadActions(manager, jsonArray, classifications) {
                 })[0]
 
                 let numberOfPosts = jsonArray.filter((e) => {
-                    return !e.Post_ID.includes("Bot") && e.FeedType === "Post"
+                    try {
+                        return !e.Post_ID.toString().includes("Bot") && e.FeedType === "Post"
+                    } catch (error) {
+                        console.log(e)
+                    }
                 })
 
                 let numberOfQuery = jsonArray.filter((e) => {
-                    return !e.Post_ID.includes("Bot") && e.FeedType === "Query"
+                    return !e.Post_ID.toString().includes("Bot") && e.FeedType === "Query"
                 })
 
                 let numberOfCOMPost = jsonArray.filter((e) => {
-                    return !e.Post_ID.includes("Bot") && e.FeedType === "COM Post"
+                    return !e.Post_ID.toString().includes("Bot") && e.FeedType === "COM Post"
                 })
 
                 let numberOfExpertPost = jsonArray.filter((e) => {
-                    return !e.Post_ID.includes("Bot") && e.FeedType === "Expert Post"
+                    return !e.Post_ID.toString().includes("Bot") && e.FeedType === "Expert Post"
                 })
 
                 //Check for post category
@@ -100,7 +104,9 @@ async function loadActions(manager, jsonArray, classifications) {
         //Documents
         manager.addDocument('en', 'How many @post_field are there in post @post_number?', "intent_showCountBasedOnPostTypeAndPostNumber")
         manager.addDocument('en', 'How many @post_field are there on post @post_number?', "intent_showCountBasedOnPostTypeAndPostNumber")
-        manager.slotManager.addSlot('intent_showCountBasedOnPostTypeAndPostNumber', 'post_number', true, { en: 'For which post, you want to see the {{post_type}}?' });
+        manager.slotManager.addSlot('intent_showCountBasedOnPostTypeAndPostNumber', 'post_number', true, {
+            en: 'For which post, you want to see the {{post_type}}?'
+        });
 
         //Actions
         manager.addAction("intent_showCountBasedOnPostTypeAndPostNumber", 'showCountBasedOnPostTypeAndPostNumber', [], async (data) => {
@@ -115,7 +121,7 @@ async function loadActions(manager, jsonArray, classifications) {
 
                 if (post_number) {
                     let numberOfPosts = jsonArray.filter((e) => {
-                        return !e.Post_ID.includes("Bot") && e.Post_ID === post_number.sourceText.replace(/[^0-9]/g, "");
+                        return !e.Post_ID.toString().includes("Bot") && e.Post_ID.toString() === post_number.sourceText.replace(/[^0-9]/g, "");
                     })[0]
 
                     //For comments
@@ -140,7 +146,7 @@ async function loadActions(manager, jsonArray, classifications) {
         manager.addAction("intent_showListOfCategories", 'showListOfCategories', [], async (data) => {
             if (data) {
                 let uniqueCategories = _.keys(_.countBy(jsonArray, function (data) {
-                    if (!data.Post_ID.includes("Bot"))
+                    if (!data.Post_ID.toString().includes("Bot"))
                         return data.FeedType
                 }));
                 uniqueCategories = uniqueCategories.filter((e) => {

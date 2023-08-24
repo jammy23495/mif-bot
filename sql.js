@@ -1,36 +1,26 @@
 const sql = require('mssql')
-
+require('dotenv').config()
 const sqlConfig = {
     user: process.env.DB_USER,
-    password: process.env.DB_PWD,
+    password: process.env.DB_PASS,
     database: process.env.DB_NAME,
-    server: 'localhost',
-    pool: {
-        max: 10,
-        min: 0,
-        idleTimeoutMillis: 30000
-    },
+    server: process.env.DB_SERVER,
     options: {
         encrypt: true, // for azure
-        trustServerCertificate: false // change to true for local dev / self-signed certs
+        trustServerCertificate: true // change to true for local dev / self-signed certs
     }
 }
 
 async function getMIFData() {
     try {
-        let pool = await sql.connect(config)
-        let result2 = await pool.request()
-            .input('input_parameter', sql.Int, value)
-            .output('output_parameter', sql.VarChar(50))
-            .execute('procedure_name')
-
-        console.dir(result2)
-        return result2
+        await sql.connect(sqlConfig)
+        const result = await sql.query `select * from MIFBOT`
+        return result.recordsets[0]
     } catch (error) {
-
+        console.log(error)
     }
 }
- 
+
 
 module.exports = {
     getMIFData
