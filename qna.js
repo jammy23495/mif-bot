@@ -47,11 +47,13 @@ async function qna(question, manager) {
                     for (let i = 0; i < allAnswers.length; i++) {
                         console.log(`Answer: ${i+1}`)
                         let ans = await generateAnswer(allAnswers[i].answer)
-                        let isGreet = isBot(ans.props.Answered_By)
-                        let isCommented = isNULL(ans.props.Answered_By)
-                        ans.isGreet = isGreet
-                        ans.isCommented = isCommented
-                        finalAnswers.push(ans)
+                        if (ans.isGreet !== true) {
+                            let isGreet = isBot(ans.props.Answered_By)
+                            let isCommented = isNULL(ans.props.Answered_By)
+                            ans.isGreet = isGreet
+                            ans.isCommented = isCommented
+                            finalAnswers.push(ans)
+                        }
                     }
                 } else {
                     console.log("No Answer found for Valid Classification!")
@@ -115,18 +117,19 @@ async function generateAnswer(answer) {
 
         return {
             answer_summary: answer_summary,
+            isGreet: false,
             props: props
         }
     } catch (error) {
         return {
             answer_summary: "I am sorry! I don't know about this. Please ask questions related to forum.",
+            isGreet: true,
             props: {}
         }
     }
 
 
 }
-
 
 module.exports = {
     qna
