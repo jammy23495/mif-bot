@@ -5,6 +5,9 @@ let {
     filterString
 } = require("./utils")
 const moment = require('moment');
+let {
+    loadActions
+} = require("./actions")
 
 
 let SummarizerManager = require("node-summarizer").SummarizerManager;
