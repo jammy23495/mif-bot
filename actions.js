@@ -27,7 +27,7 @@ async function loadActions(manager, jsonArray, classifications) {
                 entities.filter(async (ent) => {
                     if (ent.entity === "answered_by") {
                         jsonArray.filter(async (c) => { 
-                            if (c.Comment_By.toLowerCase().includes(ent.sourceText.toLowerCase())) {
+                            if (c?.Comment_By?.toLowerCase().includes(ent.sourceText.toLowerCase())) {
                                 let intent = c.Row_Number + `_${c.Topic}` + "_intent_" + c.Subject.replaceAll(" ", "_")
                                 classifications.push({
                                     "intent": intent,
@@ -147,7 +147,7 @@ async function loadActions(manager, jsonArray, classifications) {
             if (data) {
                 let uniqueCategories = _.keys(_.countBy(jsonArray, function (data) {
                     if (!data.Post_ID.toString().includes("Bot"))
-                        return data.FeedType
+                        return data.Category
                 }));
                 uniqueCategories = uniqueCategories.filter((e) => {
                     return e && e !== "undefined"
