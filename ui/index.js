@@ -66,17 +66,20 @@ angular.module("myapp", [])
                     console.log(botAnswer)
                     appendMessage(BOT_NAME, BOT_IMG, "left", botAnswer);
                 } else {
+                    let totalComments = 0;
                     data.map((d) => {
                         groups.push(d.props)
+                        totalComments += d.props.Comments
                     })
                     console.log(groups)
                     let groupedData = groupBy(groups, "FeedType")
                     let properties = Object.keys(groupedData)
-                    botAnswer += "I have found ";
+                    botAnswer += "<p>I have found ";
                     for (let index = 0; index < properties.length; index++) {
-                        botAnswer += `${groupedData[properties[index]].length} ${properties[index]},`
+                        botAnswer += `${groupedData[properties[index]].length} ${properties[index]}, `
                     }
-                    botAnswer += ` and ${data.length} comments related to your query, here are the details:`
+                    botAnswer += totalComments > 0 ? ` and ${totalComments} comments ` : ""
+                    botAnswer += `related to your query, here are the details:</p>`
 
                     // botAnswer += `I have found ${data.length} posts/queries & ${data.length} comments related to your query, here are the details: <br><br>`
                     for (let i = 0; i < data.length; i++) {
@@ -85,9 +88,10 @@ angular.module("myapp", [])
                         botAnswer += `<br><p><b>Subject: </b> ${data[i].props.Subject}</p>`
                         botAnswer += `<br><p><b>${data[i].props.FeedType} </b> ${data[i].props.Question}</p><br>`
 
-
-                        botAnswer += data[i].props.Comment_By !== "NULL" ? `<p>As commented by <b>${data[i].props.Comment_By}</b> ` : ""
-                        botAnswer += data[i].props.Commented_On !== "NULL" && data[i].props.Commented_On !== "Invalid date" ? `on <b>${data[i].props.Commented_On}</b>, </p>` : "</p>";
+                        if (data[i].props.Comments > 0) {
+                            botAnswer += `<p>As commented by <b>${data[i].props.Comment_By}</b> `
+                            botAnswer += `on <b>${data[i].props.Commented_On}</b>, </p>`;
+                        }
 
                         botAnswer += `<br><b>Comment: </b>"${data[i].answer_summary}"<br>`
 
