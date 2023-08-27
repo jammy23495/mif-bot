@@ -60,17 +60,30 @@ angular.module("myapp", [])
 
                 let data = response.data.data;
                 let botAnswer = ""
+                let groups = []
                 if (data[0].isGreet) {
                     botAnswer += data[0].answer_summary
                     console.log(botAnswer)
                     appendMessage(BOT_NAME, BOT_IMG, "left", botAnswer);
                 } else {
-                    botAnswer += `I have found ${data.length} posts/queries & ${data.length} comments related to your query, here are the details: <br><br>`
+                    data.map((d) => {
+                        groups.push(d.props)
+                    })
+                    console.log(groups)
+                    let groupedData = groupBy(groups, "FeedType")
+                    let properties = Object.keys(groupedData)
+                    botAnswer += "I have found ";
+                    for (let index = 0; index < properties.length; index++) {
+                        botAnswer += `${groupedData[properties[index]].length} ${properties[index]},`
+                    }
+                    botAnswer += ` and ${data.length} comments related to your query, here are the details:`
+
+                    // botAnswer += `I have found ${data.length} posts/queries & ${data.length} comments related to your query, here are the details: <br><br>`
                     for (let i = 0; i < data.length; i++) {
-                        botAnswer += data[i].props.Posted_By !== "NULL" ? `<p>As posted by <b>${data[i].props.Posted_By}</b> ` : ""
+                        botAnswer += data[i].props.Posted_By !== "NULL" ? `<br><p>As posted by <b>${data[i].props.Posted_By}</b> ` : ""
                         botAnswer += data[i].props.Posted_On !== "NULL" && data[i].props.Posted_On !== "Invalid date" ? `on <b>${data[i].props.Posted_On}</b>, </p>` : "</p>";
                         botAnswer += `<br><p><b>Subject: </b> ${data[i].props.Subject}</p>`
-                        botAnswer += `<br><p><b>Post: </b> ${data[i].props.Question}</p><br>`
+                        botAnswer += `<br><p><b>${data[i].props.FeedType} </b> ${data[i].props.Question}</p><br>`
 
 
                         botAnswer += data[i].props.Comment_By !== "NULL" ? `<p>As commented by <b>${data[i].props.Comment_By}</b> ` : ""
@@ -99,7 +112,7 @@ angular.module("myapp", [])
                         </div>
                         <br>`
                         botAnswer += i !== (data.length - 1) ? `<br>` : ``
-                        console.log(groupBy(data,"FeedType"))
+                        // groups.push(data[i].props)
                     }
                     appendMessage(BOT_NAME, BOT_IMG, "left", botAnswer);
                 }
