@@ -65,13 +65,18 @@ angular.module("myapp", [])
                     console.log(botAnswer)
                     appendMessage(BOT_NAME, BOT_IMG, "left", botAnswer);
                 } else {
-                    botAnswer += `I have found ${data.length} comments related to your query, here are the details: <br><br>`
+                    botAnswer += `I have found ${data.length} posts/queries & ${data.length} comments related to your query, here are the details: <br><br>`
                     for (let i = 0; i < data.length; i++) {
-                        botAnswer += data[i].props.Answered_By !== "NULL" ? `<p>As commented by <b>${data[i].props.Answered_By}</b> ` : ""
-                        botAnswer += data[i].props.post_date !== "NULL" && data[i].props.post_date !== "Invalid date" ? `on <b>${data[i].props.post_date}</b>, </p>` : "</p>";
-                        // botAnswer += `<br><p><b>Subject: </b> ${data[i].props.subject}</p>`
-                        // botAnswer += `<br><p><b>Question: </b> ${data[i].props.question}</p>`
-                        botAnswer += data[i].props.answer === "NULL" ? `<br><p> <span style="color:red">"${data[i].answer_summary}"</span></p>` : `<br><p> "${data[i].answer_summary}"</p>`
+                        botAnswer += data[i].props.Posted_By !== "NULL" ? `<p>As posted by <b>${data[i].props.Posted_By}</b> ` : ""
+                        botAnswer += data[i].props.Posted_On !== "NULL" && data[i].props.Posted_On !== "Invalid date" ? `on <b>${data[i].props.Posted_On}</b>, </p>` : "</p>";
+                        botAnswer += `<br><p><b>Subject: </b> ${data[i].props.Subject}</p>`
+                        botAnswer += `<br><p><b>Post: </b> ${data[i].props.Question}</p><br>`
+
+
+                        botAnswer += data[i].props.Comment_By !== "NULL" ? `<p>As commented by <b>${data[i].props.Comment_By}</b> ` : ""
+                        botAnswer += data[i].props.Commented_On !== "NULL" && data[i].props.Commented_On !== "Invalid date" ? `on <b>${data[i].props.Commented_On}</b>, </p>` : "</p>";
+
+                        botAnswer += `<br><b>Comment: </b>"${data[i].answer_summary}"<br>`
 
                         botAnswer += `<br><span>Click on the below link to view the post</span> <br> <a href="${data[i].props.post_url !== "null" ? data[i].props.post_url : "#"}" target="_blank"> View Post</a>`
 
@@ -81,19 +86,20 @@ angular.module("myapp", [])
                                 <span><img src="./assets/thumbs-up.png"></img></span>
                             </div>
                             <div class="text_div">
-                                <span>${data[i].props.likes} Likes</span><br>
+                                <span>${data[i].props.Likes} Likes</span><br>
                                 <span></span>
                             </div>
                             <div class="icon_div">
                                 <span><img src="./assets/speech-bubble.png"></img></span>
                             </div>
                             <div class="text_div">
-                                <span>${data[i].props.comments} Comments</span><br>
+                                <span>${data[i].props.Comments} Comments</span><br>
                                 <span></span>
                             </div>
                         </div>
                         <br>`
                         botAnswer += i !== (data.length - 1) ? `<br>` : ``
+                        console.log(groupBy(data,"FeedType"))
                     }
                     appendMessage(BOT_NAME, BOT_IMG, "left", botAnswer);
                 }
@@ -105,6 +111,13 @@ angular.module("myapp", [])
                 appendMessage(BOT_NAME, BOT_IMG, "left", "Error in sending message. Please connect with Administrator");
             });
         }
+
+        let groupBy = function (xs, key) {
+            return xs.reduce(function (rv, x) {
+                (rv[x[key]] = rv[x[key]] || []).push(x);
+                return rv;
+            }, {});
+        };
 
 
 

@@ -17,8 +17,20 @@ function getRandomFallbackAnswers() {
     return fallBackAnswers[randomNumber]
 }
 
+function filterString(answer) {
+    if (answer) {
+        answer = answer.includes("\"") ? answer.replaceAll("\"", "\'") : answer;
+        answer = answer.includes("\r") ? answer.replaceAll("\r", " ") : answer;
+        answer = answer.includes("\n") ? answer.replaceAll("\n", " ") : answer;
+        answer = answer.includes("\t") ? answer.replaceAll("\t", " ") : answer;
+        answer = answer.includes("�") ? answer.replaceAll("�", "") : answer;
+        return answer
+    }
+}
+
 module.exports = {
     isNULL,
     isBot,
-    getRandomFallbackAnswers
+    getRandomFallbackAnswers,
+    filterString
 }

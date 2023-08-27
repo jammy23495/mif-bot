@@ -1,8 +1,10 @@
 let {
     isBot,
     isNULL,
-    getRandomFallbackAnswers
+    getRandomFallbackAnswers,
+    filterString
 } = require("./utils")
+const moment = require('moment');
 
 
 let SummarizerManager = require("node-summarizer").SummarizerManager;
@@ -19,10 +21,9 @@ async function qna(question, manager) {
 
     //Check the greet response (topic)
     if (response && response.intent && (response.intent.toLowerCase().includes("greet") || response.intent.toLowerCase().includes("action"))) {
-        let answer = await generateAnswer(response.answer || "I am sorry, I don't know the answer. Please ask questions related to forum.")
+        let answer = response.answer || "I am sorry, I don't know the answer. Please ask questions related to forum."
         finalAnswers.push({
-            "answer_summary": answer.answer_summary,
-            "props": answer.props,
+            "answer_summary": answer,
             "isGreet": true
         })
     }
@@ -39,64 +40,52 @@ async function qna(question, manager) {
                 let allAnswers = []
                 for (let i = 0; i < validClassifications.length; i++) {
                     if (validClassifications[i].intent.includes("MIF")) {
-                        let newUtterance = await manager.findAllAnswers("en", validClassifications[i].intent)
-                        allAnswers.push(newUtterance[0]);
-                    }
-                }
-                //Get all answers
-                if (allAnswers && allAnswers.length > 0) {
-                    console.log(`${allAnswers.length} valid answer(s)\n`)
-                    for (let i = 0; i < allAnswers.length; i++) {
-                        console.log(`Answer: ${i+1}`)
-                        let ans = await generateAnswer(allAnswers[i].answer)
-                        if (ans.isGreet !== true && ans.answer_summary) {
-                            let isGreet = isBot(ans.props.Answered_By)
-                            let isCommented = isNULL(ans.props.Answered_By)
-                            ans.isGreet = isGreet
-                            ans.isCommented = isCommented
-                            finalAnswers.push(ans)
-                        } else {
-                            finalAnswers.push({
-                                "answer_summary": getRandomFallbackAnswers(),
-                                "isGreet": true,
-                                "props": {
-                                    "ID": "null",
-                                    "Answered_By": "Bot"
+                        let intent = validClassifications[i].intent.split("_");
+                        let POST_ID = intent[0];
+                        console.log(POST_ID)
+                        let post = await getDataByPOSTID(POST_ID)
+                        console.log(post)
+                        if (post && post.length > 0) {
+                            for (let j = 0; j < post.length; j++) {
+                                let comment_summary = post[i].Comment && post[i].Comment != "NULL" ? await generateAnswer(filterString(post[i].Comment)) : {
+                                    "answer_summary": "No comments found!",
+                                    "isGreet": false
                                 }
-                            })
+                                finalAnswers.push({
+                                    "answer_summary": comment_summary.answer_summary,
+                                    "isGreet": comment_summary.isGreet,
+                                    "props": {
+                                        "ID": post[i].Post_ID,
+                                        "Posted_By": post[i].SubmittedBy,
+                                        "Subject": post[i].Subject,
+                                        "Question": post[i].Question,
+                                        "FeedType": post[i].FeedType,
+                                        "Posted_On": moment(post[i].Submitted_On, "YYYY-MM-DD").format('MMMM Do YYYY'),
+                                        "Likes": post[i].LikeCount,
+                                        "Comments": post[i].CommentCount,
+                                        "Views": post[i].ViewCount,
+                                        "Comment_By": post[i].Comment_By,
+                                        "Commented_On": moment(post[i].Comment_On, "YYYY-MM-DD").format('MMMM Do YYYY'),
+                                        "Category": post[i].Category
+                                    }
+                                })
+                            }
                         }
                     }
-                } else {
-                    console.log("No Answer found for Valid Classification!")
-                    finalAnswers.push({
-                        "answer_summary": getRandomFallbackAnswers(),
-                        "isGreet": true,
-                        "props": {
-                            "ID": "null",
-                            "Answered_By": "Bot"
-                        }
-                    })
                 }
+
             } else {
                 console.log("No Valid Classifications found!")
                 finalAnswers.push({
                     "answer_summary": getRandomFallbackAnswers(),
-                    "isGreet": true,
-                    "props": {
-                        "ID": "null",
-                        "Answered_By": "Bot"
-                    }
+                    "isGreet": true
                 })
             }
         } else {
             console.log("No Classifications found!")
             finalAnswers.push({
                 "answer_summary": getRandomFallbackAnswers(),
-                "isGreet": true,
-                "props": {
-                    "ID": "null",
-                    "Answered_By": "Bot"
-                }
+                "isGreet": true
             })
         }
     }
@@ -108,16 +97,8 @@ async function qna(question, manager) {
 
 async function generateAnswer(answer) {
     try {
-        console.log(answer)
-        let position = answer.lastIndexOf("???")
-        let slicedString = answer.slice(position)
-        answer = answer.slice(0, position)
-        answer = isNULL(answer) ? "No comments found on this post/query!" : answer
-        let answersCount = answer.split(/[.?!]/g).filter(Boolean).length;
-
-        let props = JSON.parse(slicedString.split("???").pop())
         let answer_summary = ""
-
+        let answersCount = answer.split(/[.?!]/g).filter(Boolean).length;
         if (answersCount < 5) {
             answer_summary = answer
         } else {
@@ -127,18 +108,25 @@ async function generateAnswer(answer) {
 
         return {
             answer_summary: answer_summary,
-            isGreet: false,
-            props: props
+            isGreet: false
         }
     } catch (error) {
         return {
             answer_summary: "I am sorry! I don't know about this. Please ask questions related to forum.",
-            isGreet: true,
-            props: {}
+            isGreet: true
         }
     }
+}
 
-
+async function getDataByPOSTID(id) {
+    let {
+        getMIFData
+    } = require("./sql")
+    let sqlData = await getMIFData();
+    let filteredData = sqlData.filter((s) => {
+        return s.Post_ID == id
+    })
+    return filteredData
 }
 
 module.exports = {

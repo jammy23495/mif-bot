@@ -166,7 +166,7 @@ async function loadActions(manager, jsonArray, classifications) {
 
 async function generateActionDataResponse(data, intent, answer) {
     data.intent = intent
-    data.answer = answer + "???{}"
+    data.answer = answer
     return data;
 }
 
