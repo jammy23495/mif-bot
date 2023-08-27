@@ -47,7 +47,7 @@ async function qna(question, manager) {
                         console.log(post)
                         if (post && post.length > 0) {
                             for (let j = 0; j < post.length; j++) {
-                                let comment_summary = post[i].Comment && post[i].Comment != "NULL" ? await generateAnswer(filterString(post[i].Comment)) : {
+                                let comment_summary = post[j].Comment && post[j].Comment != "NULL" ? await generateAnswer(filterString(post[j].Comment)) : {
                                     "answer_summary": "No comments found!",
                                     "isGreet": false
                                 }
@@ -55,18 +55,18 @@ async function qna(question, manager) {
                                     "answer_summary": comment_summary.answer_summary,
                                     "isGreet": comment_summary.isGreet,
                                     "props": {
-                                        "ID": post[i].Post_ID,
-                                        "Posted_By": post[i].SubmittedBy,
-                                        "Subject": post[i].Subject,
-                                        "Question": post[i].Question,
-                                        "FeedType": post[i].FeedType,
-                                        "Posted_On": moment(post[i].Submitted_On, "YYYY-MM-DD").format('MMMM Do YYYY'),
-                                        "Likes": post[i].LikeCount,
-                                        "Comments": post[i].CommentCount,
-                                        "Views": post[i].ViewCount,
-                                        "Comment_By": post[i].Comment_By,
-                                        "Commented_On": moment(post[i].Comment_On, "YYYY-MM-DD").format('MMMM Do YYYY'),
-                                        "Category": post[i].Category
+                                        "ID": post[j].Post_ID,
+                                        "Posted_By": post[j].SubmittedBy,
+                                        "Subject": post[j].Subject,
+                                        "Question": post[j].Question,
+                                        "FeedType": post[j].FeedType,
+                                        "Posted_On": moment(post[j].Submitted_On, "YYYY-MM-DD").format('MMMM Do YYYY'),
+                                        "Likes": post[j].LikeCount,
+                                        "Comments": post[j].CommentCount,
+                                        "Views": post[j].ViewCount,
+                                        "Comment_By": post[j].Comment_By,
+                                        "Commented_On": moment(post[j].Comment_On, "YYYY-MM-DD").format('MMMM Do YYYY'),
+                                        "Category": post[j].Category
                                     }
                                 })
                             }
