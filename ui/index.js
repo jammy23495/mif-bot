@@ -101,6 +101,7 @@ angular.module("myapp", [])
             }, function errorCallback(response) {
                 // called asynchronously if an error occurs
                 // or server returns response with an error status.
+                console.log(response)
                 appendMessage(BOT_NAME, BOT_IMG, "left", "Error in sending message. Please connect with Administrator");
             });
         }

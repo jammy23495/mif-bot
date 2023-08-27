@@ -26,7 +26,7 @@ async function loadActions(manager, jsonArray, classifications) {
                 let entities = data.entities;
                 entities.filter(async (ent) => {
                     if (ent.entity === "answered_by") {
-                        jsonArray.filter(async (c) => {
+                        jsonArray.filter(async (c) => { 
                             if (c.Comment_By.toLowerCase().includes(ent.sourceText.toLowerCase())) {
                                 let intent = c.Row_Number + `_${c.Topic}` + "_intent_" + c.Subject.replaceAll(" ", "_")
                                 classifications.push({

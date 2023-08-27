@@ -21,15 +21,22 @@ async function train(manager) {
         //Create Intents and Utterances from Greet
         for (let index = 0; index < jsonArray.length; index++) {
             let topic = jsonArray[index].Topic ? jsonArray[index].Topic : "MIF";
-            let subject = jsonArray[index].Subject ? jsonArray[index].Subject : "";
-            let question = jsonArray[index].Question ? jsonArray[index].Question.replaceAll("\"", "\'") : "";
-            question = question.replaceAll("�", "");
+            
             let ROW_ID = jsonArray[index].Row_Number.toString();
             let ID = jsonArray[index].Post_ID.toString();
-            let answer = await filterAnswer(jsonArray[index].Comment);
+
+            let filteredSubject = await filterString(jsonArray[index].Subject)
+            let subject = jsonArray[index].Subject ? filteredSubject.answer : "";
+            
+            let filteredQuestion = await filterString(jsonArray[index].Question)
+            let question = jsonArray[index].Question ? filteredQuestion.answer : "";
+
+            let filteredAnswer = await filterString(jsonArray[index].Comment)
+            let answer = jsonArray[index].Comment ? filteredAnswer.answer : "";
+
             let likes = jsonArray[index].LikeCount ? jsonArray[index].LikeCount : 0;
             let comments = jsonArray[index].CommentCount ? jsonArray[index].CommentCount : 0;
-            let post_url = jsonArray[index].Post_URL ? jsonArray[index].Post_URL : "https://www.google.com";
+            let post_url = jsonArray[index].Post_URL ? jsonArray[index].Post_URL : "https://miforum.indiannavy.mil:8081/#/home/" + ID;
             let post_date = jsonArray[index].Comment_On;
             let post_date_string = moment(post_date, "YYYY-MM-DD").format('MMMM Do YYYY');
             let answered_by = jsonArray[index].Comment_By;
@@ -42,6 +49,7 @@ async function train(manager) {
             manager.addDocument(language, "Summarize " + subject, intent);
             manager.addDocument(language, "Tell me something about " + subject, intent);
             manager.addDocument(language, "Is there any post related to " + subject, intent);
+            manager.addDocument(language, "Are there any post related to " + subject, intent);
 
 
 
@@ -67,15 +75,22 @@ async function train(manager) {
     }
 }
 
-async function filterAnswer(answer) {
+async function filterString(answer) {
     if (answer) {
-        answer = answer.replaceAll("\"", "\'")
-        answer = answer.replaceAll("\r", " ")
-        answer = answer.replaceAll("\n", " ")
-        answer = answer.replaceAll("\t", " ")
-        return answer;
+        answer = answer.includes("\"") ? answer.replaceAll("\"", "\'") : answer;
+        answer = answer.includes("\r") ? answer.replaceAll("\r", " ") : answer;
+        answer = answer.includes("\n") ? answer.replaceAll("\n", " ") : answer;
+        answer = answer.includes("\t") ? answer.replaceAll("\t", " ") : answer;
+        answer = answer.includes("�") ? answer.replaceAll("�", "") : answer;
+        return {
+            "answer": answer,
+            "status": 200
+        };
     } else {
-        return "I am sorry! I don't know about this."
+        return {
+            "answer": "I am sorry! I don't know about this.",
+            "status": 400
+        }
     }
 }
 

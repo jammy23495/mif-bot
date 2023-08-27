@@ -38,8 +38,10 @@ async function qna(question, manager) {
             if (validClassifications && validClassifications.length > 0) {
                 let allAnswers = []
                 for (let i = 0; i < validClassifications.length; i++) {
-                    let newUtterance = await manager.findAllAnswers("en", validClassifications[i].intent)
-                    allAnswers.push(newUtterance[0]);
+                    if (validClassifications[i].intent.includes("MIF")) {
+                        let newUtterance = await manager.findAllAnswers("en", validClassifications[i].intent)
+                        allAnswers.push(newUtterance[0]);
+                    }
                 }
                 //Get all answers
                 if (allAnswers && allAnswers.length > 0) {
@@ -47,12 +49,21 @@ async function qna(question, manager) {
                     for (let i = 0; i < allAnswers.length; i++) {
                         console.log(`Answer: ${i+1}`)
                         let ans = await generateAnswer(allAnswers[i].answer)
-                        if (ans.isGreet !== true) {
+                        if (ans.isGreet !== true && ans.answer_summary) {
                             let isGreet = isBot(ans.props.Answered_By)
                             let isCommented = isNULL(ans.props.Answered_By)
                             ans.isGreet = isGreet
                             ans.isCommented = isCommented
                             finalAnswers.push(ans)
+                        } else {
+                            finalAnswers.push({
+                                "answer_summary": getRandomFallbackAnswers(),
+                                "isGreet": true,
+                                "props": {
+                                    "ID": "null",
+                                    "Answered_By": "Bot"
+                                }
+                            })
                         }
                     }
                 } else {
@@ -77,7 +88,6 @@ async function qna(question, manager) {
                     }
                 })
             }
-
         } else {
             console.log("No Classifications found!")
             finalAnswers.push({
