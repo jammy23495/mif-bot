@@ -17,6 +17,9 @@ async function train(manager) {
         jsonArray = [...jsonArray, ...sqlData]
         let classifications = []
 
+        //Load Actions & Entities
+        await loadActions(manager, jsonArray, classifications)
+
         //Create Intents and Utterances from Greet
         for (let index = 0; index < jsonArray.length; index++) {
             let topic = jsonArray[index].Topic ? jsonArray[index].Topic : "MIF";
@@ -48,10 +51,6 @@ async function train(manager) {
 
             manager.addAnswer(language, intent, answer);
         }
-
-
-        //Load Actions & Entities
-        await loadActions(manager, jsonArray, classifications)
 
         // Train and save the model.
         await manager.train();
