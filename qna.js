@@ -19,7 +19,16 @@ async function qna(question, manager) {
 
     //Check the greet response (topic)
     if (response && response.intent && (response.intent.toLowerCase().includes("greet") || response.intent.toLowerCase().includes("action"))) {
-        let answer = response.answer || "I am sorry, I don't know the answer. Please ask questions related to forum."
+        let classifications = response.classifications;
+        let validClassifications = classifications.filter((e) => {
+            return e.score > 0.3 && !e.intent.toLowerCase().includes("greet")
+        })
+        let answer= "";
+        if (validClassifications && validClassifications.length > 0) {
+            answer = response.answer;
+        } else {
+            answer = getRandomFallbackAnswers()
+        }
         finalAnswers.push({
             "answer_summary": answer,
             "isGreet": true
@@ -33,6 +42,7 @@ async function qna(question, manager) {
             let validClassifications = classifications.filter((e) => {
                 return e.score > 0.1 && !e.intent.toLowerCase().includes("greet")
             })
+
             //Valid Classifications found
             if (validClassifications && validClassifications.length > 0) {
                 let allAnswers = []
@@ -49,6 +59,8 @@ async function qna(question, manager) {
                                     "answer_summary": "No comments found!",
                                     "isGreet": false
                                 }
+
+                                let question_summary = await generateAnswer(filterString(post[j].Question))
                                 finalAnswers.push({
                                     "answer_summary": comment_summary.answer_summary,
                                     "isGreet": comment_summary.isGreet,
@@ -56,7 +68,7 @@ async function qna(question, manager) {
                                         "ID": post[j].Post_ID,
                                         "Posted_By": post[j].SubmittedBy,
                                         "Subject": post[j].Subject,
-                                        "Question": post[j].Question,
+                                        "Question": question_summary.answer_summary,
                                         "FeedType": post[j].FeedType,
                                         "Posted_On": moment(post[j].Submitted_On, "YYYY-MM-DD").format('MMMM Do YYYY'),
                                         "Likes": post[j].LikeCount,
@@ -97,6 +109,7 @@ async function generateAnswer(answer) {
     try {
         let answer_summary = ""
 
+
         let data = JSON.stringify({
             "text": answer
         });
@@ -111,14 +124,20 @@ async function generateAnswer(answer) {
             data: data
         };
 
-        await axios.request(config)
-            .then((response) => {
-                let data = response.data;
-                answer_summary = data && data.length > 0 ? data[0].summary_text : ""
-            })
-            .catch((error) => {
-                console.log(error);
-            });
+        let answer_length = answer.split(/[.?!]/g).filter(Boolean).length;
+        //Perform Summarization
+        if (answer_length > 3) {
+            await axios.request(config)
+                .then((response) => {
+                    let data = response.data;
+                    answer_summary = data && data.length > 0 ? data[0].summary_text : ""
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
+        } else {
+            answer_summary = answer
+        }
 
 
         return {

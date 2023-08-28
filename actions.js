@@ -35,11 +35,11 @@ async function loadActions(manager, jsonArray, classifications) {
                 entities.filter(async (ent) => {
                     if (ent.entity === "answered_by") {
                         jsonArray.filter(async (c) => {
-                            if (c.Comment_By.toLowerCase().includes(ent.sourceText.toLowerCase())) {
+                            if (c?.Comment_By?.toLowerCase().includes(ent.sourceText.toLowerCase())) {
                                 let intent = c.Post_ID + `_${c.Topic || "MIF"}` + "_intent_" + c.Subject.replaceAll(" ", "_")
                                 classifications.push({
                                     "intent": intent,
-                                    "score": 0.5
+                                    "score": 1
                                 })
                             } else {
                                 data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showCommentsByNameError" : "intent_action_showCommentsByName", "I am sorry! I cannot find the posts/queries by this person")
@@ -128,6 +128,10 @@ async function loadActions(manager, jsonArray, classifications) {
                 })[0]
 
                 if (post_number) {
+                    classifications.push({
+                        "intent": "intent_showCountBasedOnPostTypeAndPostNumber",
+                        "score": 1
+                    })
                     let numberOfPosts = jsonArray.filter((e) => {
                         return !e.Post_ID.toString().includes("Bot") && e.Post_ID.toString() === post_number.sourceText.replace(/[^0-9]/g, "");
                     })[0]
@@ -181,7 +185,7 @@ async function loadActions(manager, jsonArray, classifications) {
             if (data) {
                 let expertList = await getListOfExperts();
                 data = generateActionDataResponse(data, "intent_action_showListOfExperts", `There are ${expertList
-                    .length} categories in MIF`)
+                    .length} experts in MIF`)
             }
             data.classifications = classifications;
         })

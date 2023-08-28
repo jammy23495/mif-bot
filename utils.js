@@ -1,5 +1,6 @@
 const fallBackAnswers = ["I am sorry, I don't understand this. Please ask me something related to forum.",
-    "I am sorry, I don't understand this. Maybe the experts can help you. Please check with designated Subject Matter Expert."
+    "I am sorry, I have found no such discussions on this matter in the forum.",
+    "I am sorry, I have found no such discussions in the forum. Please check with designated Subject Matter Expert."
 ]
 
 function isNULL(property) {

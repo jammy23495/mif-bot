@@ -86,7 +86,7 @@ angular.module("myapp", [])
                         botAnswer += data[i].props.Posted_By !== "NULL" ? `<br><p>As posted by <b>${data[i].props.Posted_By}</b> ` : ""
                         botAnswer += data[i].props.Posted_On !== "NULL" && data[i].props.Posted_On !== "Invalid date" ? `on <b>${data[i].props.Posted_On}</b>, </p>` : "</p>";
                         botAnswer += `<br><p><b>Subject: </b> ${data[i].props.Subject}</p>`
-                        botAnswer += `<br><p><b>${data[i].props.FeedType} </b> ${data[i].props.Question}</p><br>`
+                        botAnswer += `<br><p><b>${data[i].props.FeedType}: </b> ${data[i].props.Question}</p><br>`
 
                         if (data[i].props.Comments > 0) {
                             botAnswer += `<p>As commented by <b>${data[i].props.Comment_By}</b> `
