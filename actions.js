@@ -39,7 +39,7 @@ async function loadActions(manager, jsonArray, classifications) {
                                 let intent = c.Post_ID + `_${c.Topic || "MIF"}` + "_intent_" + c.Subject.replaceAll(" ", "_")
                                 classifications.push({
                                     "intent": intent,
-                                    "score": 1
+                                    "score": 0.5
                                 })
                             } else {
                                 data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showCommentsByNameError" : "intent_action_showCommentsByName", "I am sorry! I cannot find the posts/queries by this person")

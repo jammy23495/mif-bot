@@ -19,16 +19,9 @@ async function qna(question, manager) {
 
     //Check the greet response (topic)
     if (response && response.intent && (response.intent.toLowerCase().includes("greet") || response.intent.toLowerCase().includes("action"))) {
-        let classifications = response.classifications;
-        let validClassifications = classifications.filter((e) => {
-            return e.score > 0.3
-        })
-        let answer= "";
-        if (validClassifications && validClassifications.length > 0) {
-            answer = response.answer;
-        } else {
-            answer = getRandomFallbackAnswers()
-        }
+
+        let answer = response.answer || getRandomFallbackAnswers();
+
         finalAnswers.push({
             "answer_summary": answer,
             "isGreet": true
