@@ -21,7 +21,7 @@ async function qna(question, manager) {
     if (response && response.intent && (response.intent.toLowerCase().includes("greet") || response.intent.toLowerCase().includes("action"))) {
         let classifications = response.classifications;
         let validClassifications = classifications.filter((e) => {
-            return e.score > 0.3 && !e.intent.toLowerCase().includes("greet")
+            return e.score > 0.3
         })
         let answer= "";
         if (validClassifications && validClassifications.length > 0) {
