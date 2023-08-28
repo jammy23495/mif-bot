@@ -15,7 +15,6 @@ async function train(manager) {
         let jsonArray = await csv().fromFile("./mif.csv");
         let sqlData = await getMIFData();
         jsonArray = [...jsonArray, ...sqlData]
-        let classifications = []
 
         //Create Intents and Utterances from Greet
         for (let index = 0; index < jsonArray.length; index++) {
@@ -48,10 +47,6 @@ async function train(manager) {
 
             manager.addAnswer(language, intent, answer);
         }
-
-
-        //Load Actions & Entities
-        await loadActions(manager, jsonArray, classifications)
 
         // Train and save the model.
         await manager.train();

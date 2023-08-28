@@ -10,6 +10,14 @@ let {
     qna
 } = require("./qna")
 
+let {
+    getMIFData
+} = require("./sql")
+const csv = require('csvtojson');
+let {
+    loadActions
+} = require("./actions")
+
 const express = require('express')
 const app = express()
 const port = 3000
@@ -33,6 +41,12 @@ let manager;
     });
 
     manager = dock.get('nlp');
+    let jsonArray = await csv().fromFile("./mif.csv");
+    let sqlData = await getMIFData();
+    jsonArray = [...jsonArray, ...sqlData]
+    let classifications = []
+    //Load Actions & Entities
+    await loadActions(manager, jsonArray, classifications)
 
 })();
 
