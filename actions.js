@@ -1,7 +1,14 @@
 var _ = require('underscore');
 
-async function loadActions(manager, jsonArray, classifications) {
+let {
+    getMIFData,
+    getListOfExperts
+} = require("./sql");
+const {
+    get
+} = require('lodash');
 
+async function loadActions(manager, jsonArray, classifications) {
     try {
         //Entities
         manager.addNerAfterLastCondition('en', 'answered_by', 'by');
@@ -27,8 +34,8 @@ async function loadActions(manager, jsonArray, classifications) {
                 let entities = data.entities;
                 entities.filter(async (ent) => {
                     if (ent.entity === "answered_by") {
-                        jsonArray.filter(async (c) => { 
-                            if (c?.Comment_By?.toLowerCase().includes(ent.sourceText.toLowerCase())) {
+                        jsonArray.filter(async (c) => {
+                            if (c.Comment_By.toLowerCase().includes(ent.sourceText.toLowerCase())) {
                                 let intent = c.Post_ID + `_${c.Topic || "MIF"}` + "_intent_" + c.Subject.replaceAll(" ", "_")
                                 classifications.push({
                                     "intent": intent,
@@ -141,7 +148,8 @@ async function loadActions(manager, jsonArray, classifications) {
         //Documents
         manager.addDocument('en', 'Give me the list of categories', "intent_showListOfCategories")
         manager.addDocument('en', 'Provide me the list of categories', "intent_showListOfCategories")
-        manager.addDocument('en', 'What are the categories available?', "intent_showListOfCategories")
+        manager.addDocument('en', 'Which categories are available?', "intent_showListOfCategories")
+        manager.addDocument('en', 'How many categories are there in MIF?', "intent_showListOfCategories")
 
         //Actions
         manager.addAction("intent_showListOfCategories", 'showListOfCategories', [], async (data) => {
@@ -158,6 +166,27 @@ async function loadActions(manager, jsonArray, classifications) {
             }
             data.classifications = classifications;
         })
+
+
+        //-------------------------------------------showListOfExperts------------------------------------------------------------
+
+        //Documents
+        manager.addDocument('en', 'Give me the list of experts', "intent_showListOfExperts")
+        manager.addDocument('en', 'Provide me the list of experts', "intent_showListOfExperts")
+        manager.addDocument('en', 'Who are the experts in MIF?', "intent_showListOfExperts")
+        manager.addDocument('en', 'How many experts are there in MIF?', "intent_showListOfExperts")
+
+        //Actions
+        manager.addAction("intent_showListOfExperts", 'showListOfExperts', [], async (data) => {
+            if (data) {
+                let expertList = await getListOfExperts();
+                data = generateActionDataResponse(data, "intent_action_showListOfExperts", `There are ${expertList
+                    .length} categories in MIF`)
+            }
+            data.classifications = classifications;
+        })
+
+
 
     } catch (error) {
         data.classifications = classifications;

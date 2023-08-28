@@ -21,7 +21,18 @@ async function getMIFData() {
     }
 }
 
+async function getListOfExperts() {
+    try {
+        await sql.connect(sqlConfig)
+        const result = await sql.query `exec GetExpertList`
+        return result.recordsets[0]
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 
 module.exports = {
-    getMIFData
+    getMIFData,
+    getListOfExperts
 }

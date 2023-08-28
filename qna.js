@@ -1,13 +1,11 @@
 let {
-    isBot,
-    isNULL,
     getRandomFallbackAnswers,
     filterString
 } = require("./utils")
 const moment = require('moment');
+let axios = require("axios")
+require('dotenv').config()
 
-
-let SummarizerManager = require("node-summarizer").SummarizerManager;
 
 //QNA
 async function qna(question, manager) {
@@ -98,13 +96,30 @@ async function qna(question, manager) {
 async function generateAnswer(answer) {
     try {
         let answer_summary = ""
-        let answersCount = answer.split(/[.?!]/g).filter(Boolean).length;
-        if (answersCount < 5) {
-            answer_summary = answer
-        } else {
-            let Summarizer = new SummarizerManager(answer, 5);
-            answer_summary = Summarizer.getSummaryByFrequency().summary;
-        }
+
+        let data = JSON.stringify({
+            "text": answer
+        });
+
+        let config = {
+            method: 'post',
+            maxBodyLength: Infinity,
+            url: `${process.env.SUMMARIZE_API_SERVER}/mif`,
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            data: data
+        };
+
+        await axios.request(config)
+            .then((response) => {
+                let data = response.data;
+                answer_summary = data && data.length > 0 ? data[0].summary_text : ""
+            })
+            .catch((error) => {
+                console.log(error);
+            });
+
 
         return {
             answer_summary: answer_summary,
