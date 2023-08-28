@@ -18,6 +18,7 @@ async function loadActions(manager, jsonArray, classifications) {
 
         //Documents
         manager.addDocument('en', 'Show me the comments given by @answered_by', "intent_showCommentsByName");
+        manager.addDocument('en', 'Is there any comments given by @answered_by', "intent_showCommentsByName");
 
         //Action
         manager.addAction("intent_showCommentsByName", 'showCommentsByName', [], async (data) => {
@@ -28,7 +29,7 @@ async function loadActions(manager, jsonArray, classifications) {
                     if (ent.entity === "answered_by") {
                         jsonArray.filter(async (c) => { 
                             if (c?.Comment_By?.toLowerCase().includes(ent.sourceText.toLowerCase())) {
-                                let intent = c.Row_Number + `_${c.Topic}` + "_intent_" + c.Subject.replaceAll(" ", "_")
+                                let intent = c.Post_ID + `_${c.Topic || "MIF"}` + "_intent_" + c.Subject.replaceAll(" ", "_")
                                 classifications.push({
                                     "intent": intent,
                                     "score": 0.5
