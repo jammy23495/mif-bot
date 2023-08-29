@@ -14,7 +14,7 @@ const sqlConfig = {
 async function getMIFData() {
     try {
         await sql.connect(sqlConfig)
-        const result = await sql.query `select * from MIFBOT`
+        const result = await sql.query`select * from MIFBOT`
         return result.recordsets[0]
     } catch (error) {
         console.log(error)
@@ -24,7 +24,17 @@ async function getMIFData() {
 async function getListOfExperts() {
     try {
         await sql.connect(sqlConfig)
-        const result = await sql.query `exec GetExpertList`
+        const result = await sql.query`exec GetExpertList`
+        return result.recordsets[0]
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+async function getListOfCategories() {
+    try {
+        await sql.connect(sqlConfig)
+        const result = await sql.query`select Name from Categories`
         return result.recordsets[0]
     } catch (error) {
         console.log(error)
@@ -34,5 +44,6 @@ async function getListOfExperts() {
 
 module.exports = {
     getMIFData,
-    getListOfExperts
+    getListOfExperts,
+    getListOfCategories
 }

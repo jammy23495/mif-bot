@@ -2,7 +2,8 @@ var _ = require('underscore');
 
 let {
     getMIFData,
-    getListOfExperts
+    getListOfExperts,
+    getListOfCategories
 } = require("./sql");
 const {
     get
@@ -158,15 +159,18 @@ async function loadActions(manager, jsonArray, classifications) {
         //Actions
         manager.addAction("intent_showListOfCategories", 'showListOfCategories', [], async (data) => {
             if (data) {
-                let uniqueCategories = _.keys(_.countBy(jsonArray, function (data) {
-                    if (!data.Post_ID.toString().includes("Bot"))
-                        return data.Category
-                }));
-                uniqueCategories = uniqueCategories.filter((e) => {
-                    return e && e !== "undefined"
+                let categoryList = await getListOfCategories();
+                let categoryString = `There are ${categoryList.length} categories in MIF.`
+                categoryString += " Below are the list of categories:\n"
+                categoryString += "<ul style='padding: revert; '>"
+                categoryList.map((c) => {
+                    categoryString += "<li>"
+                    categoryString += `${c.Name}`
+                    categoryString += "</li>"
                 })
-                data = generateActionDataResponse(data, "intent_action_showListOfCategories", `There are ${uniqueCategories.length} categories in MIF such as ${uniqueCategories.toString()}`)
-
+                console.log(categoryList)
+                categoryString += "</ul>"
+                data = generateActionDataResponse(data, "intent_action_showListOfExperts", categoryString)
             }
             data.classifications = classifications;
         })
@@ -184,8 +188,17 @@ async function loadActions(manager, jsonArray, classifications) {
         manager.addAction("intent_showListOfExperts", 'showListOfExperts', [], async (data) => {
             if (data) {
                 let expertList = await getListOfExperts();
-                data = generateActionDataResponse(data, "intent_action_showListOfExperts", `There are ${expertList
-                    .length} experts in MIF`)
+                let expertString = `There are ${expertList.length} experts in MIF.`
+                expertString += " Below are the list of experts:\n"
+                expertString += "<ul style='padding: revert; '>"
+                expertList.map((e) => {
+                    expertString += "<li>"
+                    expertString += `${e.Name}(${e.Category})`
+                    expertString += "</li>"
+                })
+                console.log(expertList)
+                expertString += "</ul>"
+                data = generateActionDataResponse(data, "intent_action_showListOfExperts", expertString)
             }
             data.classifications = classifications;
         })
