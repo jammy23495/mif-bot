@@ -55,8 +55,21 @@ app.get('/', async (req, res) => {
 })
 
 app.get('/ask/:question', async (req, res) => {
-    let response = await qna(req.params.question, manager);
-    res.send(response)
+    try {
+        let response = await qna(req.params.question, manager);
+        res.send(response)
+    } catch (error) {
+        console.log(error)
+        res.send({
+            "data": [
+                {
+                    "answer_summary": "I am still learning! I don't understand this. Please ask something related to forum.",
+                    "isGreet": true
+                }
+            ],
+            "response": error
+        })
+    }
 })
 
 app.get('/train', async (req, res) => {

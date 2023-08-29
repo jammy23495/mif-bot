@@ -8,12 +8,15 @@
     <body ng-app = "myapp" ng-controller = "HelloController" >
         <section class="msger">
             <header class="msger-header">
-              <div class="msger-header-title">
+              <div class="msger-header-title" style="margin: 5px;">
                 <i class="fas fa-comment-alt"></i> Chat with MIF Bot
               </div>
+
               <div class="msger-header-options">
                 <span><i class="fas fa-cog"></i></span>
               </div>
+              
+              <button type="submit" class="msger-send-btn" ng-click="train()" style="padding: 5px !important; border: 1px solid #397fd9;">{{train_button}}</button>
             </header>
           
             <main class="msger-chat">

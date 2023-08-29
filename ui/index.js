@@ -17,6 +17,8 @@ angular.module("myapp", [])
         const BOT_NAME = "MIF Bot";
         const PERSON_NAME = "User";
         $scope.time = formatDate(new Date());
+        
+        $scope.train_button = "Train"
 
         $scope.submit = () => {
             console.log("In Submit")
@@ -28,6 +30,28 @@ angular.module("myapp", [])
             msgerInput.value = "";
 
             botResponse(msgText);
+        }
+
+
+        $scope.train = () => {
+            console.log("In Training...")
+            $scope.train_button = "Training..."
+            $http({
+                method: 'GET',
+                url: `${HOST}/train`
+            }).then(function successCallback(response) {
+                let status = response.data.status;
+                if (status == 200) {
+                    $scope.train_button = "Train"
+                    alert("Model Trained successfully!")
+                }
+                else {
+                    alert("Error in training model")
+                }
+            }, function errorCallback(response) {
+                console.log(response)
+                alert("Error in training model")
+            });
         }
 
         function appendMessage(name, img, side, text) {
