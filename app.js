@@ -73,8 +73,16 @@ app.get('/ask/:question', async (req, res) => {
 })
 
 app.get('/train', async (req, res) => {
-    let response = await train(manager);
-    res.send(response)
+    try {
+        let response = await train(manager);
+        res.send(response)
+    } catch (error) {
+        console.log(error)
+        res.send({
+            "status": "400",
+            "message": "Error in training model " + error
+        })
+    }
 })
 
 app.listen(port, async () => {
