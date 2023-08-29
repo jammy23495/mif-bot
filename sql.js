@@ -31,6 +31,26 @@ async function getListOfExperts() {
     }
 }
 
+async function getListOfAPSOS() {
+    try {
+        await sql.connect(sqlConfig)
+        const result = await sql.query`exec GetAPSOsList`
+        return result.recordsets[0]
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+async function getWeeklyQuizAnswers() {
+    try {
+        await sql.connect(sqlConfig)
+        const result = await sql.query`exec GetCorrectAnsMemberList`
+        return result.recordsets[0]
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 async function getListOfCategories() {
     try {
         await sql.connect(sqlConfig)
@@ -41,9 +61,22 @@ async function getListOfCategories() {
     }
 }
 
+async function getInformationBasket() {
+    try {
+        await sql.connect(sqlConfig)
+        const result = await sql.query`select * from InformationBaskets`
+        return result.recordsets[0]
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 
 module.exports = {
     getMIFData,
     getListOfExperts,
-    getListOfCategories
+    getListOfCategories,
+    getListOfAPSOS,
+    getWeeklyQuizAnswers,
+    getInformationBasket
 }

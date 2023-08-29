@@ -3,7 +3,10 @@ var _ = require('underscore');
 let {
     getMIFData,
     getListOfExperts,
-    getListOfCategories
+    getListOfCategories,
+    getListOfAPSOS,
+    getWeeklyQuizAnswers,
+    getInformationBasket
 } = require("./sql");
 const {
     get
@@ -168,7 +171,6 @@ async function loadActions(manager, jsonArray, classifications) {
                     categoryString += `${c.Name}`
                     categoryString += "</li>"
                 })
-                console.log(categoryList)
                 categoryString += "</ul>"
                 data = generateActionDataResponse(data, "intent_action_showListOfExperts", categoryString)
             }
@@ -196,9 +198,84 @@ async function loadActions(manager, jsonArray, classifications) {
                     expertString += `${e.Name}(${e.Category})`
                     expertString += "</li>"
                 })
-                console.log(expertList)
                 expertString += "</ul>"
                 data = generateActionDataResponse(data, "intent_action_showListOfExperts", expertString)
+            }
+            data.classifications = classifications;
+        })
+
+        //-------------------------------------------showListOfAPSOs------------------------------------------------------------
+
+        //Documents
+        manager.addDocument('en', 'Give me the list of APSOs', "intent_showListOfAPSOs")
+        manager.addDocument('en', 'Provide me the list of APSOs', "intent_showListOfAPSOs")
+        manager.addDocument('en', 'Who are the APSOs in MIF?', "intent_showListOfAPSOs")
+        manager.addDocument('en', 'How many APSOs are there in MIF?', "intent_showListOfAPSOs")
+
+        //Actions
+        manager.addAction("intent_showListOfAPSOs", 'showListOfAPSOs', [], async (data) => {
+            if (data) {
+                let APSOsList = await getListOfAPSOS();
+                let APSOsString = `There are ${APSOsList.length} APSOs in MIF.`
+                APSOsString += " Below are the list of APSOs:\n"
+                APSOsString += "<ul style='padding: revert; '>"
+                APSOsList.map((e) => {
+                    APSOsString += "<li>"
+                    APSOsString += `${e.Name}`
+                    APSOsString += "</li>"
+                })
+                APSOsString += "</ul>"
+                data = generateActionDataResponse(data, "intent_action_showListOfAPSOs", APSOsString)
+            }
+            data.classifications = classifications;
+        })
+
+
+        //-------------------------------------------showWeeklyQuizAnswerList------------------------------------------------------------
+
+        //Documents
+        manager.addDocument('en', 'How many people answered in weekly quiz?', "intent_showWeeklyQuizAnswerList")
+        manager.addDocument('en', 'Provide me the details about the members who answered correctly in weekly quiz', "intent_showWeeklyQuizAnswerList")
+
+        //Actions
+        manager.addAction("intent_showWeeklyQuizAnswerList", 'showWeeklyQuizAnswerList', [], async (data) => {
+            if (data) {
+                let weeklyQuizList = await getWeeklyQuizAnswers();
+                let weeklyQuizString = `In MIF, ${weeklyQuizList.length} members have answered correctly in weekly quiz.`
+                weeklyQuizString += " Below are the list of members:\n"
+                weeklyQuizString += "<ul style='padding: revert; '>"
+                weeklyQuizList.map((e) => {
+                    weeklyQuizString += "<li>"
+                    weeklyQuizString += `${e.Name}`
+                    weeklyQuizString += "</li>"
+                })
+                weeklyQuizString += "</ul>"
+                data = generateActionDataResponse(data, "intent_action_showWeeklyQuizAnswerList", weeklyQuizString)
+            }
+            data.classifications = classifications;
+        })
+
+        
+        //-------------------------------------------showNameOfTheLinks------------------------------------------------------------
+
+        //Documents
+        manager.addDocument('en', 'Show me the name of the links in the information basket', "intent_showNameOfTheLinks")
+        manager.addDocument('en', 'Provide me the details about information basket', "intent_showNameOfTheLinks")
+
+        //Actions
+        manager.addAction("intent_showNameOfTheLinks", 'showNameOfTheLinks', [], async (data) => {
+            if (data) {
+                let InformationBasketsList = await getInformationBasket();
+                let InformationBasketsString = `There are ${InformationBasketsList.length} links in Information Baskets.`
+                InformationBasketsString += " Below are the list of links:\n"
+                InformationBasketsString += "<ul style='padding: revert; '>"
+                InformationBasketsList.map((e) => {
+                    InformationBasketsString += "<li>"
+                    InformationBasketsString += `${e.Name} (${e.FilePath})`
+                    InformationBasketsString += "</li>"
+                })
+                InformationBasketsString += "</ul>"
+                data = generateActionDataResponse(data, "intent_action_showNameOfTheLinks", InformationBasketsString)
             }
             data.classifications = classifications;
         })
