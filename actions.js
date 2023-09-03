@@ -2,7 +2,11 @@ var _ = require('underscore');
 
 let {
     getMIFData,
-    getListOfExperts
+    getListOfExperts,
+    getListOfCategories,
+    getListOfAPSOS,
+    getWeeklyQuizAnswers,
+    getInformationBasket
 } = require("./sql");
 const {
     get
@@ -15,8 +19,8 @@ async function loadActions(manager, jsonArray, classifications) {
         manager.addNerAfterLastCondition('en', 'post_number', 'in');
         manager.addNerAfterLastCondition('en', 'post_number', 'post');
         manager.addNerRuleOptionTexts('en', 'post_type', 'post', ["Posts", "post", "posts", "Post"]);
-        manager.addNerRuleOptionTexts('en', 'post_field', 'comment', ["Comment", "comment", "Comments", "comments"]);
-        manager.addNerRuleOptionTexts('en', 'post_field', 'likes', ["Likes", "likes", "Like", "like"]);
+        manager.addNerRuleOptionTexts('en', 'post_field', 'comment', ["Comment", "comment", "Comments", "comments", "Commented", "commented"]);
+        manager.addNerRuleOptionTexts('en', 'post_field', 'likes', ["Likes", "likes", "Like", "like", "Liked", "liked"]);
         manager.addNerRuleOptionTexts('en', 'post_type', 'query', ["Query", "query", "Queries", "queries"]);
         manager.addNerRuleOptionTexts('en', 'post_type', 'COM Post', ["COM Post", "COM Posts", "COM post", "COM posts"]);
         manager.addNerRuleOptionTexts('en', 'post_type', 'Expert Post', ["Expert Post", "Expert Posts", "expert post", "expert posts"]);
@@ -112,9 +116,8 @@ async function loadActions(manager, jsonArray, classifications) {
         //Documents
         manager.addDocument('en', 'How many @post_field are there in post @post_number?', "intent_showCountBasedOnPostTypeAndPostNumber")
         manager.addDocument('en', 'How many @post_field are there on post @post_number?', "intent_showCountBasedOnPostTypeAndPostNumber")
-        manager.slotManager.addSlot('intent_showCountBasedOnPostTypeAndPostNumber', 'post_number', true, {
-            en: 'For which post, you want to see the {{post_type}}?'
-        });
+        manager.addDocument('en', 'How many people @post_field on post @post_number?', "intent_showCountBasedOnPostTypeAndPostNumber")
+        
 
         //Actions
         manager.addAction("intent_showCountBasedOnPostTypeAndPostNumber", 'showCountBasedOnPostTypeAndPostNumber', [], async (data) => {
@@ -158,15 +161,17 @@ async function loadActions(manager, jsonArray, classifications) {
         //Actions
         manager.addAction("intent_showListOfCategories", 'showListOfCategories', [], async (data) => {
             if (data) {
-                let uniqueCategories = _.keys(_.countBy(jsonArray, function (data) {
-                    if (!data.Post_ID.toString().includes("Bot"))
-                        return data.Category
-                }));
-                uniqueCategories = uniqueCategories.filter((e) => {
-                    return e && e !== "undefined"
+                let categoryList = await getListOfCategories();
+                let categoryString = `There are ${categoryList.length} categories in MIF.`
+                categoryString += " Below are the list of categories:\n"
+                categoryString += "<ul style='padding: revert; '>"
+                categoryList.map((c) => {
+                    categoryString += "<li>"
+                    categoryString += `${c.Name}`
+                    categoryString += "</li>"
                 })
-                data = generateActionDataResponse(data, "intent_action_showListOfCategories", `There are ${uniqueCategories.length} categories in MIF such as ${uniqueCategories.toString()}`)
-
+                categoryString += "</ul>"
+                data = generateActionDataResponse(data, "intent_action_showListOfExperts", categoryString)
             }
             data.classifications = classifications;
         })
@@ -184,8 +189,92 @@ async function loadActions(manager, jsonArray, classifications) {
         manager.addAction("intent_showListOfExperts", 'showListOfExperts', [], async (data) => {
             if (data) {
                 let expertList = await getListOfExperts();
-                data = generateActionDataResponse(data, "intent_action_showListOfExperts", `There are ${expertList
-                    .length} experts in MIF`)
+                let expertString = `There are ${expertList.length} experts in MIF.`
+                expertString += " Below are the list of experts:\n"
+                expertString += "<ul style='padding: revert; '>"
+                expertList.map((e) => {
+                    expertString += "<li>"
+                    expertString += `${e.Name}(${e.Category})`
+                    expertString += "</li>"
+                })
+                expertString += "</ul>"
+                data = generateActionDataResponse(data, "intent_action_showListOfExperts", expertString)
+            }
+            data.classifications = classifications;
+        })
+
+        //-------------------------------------------showListOfAPSOs------------------------------------------------------------
+
+        //Documents
+        manager.addDocument('en', 'Give me the list of APSOs', "intent_showListOfAPSOs")
+        manager.addDocument('en', 'Provide me the list of APSOs', "intent_showListOfAPSOs")
+        manager.addDocument('en', 'Who are the APSOs in MIF?', "intent_showListOfAPSOs")
+        manager.addDocument('en', 'How many APSOs are there in MIF?', "intent_showListOfAPSOs")
+
+        //Actions
+        manager.addAction("intent_showListOfAPSOs", 'showListOfAPSOs', [], async (data) => {
+            if (data) {
+                let APSOsList = await getListOfAPSOS();
+                let APSOsString = `There are ${APSOsList.length} APSOs in MIF.`
+                APSOsString += " Below are the list of APSOs:\n"
+                APSOsString += "<ul style='padding: revert; '>"
+                APSOsList.map((e) => {
+                    APSOsString += "<li>"
+                    APSOsString += `${e.Name}`
+                    APSOsString += "</li>"
+                })
+                APSOsString += "</ul>"
+                data = generateActionDataResponse(data, "intent_action_showListOfAPSOs", APSOsString)
+            }
+            data.classifications = classifications;
+        })
+
+
+        //-------------------------------------------showWeeklyQuizAnswerList------------------------------------------------------------
+
+        //Documents
+        manager.addDocument('en', 'How many people answered in weekly quiz?', "intent_showWeeklyQuizAnswerList")
+        manager.addDocument('en', 'Provide me the details about the members who answered correctly in weekly quiz', "intent_showWeeklyQuizAnswerList")
+
+        //Actions
+        manager.addAction("intent_showWeeklyQuizAnswerList", 'showWeeklyQuizAnswerList', [], async (data) => {
+            if (data) {
+                let weeklyQuizList = await getWeeklyQuizAnswers();
+                let weeklyQuizString = `In MIF, ${weeklyQuizList.length} members have answered correctly in weekly quiz.`
+                weeklyQuizString += " Below are the list of members:\n"
+                weeklyQuizString += "<ul style='padding: revert; '>"
+                weeklyQuizList.map((e) => {
+                    weeklyQuizString += "<li>"
+                    weeklyQuizString += `${e.Name}`
+                    weeklyQuizString += "</li>"
+                })
+                weeklyQuizString += "</ul>"
+                data = generateActionDataResponse(data, "intent_action_showWeeklyQuizAnswerList", weeklyQuizString)
+            }
+            data.classifications = classifications;
+        })
+
+        
+        //-------------------------------------------showNameOfTheLinks------------------------------------------------------------
+
+        //Documents
+        manager.addDocument('en', 'Show me the name of the links in the information basket', "intent_showNameOfTheLinks")
+        manager.addDocument('en', 'Provide me the details about information basket', "intent_showNameOfTheLinks")
+
+        //Actions
+        manager.addAction("intent_showNameOfTheLinks", 'showNameOfTheLinks', [], async (data) => {
+            if (data) {
+                let InformationBasketsList = await getInformationBasket();
+                let InformationBasketsString = `There are ${InformationBasketsList.length} links in Information Baskets.`
+                InformationBasketsString += " Below are the list of links:\n"
+                InformationBasketsString += "<ul style='padding: revert; '>"
+                InformationBasketsList.map((e) => {
+                    InformationBasketsString += "<li>"
+                    InformationBasketsString += `${e.Name} (${e.FilePath})`
+                    InformationBasketsString += "</li>"
+                })
+                InformationBasketsString += "</ul>"
+                data = generateActionDataResponse(data, "intent_action_showNameOfTheLinks", InformationBasketsString)
             }
             data.classifications = classifications;
         })
