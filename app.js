@@ -20,13 +20,14 @@ let {
 
 const express = require('express')
 const app = express()
-const port = 3000
+const port =  process.env.PORT || 9999
 app.use(express.static('ui'))
 var cors = require('cors')
 app.use(cors({
     origin: '*'
 }))
 let manager;
+
 
 (async () => {
     const dock = await dockStart({
@@ -51,7 +52,7 @@ let manager;
 })();
 
 app.get('/', async (req, res) => {
-    res.sendFile(ui / index.html)
+    res.sendFile(ui/index.html)
 })
 
 app.get('/ask/:question', async (req, res) => {
