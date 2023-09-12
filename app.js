@@ -1,24 +1,11 @@
-const {
-    dockStart
-} = require('@nlpjs/basic');
-
-let {
-    train
-} = require("./train")
-
-let {
-    qna
-} = require("./qna")
-
-let {
-    getMIFData
-} = require("./sql")
+const { dockStart } = require('@nlpjs/basic');
+let { train } = require("./train")
+let { qna } = require("./qna")
+let { getMIFData } = require("./sql")
 const csv = require('csvtojson');
-let {
-    loadActions
-} = require("./actions")
-
-
+let { loadActions } = require("./actions")
+let { SummarizationPipeline } = require("./summarizer")
+let summarizer;
 const express = require('express')
 const app = express()
 const port = process.env.PORT || 3000
@@ -58,7 +45,7 @@ app.get('/', async (req, res) => {
 
 app.get('/ask/:question', async (req, res) => {
     try {
-        let response = await qna(req.params.question, manager);
+        let response = await qna(req.params.question, manager, summarizer);
         res.send(response)
     } catch (error) {
         console.log(error)
@@ -86,5 +73,6 @@ app.get('/train', async (req, res) => {
 })
 
 app.listen(port, async () => {
+    summarizer = await SummarizationPipeline.getInstance()
     console.log(`Example app listening on port ${port}`)
 })

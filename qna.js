@@ -8,7 +8,7 @@ require('dotenv').config()
 
 
 //QNA
-async function qna(question, manager) {
+async function qna(question, manager, summarizer) {
     //Load NLP Manager
     await manager.load("./model.nlp")
 
@@ -48,12 +48,12 @@ async function qna(question, manager) {
                         console.log(post)
                         if (post && post.length > 0) {
                             for (let j = 0; j < post.length; j++) {
-                                let comment_summary = post[j].Comment && post[j].Comment != "NULL" ? await generateAnswer(filterString(post[j].Comment)) : {
+                                let comment_summary = post[j].Comment && post[j].Comment != "NULL" ? await generateAnswer(filterString(post[j].Comment), summarizer) : {
                                     "answer_summary": "No comments found!",
                                     "isGreet": false
                                 }
 
-                                let question_summary = await generateAnswer(filterString(post[j].Question))
+                                let question_summary = await generateAnswer(filterString(post[j].Question), summarizer)
                                 finalAnswers.push({
                                     "answer_summary": comment_summary.answer_summary,
                                     "isGreet": comment_summary.isGreet,
@@ -98,40 +98,19 @@ async function qna(question, manager) {
     };
 }
 
-async function generateAnswer(answer) {
+async function generateAnswer(answer, summarizer) {
     try {
         let answer_summary = ""
 
-
-        let data = JSON.stringify({
-            "text": answer
-        });
-
-        let config = {
-            method: 'post',
-            maxBodyLength: Infinity,
-            url: `${process.env.SUMMARIZE_API_SERVER}/mif`,
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            data: data
-        };
-
         let answer_length = answer.split(/[.?!]/g).filter(Boolean).length;
+
         //Perform Summarization
         if (answer_length > 3) {
-            await axios.request(config)
-                .then((response) => {
-                    let data = response.data;
-                    answer_summary = data && data.length > 0 ? data[0].summary_text : ""
-                })
-                .catch((error) => {
-                    console.log(error);
-                });
+            let response = await summarizer(answer)
+            answer_summary = response && response.length > 0 ? response[0].summary_text : ""
         } else {
             answer_summary = answer
         }
-
 
         return {
             answer_summary: answer_summary,
