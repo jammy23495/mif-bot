@@ -17,7 +17,7 @@ angular.module("myapp", [])
         const BOT_NAME = "MIF Bot";
         const PERSON_NAME = "User";
         $scope.time = formatDate(new Date());
-        
+
         $scope.train_button = "Train"
 
         $scope.submit = () => {
@@ -44,8 +44,7 @@ angular.module("myapp", [])
                 if (status == 200) {
                     $scope.train_button = "Train"
                     alert("Model Trained successfully!")
-                }
-                else {
+                } else {
                     alert("Error in training model")
                 }
             }, function errorCallback(response) {

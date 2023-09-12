@@ -18,9 +18,10 @@ let {
     loadActions
 } = require("./actions")
 
+
 const express = require('express')
 const app = express()
-const port =  process.env.PORT || 9999
+const port = process.env.PORT || 3000
 app.use(express.static('ui'))
 var cors = require('cors')
 app.use(cors({
@@ -52,7 +53,7 @@ let manager;
 })();
 
 app.get('/', async (req, res) => {
-    res.sendFile(ui/index.html)
+    res.sendFile(ui / index.html)
 })
 
 app.get('/ask/:question', async (req, res) => {
@@ -62,12 +63,10 @@ app.get('/ask/:question', async (req, res) => {
     } catch (error) {
         console.log(error)
         res.send({
-            "data": [
-                {
-                    "answer_summary": "I am still learning! I don't understand this. Please ask something related to forum.",
-                    "isGreet": true
-                }
-            ],
+            "data": [{
+                "answer_summary": "I am still learning! I don't understand this. Please ask something related to forum.",
+                "isGreet": true
+            }],
             "response": error
         })
     }
