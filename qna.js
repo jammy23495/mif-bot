@@ -1,13 +1,12 @@
 let {
     getRandomFallbackAnswers,
-    filterString
+    filterString,
+    checkInternet
 } = require("./utils")
 
 let { summarize } = require("./hf")
 const moment = require('moment');
 require('dotenv').config()
-
-let checkInternetConnected = require('check-internet-connected');
 
 
 //QNA
@@ -101,7 +100,7 @@ async function qna(question, manager, summarizer) {
     };
 }
 
-async function generateAnswer(answer, summarizer) {
+async function generateAnswer(answer, offlineSummarizer) {
     try {
         let answer_summary = ""
 
@@ -110,15 +109,16 @@ async function generateAnswer(answer, summarizer) {
         //Perform Summarization
         if (answer_length > 3) {
             let internet = await checkInternet()
-            // Using Transformersjs if internet isn't available
-            if (internet && process.env.isOffline.toLocaleLowerCase() === "true") {
-                let response = await summarizer(answer)
-                answer_summary = response && response.length > 0 ? response[0].summary_text : ""
-            }
+
             // Using huggingfacejs inference if internet is available
-            else {
+            if (internet && process?.env?.runOffline?.toLocaleLowerCase() === "false") {
                 let response = await summarize(answer)
                 answer_summary = response ? response.summary_text : ""
+            }
+            // Using Transformersjs if internet isn't available
+            else {
+                let response = await offlineSummarizer(answer)
+                answer_summary = response && response.length > 0 ? response[0].summary_text : ""
             }
         } else {
             answer_summary = answer
@@ -147,19 +147,6 @@ async function getDataByPOSTID(id) {
     return filteredData
 }
 
-async function checkInternet() {
-    const config = {
-        timeout: 5000, //timeout connecting to each server, each try
-        retries: 5,//number of retries to do before failing
-        domain: 'https://google.com',//the domain to check DNS record of
-    }
-    try {
-        let response = await checkInternetConnected(config);
-        return response
-    } catch (error) {
-        console.log(error)
-    }
-}
 
 module.exports = {
     qna

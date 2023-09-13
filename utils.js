@@ -1,3 +1,6 @@
+
+let checkInternetConnected = require('check-internet-connected');
+
 const fallBackAnswers = ["I am sorry, I don't understand this. Please ask me something related to forum.",
     "I am sorry, I have found no such discussions on this matter in the forum.",
     "I am sorry, I have found no such discussions in the forum. Please check with designated Subject Matter Expert."
@@ -29,9 +32,21 @@ function filterString(answer) {
     }
 }
 
+
+async function checkInternet() {
+    try {
+        let response = await checkInternetConnected();
+        return true
+    } catch (error) {
+        console.log(error)
+        return false;
+    }
+}
+
 module.exports = {
     isNULL,
     isBot,
     getRandomFallbackAnswers,
-    filterString
+    filterString,
+    checkInternet
 }
