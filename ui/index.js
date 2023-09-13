@@ -14,6 +14,7 @@ angular.module("myapp", [])
         // Icons made by Freepik from www.flaticon.com
         const BOT_IMG = "./assets/bot_icon.gif";
         const PERSON_IMG = "./assets/user_icon.gif";
+        const TYPING_BOT = "./assets/typing.gif";
         const BOT_NAME = "MIF Bot";
         const PERSON_NAME = "User";
         $scope.time = formatDate(new Date());
@@ -22,6 +23,7 @@ angular.module("myapp", [])
 
         $scope.submit = () => {
             console.log("In Submit")
+            
             const msgText = msgerInput.value;
             if (!msgText) return;
             console.log(msgText)
@@ -29,6 +31,7 @@ angular.module("myapp", [])
             appendMessage(PERSON_NAME, PERSON_IMG, "right", msgText);
             msgerInput.value = "";
 
+            showLoader("left", BOT_IMG)
             botResponse(msgText);
         }
 
@@ -81,6 +84,7 @@ angular.module("myapp", [])
             }).then(function successCallback(response) {
                 console.log(response.data.data);
 
+                hideLoader()
                 let data = response.data.data;
                 let botAnswer = ""
                 let groups = []
@@ -148,6 +152,7 @@ angular.module("myapp", [])
                 // called asynchronously if an error occurs
                 // or server returns response with an error status.
                 console.log(response)
+                hideLoader()
                 appendMessage(BOT_NAME, BOT_IMG, "left", "Error in sending message. Please connect with Administrator");
             });
         }
@@ -159,7 +164,13 @@ angular.module("myapp", [])
             }, {});
         };
 
+        function showLoader() {
+            $scope.isTyping = true;
+        }
 
+        function hideLoader() {
+            $scope.isTyping = false;
+        }
 
         function formatDate(date) {
             const h = "0" + date.getHours();
