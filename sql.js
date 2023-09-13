@@ -71,6 +71,26 @@ async function getInformationBasket() {
     }
 }
 
+async function getNodalDTE() {
+    try {
+        await sql.connect(sqlConfig)
+        const result = await sql.query`select Id,Name from NodalDte`
+        return result.recordsets[0]
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+async function getTechBytes() {
+    try {
+        await sql.connect(sqlConfig)
+        const result = await sql.query`select * from TechBytes`
+        return result.recordsets[0]
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 
 module.exports = {
     getMIFData,
@@ -78,5 +98,7 @@ module.exports = {
     getListOfCategories,
     getListOfAPSOS,
     getWeeklyQuizAnswers,
-    getInformationBasket
+    getInformationBasket,
+    getNodalDTE,
+    getTechBytes
 }

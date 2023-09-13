@@ -54,7 +54,8 @@ async function train(manager) {
 
         // Train and save the model.
         await manager.train();
-        manager.save();
+        await manager.save();
+        console.log("Model Trained successfully!")
         return {
             "status": "200",
             "message": "Model Trained successfully!"

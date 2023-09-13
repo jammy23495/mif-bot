@@ -74,5 +74,5 @@ app.get('/train', async (req, res) => {
 
 app.listen(port, async () => {
     summarizer = await SummarizationPipeline.getInstance()
-    console.log(`Example app listening on port ${port}`)
+    console.log(`MIF Bot listening on port ${port}`)
 })

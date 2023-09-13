@@ -6,7 +6,9 @@ let {
     getListOfCategories,
     getListOfAPSOS,
     getWeeklyQuizAnswers,
-    getInformationBasket
+    getInformationBasket,
+    getNodalDTE,
+    getTechBytes
 } = require("./sql");
 const {
     get
@@ -275,6 +277,58 @@ async function loadActions(manager, jsonArray, classifications) {
                 })
                 InformationBasketsString += "</ul>"
                 data = generateActionDataResponse(data, "intent_action_showNameOfTheLinks", InformationBasketsString)
+            }
+            data.classifications = classifications;
+        })
+
+        //-------------------------------------------showListOfTechBytes------------------------------------------------------------
+
+        //Documents
+        manager.addDocument('en', 'Give me the list of Tech Bytes', "intent_showListOfTechBytes")
+        manager.addDocument('en', 'Provide me the list of Tech Bytes', "intent_showListOfTechBytes")
+        manager.addDocument('en', 'What are the Tech bytes in MIF?', "intent_showListOfTechBytes")
+        manager.addDocument('en', 'How many tech bytes are there in MIF?', "intent_showListOfTechBytes")
+
+        //Actions
+        manager.addAction("intent_showListOfTechBytes", 'showListOfTechBytes', [], async (data) => {
+            if (data) {
+                let TechBytesList = await getTechBytes();
+                let TechBytesString = `There are ${TechBytesList.length} Tech Bytes in MIF.`
+                TechBytesString += " Below are the list of Tech bytes:\n"
+                TechBytesString += "<ul style='padding: revert; '>"
+                TechBytesList.map((e) => {
+                    TechBytesString += "<li>"
+                    TechBytesString += `${e.Name}`
+                    TechBytesString += "</li>"
+                })
+                TechBytesString += "</ul>"
+                data = generateActionDataResponse(data, "intent_action_showListOfTechBytes", TechBytesString)
+            }
+            data.classifications = classifications;
+        })
+
+        //-------------------------------------------showListOfNodalDTE------------------------------------------------------------
+
+        //Documents
+        manager.addDocument('en', 'Give me the list of nodal DTE', "intent_showListOfNodalDTE")
+        manager.addDocument('en', 'Provide me the list of  nodal DTE', "intent_showListOfNodalDTE")
+        manager.addDocument('en', 'What are the  nodal DTE in MIF?', "intent_showListOfNodalDTE")
+        manager.addDocument('en', 'How many  nodal DTE are there in MIF?', "intent_showListOfNodalDTE")
+
+        //Actions
+        manager.addAction("intent_showListOfNodalDTE", 'showListOfNodalDTE', [], async (data) => {
+            if (data) {
+                let nodalDTEList = await getNodalDTE();
+                let  nodalDTEString = `There are ${nodalDTEList.length} nodal DTE in MIF.`
+                nodalDTEString += " Below are the list of nodal DTE's:\n"
+                nodalDTEString += "<ul style='padding: revert; '>"
+                nodalDTEList.map((e) => {
+                    nodalDTEString += "<li>"
+                    nodalDTEString += `${e.Name}`
+                    nodalDTEString += "</li>"
+                })
+                nodalDTEString += "</ul>"
+                data = generateActionDataResponse(data, "intent_action_showListOfNodalDTE", nodalDTEString)
             }
             data.classifications = classifications;
         })
