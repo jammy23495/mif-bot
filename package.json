@@ -10,9 +10,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@huggingface/inference": "^2.6.1",
     "@nlpjs/basic": "^4.27.0",
     "@xenova/transformers": "^2.6.0",
     "axios": "^1.5.0",
+    "check-internet-connected": "^2.0.6",
     "cors": "^2.8.5",
     "csvtojson": "^2.0.10",
     "dotenv": "^16.3.1",

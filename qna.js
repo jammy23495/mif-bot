@@ -2,9 +2,12 @@ let {
     getRandomFallbackAnswers,
     filterString
 } = require("./utils")
+
+let { summarize } = require("./hf")
 const moment = require('moment');
-let axios = require("axios")
 require('dotenv').config()
+
+let checkInternetConnected = require('check-internet-connected');
 
 
 //QNA
@@ -106,8 +109,17 @@ async function generateAnswer(answer, summarizer) {
 
         //Perform Summarization
         if (answer_length > 3) {
-            let response = await summarizer(answer)
-            answer_summary = response && response.length > 0 ? response[0].summary_text : ""
+            let internet = await checkInternet()
+            // Using Transformersjs if internet isn't available
+            if (internet && process.env.isOffline.toLocaleLowerCase() === "true") {
+                let response = await summarizer(answer)
+                answer_summary = response && response.length > 0 ? response[0].summary_text : ""
+            }
+            // Using huggingfacejs inference if internet is available
+            else {
+                let response = await summarize(answer)
+                answer_summary = response ? response.summary_text : ""
+            }
         } else {
             answer_summary = answer
         }
@@ -133,6 +145,20 @@ async function getDataByPOSTID(id) {
         return s.Post_ID == id
     })
     return filteredData
+}
+
+async function checkInternet() {
+    const config = {
+        timeout: 5000, //timeout connecting to each server, each try
+        retries: 5,//number of retries to do before failing
+        domain: 'https://google.com',//the domain to check DNS record of
+    }
+    try {
+        let response = await checkInternetConnected(config);
+        return response
+    } catch (error) {
+        console.log(error)
+    }
 }
 
 module.exports = {

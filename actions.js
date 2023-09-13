@@ -8,7 +8,8 @@ let {
     getWeeklyQuizAnswers,
     getInformationBasket,
     getNodalDTE,
-    getTechBytes
+    getTechBytes,
+    getAnnouncements
 } = require("./sql");
 const {
     get
@@ -119,7 +120,7 @@ async function loadActions(manager, jsonArray, classifications) {
         manager.addDocument('en', 'How many @post_field are there in post @post_number?', "intent_showCountBasedOnPostTypeAndPostNumber")
         manager.addDocument('en', 'How many @post_field are there on post @post_number?', "intent_showCountBasedOnPostTypeAndPostNumber")
         manager.addDocument('en', 'How many people @post_field on post @post_number?', "intent_showCountBasedOnPostTypeAndPostNumber")
-        
+
 
         //Actions
         manager.addAction("intent_showCountBasedOnPostTypeAndPostNumber", 'showCountBasedOnPostTypeAndPostNumber', [], async (data) => {
@@ -256,7 +257,7 @@ async function loadActions(manager, jsonArray, classifications) {
             data.classifications = classifications;
         })
 
-        
+
         //-------------------------------------------showNameOfTheLinks------------------------------------------------------------
 
         //Documents
@@ -319,7 +320,7 @@ async function loadActions(manager, jsonArray, classifications) {
         manager.addAction("intent_showListOfNodalDTE", 'showListOfNodalDTE', [], async (data) => {
             if (data) {
                 let nodalDTEList = await getNodalDTE();
-                let  nodalDTEString = `There are ${nodalDTEList.length} nodal DTE in MIF.`
+                let nodalDTEString = `There are ${nodalDTEList.length} nodal DTE in MIF.`
                 nodalDTEString += " Below are the list of nodal DTE's:\n"
                 nodalDTEString += "<ul style='padding: revert; '>"
                 nodalDTEList.map((e) => {
@@ -333,6 +334,30 @@ async function loadActions(manager, jsonArray, classifications) {
             data.classifications = classifications;
         })
 
+        //-------------------------------------------showAnnouncements------------------------------------------------------------
+
+        //Documents
+        manager.addDocument('en', 'Give me the list of Announcements', "intent_showAnnouncements")
+        manager.addDocument('en', 'What are the announcements available in MIF?', "intent_showAnnouncements")
+
+        //Actions
+        manager.addAction("intent_showAnnouncements", 'showAnnouncements', [], async (data) => {
+            if (data) {
+                let announcementsList = await getAnnouncements();
+                let announcementsString = `There are ${announcementsList.length} announcements in MIF.`
+                announcementsString += " Below are the list of announcements:\n"
+                announcementsString += "<ul style='padding: revert; '>"
+                announcementsList.map((e) => {
+                    announcementsString += "<li>"
+                    announcementsString += `<b>Announcement: </b>${e.Name}<br/>`
+                    announcementsString += `<b>Description: </b>${e.Description}`
+                    announcementsString += "</li>"
+                })
+                announcementsString += "</ul>"
+                data = generateActionDataResponse(data, "intent_action_showAnnouncements", announcementsString)
+            }
+            data.classifications = classifications;
+        })
 
 
     } catch (error) {

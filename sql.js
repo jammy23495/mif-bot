@@ -91,6 +91,16 @@ async function getTechBytes() {
     }
 }
 
+async function getAnnouncements() {
+    try {
+        await sql.connect(sqlConfig)
+        const result = await sql.query`select * from Announcements`
+        return result.recordsets[0]
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 
 module.exports = {
     getMIFData,
@@ -100,5 +110,6 @@ module.exports = {
     getWeeklyQuizAnswers,
     getInformationBasket,
     getNodalDTE,
-    getTechBytes
+    getTechBytes,
+    getAnnouncements
 }
