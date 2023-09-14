@@ -1,51 +1,53 @@
 <html>
-    <head>
-      <title>MIF Bot</title>
-      <link rel="icon" type="image/x-icon" href="./assets/favico.png">
-      <link rel="stylesheet" href="index.css">
-      <script src="./assets/js/angularjs.min.js"></script>
-    </head>
-    <body ng-app = "myapp" ng-controller = "HelloController" >
-        <section class="msger">
-            <header class="msger-header">
-              <div class="msger-header-title" style="margin: 5px;">
-                <i class="fas fa-comment-alt"></i> MIF Bot <span style="color: #579ffb;" ng-show="isTyping">is typing.....</span>
-              </div>
 
-              <div class="msger-header-options">
-                <span><i class="fas fa-cog"></i></span>
-              </div>
-              
-              <button type="submit" class="msger-send-btn" ng-click="train()" style="padding: 5px !important; border: 1px solid #397fd9;">{{train_button}}</button>
-            </header>
-          
-            <main class="msger-chat">
-              <div class="msg left-msg">
-                <div
-                 class="msg-img"
-                 style="background-image: url(./assets/bot_icon.gif)"
-                ></div>
-          
-                <div class="msg-bubble">
-                  <div class="msg-info">
-                    <div class="msg-info-name">MIF Bot</div>
-                    <div class="msg-info-time">{{time}}</div>
-                  </div>
-          
-                  <div class="msg-text">
-                    Hi, I am MIF Bot! Go ahead and ask me about discussions in the forum.😄
-                  </div>
-                </div>
-              </div>
-          
-            </main>
-          
-            <form class="msger-inputarea">
-              <input type="text" class="msger-input" placeholder="Enter your message..." autofocus>
-              <button type="submit" class="msger-send-btn" ng-click="submit()">Ask</button>
-            </form>
-          </section>
-    </body>
-    
-    <script type="text/javascript" src="index.js"></script>
+<head>
+  <title>MIF Bot</title>
+  <link rel="icon" type="image/x-icon" href="./assets/favico.png">
+  <link rel="stylesheet" href="index.css">
+  <script src="./assets/js/angularjs.min.js"></script>
+</head>
+
+<body ng-app="myapp" ng-controller="HelloController">
+  <section class="msger">
+    <header class="msger-header">
+      <div class="msger-header-title" style="margin: 5px;">
+        <i class="fas fa-comment-alt"></i> MIF Bot <span style="color: #579ffb;" ng-show="isTyping">is
+          typing.....</span>
+      </div>
+
+      <div class="msger-header-options">
+        <span><i class="fas fa-cog"></i></span>
+      </div>
+
+      <button type="submit" class="msger-send-btn" ng-click="train()"
+        style="padding: 5px !important; border: 1px solid #397fd9;">{{train_button}}</button>
+    </header>
+
+    <main class="msger-chat">
+      <div class="msg left-msg">
+        <div class="msg-img" style="background-image: url(./assets/bot_icon.gif)"></div>
+
+        <div class="msg-bubble">
+          <div class="msg-info">
+            <div class="msg-info-name">MIF Bot</div>
+            <div class="msg-info-time">{{time}}</div>
+          </div>
+
+          <div class="msg-text">
+            Hi, I am MIF Bot! Go ahead and ask me about discussions in the forum.😄
+          </div>
+        </div>
+      </div>
+
+    </main>
+
+    <form class="msger-inputarea">
+      <input type="text" id="msg" class="msger-input" placeholder="Enter your message..." autofocus>
+      <button type="submit" class="msger-send-btn" ng-click="submit()">Ask</button>
+    </form>
+  </section>
+</body>
+
+<script type="text/javascript" src="index.js"></script>
+
 </html>

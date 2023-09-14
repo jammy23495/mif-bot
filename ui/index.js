@@ -9,6 +9,34 @@ function get(selector, root = document) {
     return root.querySelector(selector);
 }
 
+document.getElementById("msg").addEventListener("focus", function () {
+
+    document.onkeydown = (e) => {
+        e = e || window.event;
+        let queries = JSON.parse(localStorage.getItem("queries")) || []
+        let currentQuery = localStorage.getItem("currentQuery") || (queries.length - 1)
+        currentQuery = parseInt(currentQuery)
+        if (e.keyCode === 38) {
+            if (currentQuery > 0) {
+                currentQuery--
+                localStorage.setItem("currentQuery", currentQuery)
+            }
+
+            msgerInput.value = queries[currentQuery]
+        }
+        else if (e.keyCode === 40) {
+            if (currentQuery < (queries.length - 1)) {
+                currentQuery++
+                localStorage.setItem("currentQuery", currentQuery)
+            }
+
+            msgerInput.value = queries[currentQuery]
+        }
+
+    };
+});
+
+
 angular.module("myapp", [])
     .controller("HelloController", function ($scope, $http) {
         // Icons made by Freepik from www.flaticon.com
@@ -23,10 +51,14 @@ angular.module("myapp", [])
 
         $scope.submit = () => {
             console.log("In Submit")
-            
+
             const msgText = msgerInput.value;
             if (!msgText) return;
             console.log(msgText)
+
+            let queries = JSON.parse(localStorage.getItem("queries")) || []
+            queries.push(msgText)
+            localStorage.setItem("queries", JSON.stringify(queries));
 
             appendMessage(PERSON_NAME, PERSON_IMG, "right", msgText);
             msgerInput.value = "";

@@ -40,14 +40,11 @@ async function qna(question, manager, summarizer) {
 
             //Valid Classifications found
             if (validClassifications && validClassifications.length > 0) {
-                let allAnswers = []
                 for (let i = 0; i < validClassifications.length; i++) {
                     if (validClassifications[i].intent.includes("MIF")) {
                         let intent = validClassifications[i].intent.split("_");
                         let POST_ID = intent[0];
-                        console.log(POST_ID)
                         let post = await getDataByPOSTID(POST_ID)
-                        console.log(post)
                         if (post && post.length > 0) {
                             for (let j = 0; j < post.length; j++) {
                                 let comment_summary = post[j].Comment && post[j].Comment != "NULL" ? await generateAnswer(filterString(post[j].Comment), summarizer) : {
@@ -112,11 +109,13 @@ async function generateAnswer(answer, offlineSummarizer) {
 
             // Using huggingfacejs inference if internet is available
             if (internet && process?.env?.runOffline?.toLocaleLowerCase() === "false") {
+                console.log("Running on Huggingface online inference")
                 let response = await summarize(answer)
                 answer_summary = response ? response.summary_text : ""
             }
             // Using Transformersjs if internet isn't available
             else {
+                console.log("Running on Transformers offline pipeline")
                 let response = await offlineSummarizer(answer)
                 answer_summary = response && response.length > 0 ? response[0].summary_text : ""
             }
