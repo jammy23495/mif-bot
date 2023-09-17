@@ -65,6 +65,7 @@ async function loadActions(manager, jsonArray, classifications) {
 
         //Documents
         manager.addDocument('en', 'How many @post_type are there in MIF?', "intent_showCountBasedOnPostType")
+        manager.addDocument('en', 'How many @post_type in MIF?', "intent_showCountBasedOnPostType")
         manager.addDocument('en', 'What are the number of @post_type available in MIF?', "intent_showCountBasedOnPostType")
 
         //Actions
