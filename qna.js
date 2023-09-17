@@ -62,12 +62,12 @@ async function qna(question, manager, summarizer) {
                                         "Subject": post[j].Subject,
                                         "Question": question_summary.answer_summary,
                                         "FeedType": post[j].FeedType,
-                                        "Posted_On": moment(post[j].Submitted_On, "YYYY-MM-DD").format('MMMM Do YYYY'),
+                                        "Posted_On": moment(post[j].Submitted_On, "DD-MM-YYYY").format('MMMM Do YYYY'),
                                         "Likes": post[j].LikeCount,
                                         "Comments": post[j].CommentCount,
                                         "Views": post[j].ViewCount,
                                         "Comment_By": post[j].Comment_By,
-                                        "Commented_On": moment(post[j].Comment_On, "YYYY-MM-DD").format('MMMM Do YYYY'),
+                                        "Commented_On": moment(post[j].Comment_On, "DD-MM-YYYY").format('MMMM Do YYYY'),
                                         "Category": post[j].Category
                                     }
                                 })
