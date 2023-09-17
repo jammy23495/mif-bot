@@ -10,7 +10,8 @@ let {
     getNodalDTE,
     getTechBytes,
     getAnnouncements,
-    getDistinctMIFBotData
+    getDistinctMIFBotData,
+    getAPSOsPosts
 } = require("./sql");
 
 
@@ -41,7 +42,7 @@ async function loadActions(manager, jsonArray, classifications) {
                 entities.filter(async (ent) => {
                     if (ent.entity === "answered_by") {
                         jsonArray.filter(async (c) => {
-                            if (c ?.Comment_By ?.toLowerCase().includes(ent.sourceText.toLowerCase())) {
+                            if (c?.Comment_By?.toLowerCase().includes(ent.sourceText.toLowerCase())) {
                                 let intent = c.Post_ID + `_${c.Topic || "MIF"}` + "_intent_" + c.Subject.replaceAll(" ", "_")
                                 classifications.push({
                                     "intent": intent,
@@ -456,29 +457,21 @@ async function loadActions(manager, jsonArray, classifications) {
         //-------------------------------------------showAPSOsPosts------------------------------------------------------------
 
         //Documents
-        manager.addDocument('en', 'Give me the list of Announcements', "intent_showAnnouncements")
-        manager.addDocument('en', 'What are the announcements available in MIF?', "intent_showAnnouncements")
+        manager.addDocument('en', 'How many posts of APSOs?', "intent_showAPSOsPosts")
+        manager.addDocument('en', 'What is the count of posts that are posted by APSOs?', "intent_showAPSOsPosts")
 
         //Actions
-        manager.addAction("intent_showAnnouncements", 'showAnnouncements', [], async (data) => {
+        manager.addAction("intent_showAPSOsPosts", 'showAPSOsPosts', [], async (data) => {
             if (data) {
-                let announcementsList = await getAnnouncements();
-                4
-                if (announcementsList.length > 0) {
-                    let announcementsString = `There are ${announcementsList.length} announcements in MIF.`
-                    announcementsString += " Below are the list of announcements:\n"
-                    announcementsString += "<ul style='padding: revert; '>"
-                    announcementsList.map((e) => {
-                        announcementsString += "<li>"
-                        announcementsString += `<b>Announcement: </b>${e.Name}<br/>`
-                        announcementsString += `<b>Description: </b>${e.Description}`
-                        announcementsString += "</li>"
-                    })
-                    announcementsString += "</ul>"
-                    data = generateActionDataResponse(data, "intent_action_showAnnouncements", announcementsString)
+                let APSOsPostList = await getAPSOsPosts();
+
+                if (APSOsPostList[0].APSOsFeedCount > 0) {
+                    let APSOsString = `There are ${APSOsPostList[0].APSOsFeedCount} posts by APSO's in MIF.`
+                    data = generateActionDataResponse(data, "intent_action_showAPSOsPosts", APSOsString)
                 } else {
-                    data = generateActionDataResponse(data, "intent_action_showAnnouncements", "I am not able to find any latest announcements in MIF")
+                    data = generateActionDataResponse(data, "intent_action_showAPSOsPosts", "There are no posts by APSOs in MIF")
                 }
+
             }
             data.classifications = classifications;
         })
