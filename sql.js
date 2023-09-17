@@ -14,7 +14,7 @@ const sqlConfig = {
 async function getMIFData() {
     try {
         await sql.connect(sqlConfig)
-        const result = await sql.query`select * from MIFBOT`
+        const result = await sql.query `select * from MIFBOT`
         return result.recordsets[0]
     } catch (error) {
         console.log(error)
@@ -24,7 +24,7 @@ async function getMIFData() {
 async function getListOfExperts() {
     try {
         await sql.connect(sqlConfig)
-        const result = await sql.query`exec GetExpertList`
+        const result = await sql.query `exec GetExpertList`
         return result.recordsets[0]
     } catch (error) {
         console.log(error)
@@ -34,7 +34,7 @@ async function getListOfExperts() {
 async function getListOfAPSOS() {
     try {
         await sql.connect(sqlConfig)
-        const result = await sql.query`exec GetAPSOsList`
+        const result = await sql.query `exec GetAPSOsList`
         return result.recordsets[0]
     } catch (error) {
         console.log(error)
@@ -44,7 +44,7 @@ async function getListOfAPSOS() {
 async function getWeeklyQuizAnswers() {
     try {
         await sql.connect(sqlConfig)
-        const result = await sql.query`exec GetCorrectAnsMemberList`
+        const result = await sql.query `exec GetCorrectAnsMemberList`
         return result.recordsets[0]
     } catch (error) {
         console.log(error)
@@ -54,7 +54,7 @@ async function getWeeklyQuizAnswers() {
 async function getListOfCategories() {
     try {
         await sql.connect(sqlConfig)
-        const result = await sql.query`select Name from Categories`
+        const result = await sql.query `select Name from Categories`
         return result.recordsets[0]
     } catch (error) {
         console.log(error)
@@ -64,7 +64,7 @@ async function getListOfCategories() {
 async function getInformationBasket() {
     try {
         await sql.connect(sqlConfig)
-        const result = await sql.query`select * from InformationBaskets`
+        const result = await sql.query `select * from InformationBaskets`
         return result.recordsets[0]
     } catch (error) {
         console.log(error)
@@ -74,7 +74,7 @@ async function getInformationBasket() {
 async function getNodalDTE() {
     try {
         await sql.connect(sqlConfig)
-        const result = await sql.query`select Id,Name from NodalDte`
+        const result = await sql.query `select Id,Name from NodalDte`
         return result.recordsets[0]
     } catch (error) {
         console.log(error)
@@ -84,7 +84,7 @@ async function getNodalDTE() {
 async function getTechBytes() {
     try {
         await sql.connect(sqlConfig)
-        const result = await sql.query`select * from TechBytes`
+        const result = await sql.query `select * from TechBytes`
         return result.recordsets[0]
     } catch (error) {
         console.log(error)
@@ -94,7 +94,28 @@ async function getTechBytes() {
 async function getAnnouncements() {
     try {
         await sql.connect(sqlConfig)
-        const result = await sql.query`select * from Announcements`
+        const result = await sql.query `select * from Announcements`
+        return result.recordsets[0]
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+async function getDistinctMIFBotData() {
+    try {
+        await sql.connect(sqlConfig)
+        const result = await sql.query `select distinct POST_ID, FeedType, IsActive from MIFBOT`
+        return result.recordsets[0]
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+
+async function getAPSOsPosts() {
+    try {
+        await sql.connect(sqlConfig)
+        const result = await sql.query `exec GetAPSOsFeedCount`
         return result.recordsets[0]
     } catch (error) {
         console.log(error)
@@ -111,5 +132,7 @@ module.exports = {
     getInformationBasket,
     getNodalDTE,
     getTechBytes,
-    getAnnouncements
+    getAnnouncements,
+    getDistinctMIFBotData,
+    getAPSOsPosts
 }
