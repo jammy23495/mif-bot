@@ -34,6 +34,7 @@ async function loadActions(manager, jsonArray, classifications) {
         //Documents
         manager.addDocument('en', 'Show me the comments given by @answered_by', "intent_showCommentsByName");
         manager.addDocument('en', 'Is there any comments given by @answered_by', "intent_showCommentsByName");
+        manager.addDocument('en', 'How many comments by @answered_by', "intent_showCommentsByName");
 
         //Action
         manager.addAction("intent_showCommentsByName", 'showCommentsByName', [], async (data) => {
