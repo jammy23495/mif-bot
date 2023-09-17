@@ -265,7 +265,7 @@ async function loadActions(manager, jsonArray, classifications) {
                     expertString += "<ul style='padding: revert; '>"
                     expertList.map((e) => {
                         expertString += "<li>"
-                        expertString += `${e.Name}(${e.Category})`
+                        expertString += `${e.Name} (${e.Category})`
                         expertString += "</li>"
                     })
                     expertString += "</ul>"
