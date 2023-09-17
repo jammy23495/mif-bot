@@ -11,7 +11,8 @@ let {
     getTechBytes,
     getAnnouncements,
     getDistinctMIFBotData,
-    getAPSOsPosts
+    getAPSOsPosts,
+    getAttachmentsInIS
 } = require("./sql");
 
 
@@ -46,14 +47,14 @@ async function loadActions(manager, jsonArray, classifications) {
                                 let intent = c.Post_ID + `_${c.Topic || "MIF"}` + "_intent_" + c.Subject.replaceAll(" ", "_")
                                 classifications.push({
                                     "intent": intent,
-                                    "score": 0.5
+                                    "score": 1
                                 })
                             } else {
-                                data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showCommentsByNameError" : "intent_action_showCommentsByName", "I am sorry! I cannot find the posts/queries by this person")
+                                data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showCommentsByNameError" : "intent_action_showCommentsByName", `I am sorry! I cannot find the comments by this person`)
                             }
                         })
                     } else {
-                        data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showCommentsByNameError" : "intent_action_showCommentsByName", "I am sorry! I cannot find the posts/queries by this person")
+                        data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showCommentsByNameError" : "intent_action_showCommentsByName", `I am sorry! I cannot find the comments by this person`)
                     }
                 })
             }
@@ -434,7 +435,7 @@ async function loadActions(manager, jsonArray, classifications) {
         manager.addAction("intent_showAnnouncements", 'showAnnouncements', [], async (data) => {
             if (data) {
                 let announcementsList = await getAnnouncements();
-                4
+
                 if (announcementsList.length > 0) {
                     let announcementsString = `There are ${announcementsList.length} announcements in MIF.`
                     announcementsString += " Below are the list of announcements:\n"
@@ -454,6 +455,7 @@ async function loadActions(manager, jsonArray, classifications) {
             data.classifications = classifications;
         })
 
+
         //-------------------------------------------showAPSOsPosts------------------------------------------------------------
 
         //Documents
@@ -472,6 +474,54 @@ async function loadActions(manager, jsonArray, classifications) {
                     data = generateActionDataResponse(data, "intent_action_showAPSOsPosts", "There are no posts by APSOs in MIF")
                 }
 
+            }
+            data.classifications = classifications;
+        })
+
+
+
+
+        //-------------------------------------------showAttachmentsInIS------------------------------------------------------------
+
+        //Documents
+        manager.addDocument('en', 'How many attachment or pdf are there in information section?', "intent_showAttachmentsInIS")
+        manager.addDocument('en', 'Give me the list of attachment or pdf that are available in information section', "intent_showAttachmentsInIS")
+
+        //Actions
+        manager.addAction("intent_showAttachmentsInIS", 'showAttachmentsInIS', [], async (data) => {
+            if (data) {
+                let attachmentsList = await getAttachmentsInIS();
+
+                if (attachmentsList.length > 0) {
+                    let attachmentsString = `There are ${attachmentsList.length} attachments in Information Basket.`
+                    data = generateActionDataResponse(data, "intent_action_showAnnouncements", attachmentsString)
+                } else {
+                    data = generateActionDataResponse(data, "intent_action_showAnnouncements", "I am not able to find any attachments in Information Basket")
+                }
+            }
+            data.classifications = classifications;
+        })
+
+
+        //-------------------------------------------showCOMLikePost------------------------------------------------------------
+
+        //Documents
+        manager.addDocument('en', 'How many post and query COM like?', "intent_showCOMLikePost")
+        manager.addDocument('en', 'Give me the count of number of posts/queries COM liked', "intent_showCOMLikePost")
+
+        //Actions
+        manager.addAction("intent_showCOMLikePost", 'showCOMLikePost', [], async (data) => {
+            if (data) {
+                let COMLikedList = await getMIFData();
+                let numberCOMLikedList = COMLikedList.filter((e) => {
+                    e.Feed_COM_LIKE == 1
+                })
+                if (numberCOMLikedList.length > 0) {
+                    let attachmentsString = `${numberCOMLikedList.length} posts/queries has been liked by COM`
+                    data = generateActionDataResponse(data, "intent_action_showCOMLikePost", attachmentsString)
+                } else {
+                    data = generateActionDataResponse(data, "intent_action_showCOMLikePost", "I am not able to find any posts/queries that are liked by COM")
+                }
             }
             data.classifications = classifications;
         })

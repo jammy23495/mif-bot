@@ -104,7 +104,7 @@ async function getAnnouncements() {
 async function getDistinctMIFBotData() {
     try {
         await sql.connect(sqlConfig)
-        const result = await sql.query `select distinct POST_ID, FeedType, IsActive from MIFBOT`
+        const result = await sql.query `select distinct POST_ID, FeedType, IsActive, Feed_COM_LIKE from MIFBOT`
         return result.recordsets[0]
     } catch (error) {
         console.log(error)
@@ -123,6 +123,18 @@ async function getAPSOsPosts() {
 }
 
 
+async function getAttachmentsInIS() {
+    try {
+        await sql.connect(sqlConfig)
+        const result = await sql.query `select * from InformationBaskets I inner join Members m on  I.CreatedBy = m.Id`
+        return result.recordsets[0]
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+
+
 module.exports = {
     getMIFData,
     getListOfExperts,
@@ -134,5 +146,6 @@ module.exports = {
     getTechBytes,
     getAnnouncements,
     getDistinctMIFBotData,
-    getAPSOsPosts
+    getAPSOsPosts,
+    getAttachmentsInIS
 }
