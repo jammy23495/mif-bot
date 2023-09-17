@@ -20,6 +20,7 @@ async function loadActions(manager, jsonArray, classifications) {
     try {
         //Entities
         manager.addNerAfterLastCondition('en', 'answered_by', 'by');
+        manager.addNerAfterLastCondition('en', 'answered_by', 'of');
         manager.addNerAfterLastCondition('en', 'post_number', 'in');
         manager.addNerAfterLastCondition('en', 'post_number', 'post');
         manager.addNerRuleOptionTexts('en', 'post_type', 'post', ["Posts", "post", "posts", "Post"]);
@@ -33,6 +34,7 @@ async function loadActions(manager, jsonArray, classifications) {
 
         //Documents
         manager.addDocument('en', 'Show me the comments given by @answered_by', "intent_showCommentsByName");
+        manager.addDocument('en', 'Show me the comments of @answered_by', "intent_showCommentsByName");
         manager.addDocument('en', 'Is there any comments given by @answered_by', "intent_showCommentsByName");
         manager.addDocument('en', 'How many comments by @answered_by', "intent_showCommentsByName");
 
