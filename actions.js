@@ -70,7 +70,7 @@ async function loadActions(manager, jsonArray, classifications) {
 
         //Actions
         manager.addAction("intent_showCountBasedOnPostType", 'showCountBasedOnPostType', [], async (data) => {
-            jsonArray = await getDistinctMIFBotData()
+            let jsonArray = await getDistinctMIFBotData()
             if (data && data.entities.length > 0) {
                 let entities = data.entities;
                 let post_type = entities.filter((e) => {
@@ -123,7 +123,7 @@ async function loadActions(manager, jsonArray, classifications) {
 
         //Actions
         manager.addAction("intent_showCountBasedOnPostTypeStatus", 'showCountBasedOnPostTypeStatus', [], async (data) => {
-            jsonArray = await getDistinctMIFBotData()
+            let jsonArray = await getDistinctMIFBotData()
             if (data && data.entities.length > 0) {
                 let entities = data.entities;
                 let post_type = entities.filter((e) => {
