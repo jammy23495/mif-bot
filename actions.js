@@ -12,7 +12,8 @@ let {
     getAnnouncements,
     getDistinctMIFBotData,
     getAPSOsPosts,
-    getAttachmentsInIS
+    getAttachmentsInIS,
+    getTechBytesHistory
 } = require("./sql");
 
 
@@ -206,7 +207,7 @@ async function loadActions(manager, jsonArray, classifications) {
                         "score": 1
                     })
                     let numberOfPosts = jsonArray.filter((e) => {
-                        return !e.Post_ID.toString().includes("Bot") && e.Post_ID.toString() === post_number.sourceText.replace(/[^0-9]/g, "");
+                        return !e.Post_ID.toString().includes("Bot") && e.QueryNumber.toString() == post_number.sourceText.replace(/[^0-9]/g, "");
                     })[0]
 
                     //For comments
@@ -380,7 +381,7 @@ async function loadActions(manager, jsonArray, classifications) {
         //Actions
         manager.addAction("intent_showListOfTechBytes", 'showListOfTechBytes', [], async (data) => {
             if (data) {
-                let TechBytesList = await getTechBytes();
+                let TechBytesList = await getTechBytesHistory();
                 if (TechBytesList.length > 0) {
                     let TechBytesString = `There are ${TechBytesList.length} Tech Bytes in MIF.`
                     TechBytesString += " Below are the list of Tech bytes:\n"
@@ -394,6 +395,36 @@ async function loadActions(manager, jsonArray, classifications) {
                     data = generateActionDataResponse(data, "intent_action_showListOfTechBytes", TechBytesString)
                 } else {
                     data = generateActionDataResponse(data, "intent_action_showListOfTechBytes", "I am not able to find any tech bytes in MIF")
+                }
+            }
+            data.classifications = classifications;
+        })
+
+        //-------------------------------------------showListOfLatestTechBytes------------------------------------------------------------
+
+        //Documents
+        manager.addDocument('en', 'Give me the list of latest Tech Bytes', "intent_showListOfLatestTechBytes")
+        manager.addDocument('en', 'Provide me the list of latest Tech Bytes', "intent_showListOfLatestTechBytes")
+        manager.addDocument('en', 'What are the latest Tech bytes in MIF?', "intent_showListOfLatestTechBytes")
+        manager.addDocument('en', 'How many latest tech bytes are there in MIF?', "intent_showListOfLatestTechBytes")
+
+        //Actions
+        manager.addAction("intent_showListOfLatestTechBytes", 'showListOfLatestTechBytes', [], async (data) => {
+            if (data) {
+                let TechBytesList = await getTechBytes();
+                if (TechBytesList.length > 0) {
+                    let TechBytesString = `There are ${TechBytesList.length} latest Tech Bytes in MIF.`
+                    TechBytesString += " Below are the list of Tech bytes:\n"
+                    TechBytesString += "<ul style='padding: revert; '>"
+                    TechBytesList.map((e) => {
+                        TechBytesString += "<li>"
+                        TechBytesString += `${e.Name}`
+                        TechBytesString += "</li>"
+                    })
+                    TechBytesString += "</ul>"
+                    data = generateActionDataResponse(data, "intent_action_showListOfLatestTechBytes", TechBytesString)
+                } else {
+                    data = generateActionDataResponse(data, "intent_action_showListOfLatestTechBytes", "I am not able to find any latest tech bytes in MIF")
                 }
             }
             data.classifications = classifications;

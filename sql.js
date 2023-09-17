@@ -91,6 +91,16 @@ async function getTechBytes() {
     }
 }
 
+async function getTechBytesHistory() {
+    try {
+        await sql.connect(sqlConfig)
+        const result = await sql.query `select * from TechByteshistory`
+        return result.recordsets[0]
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 async function getAnnouncements() {
     try {
         await sql.connect(sqlConfig)
@@ -147,5 +157,6 @@ module.exports = {
     getAnnouncements,
     getDistinctMIFBotData,
     getAPSOsPosts,
-    getAttachmentsInIS
+    getAttachmentsInIS,
+    getTechBytesHistory
 }
