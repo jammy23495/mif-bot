@@ -534,6 +534,7 @@ async function loadActions(manager, jsonArray, classifications) {
 
         //Documents
         manager.addDocument('en', 'Give me the list of Announcements', "intent_showAnnouncements")
+        manager.addDocument('en', 'Give me the list of latest Announcements', "intent_showAnnouncements")
         manager.addDocument('en', 'What are the announcements available in MIF?', "intent_showAnnouncements")
 
         //Actions

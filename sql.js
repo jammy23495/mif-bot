@@ -104,7 +104,7 @@ async function getTechBytesHistory() {
 async function getAnnouncements() {
     try {
         await sql.connect(sqlConfig)
-        const result = await sql.query `select * from Announcements`
+        const result = await sql.query `SELECT TOP (1) * FROM Announcements order by Created desc`
         return result.recordsets[0]
     } catch (error) {
         console.log(error)
