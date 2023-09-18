@@ -114,7 +114,7 @@ async function getAnnouncements() {
 async function getDistinctMIFBotData() {
     try {
         await sql.connect(sqlConfig)
-        const result = await sql.query `select distinct POST_ID, FeedType, IsActive, Feed_COM_LIKE from MIFBOT`
+        const result = await sql.query `select distinct POST_ID, FeedType, IsActive, Feed_COM_LIKE, IsExpertLiked,IsAPSOsLiked from MIFBOT`
         return result.recordsets[0]
     } catch (error) {
         console.log(error)
