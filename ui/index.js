@@ -23,8 +23,7 @@ document.getElementById("msg").addEventListener("focus", function () {
             }
 
             msgerInput.value = queries[currentQuery]
-        }
-        else if (e.keyCode === 40) {
+        } else if (e.keyCode === 40) {
             if (currentQuery < (queries.length - 1)) {
                 currentQuery++
                 localStorage.setItem("currentQuery", currentQuery)
@@ -101,7 +100,7 @@ angular.module("myapp", [])
                   <div class="msg-info-time">${formatDate(new Date())}</div>
                 </div>
         
-                <div class="msg-text">${text}</div>
+                <div class="msg-text" style="word-wrap: break-word;">${text}</div>
               </div>
             </div>
           `;
