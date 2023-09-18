@@ -28,6 +28,7 @@ async function qna(question, manager, summarizer) {
             "answer_summary": answer,
             "isGreet": true
         })
+        console.log(answer)
     }
     // For other topics rather than greet
     else {
@@ -35,7 +36,7 @@ async function qna(question, manager, summarizer) {
         if (response && response.classifications && response.classifications.length > 0) {
             let classifications = response.classifications;
             let validClassifications = classifications.filter((e) => {
-                return e.score > 0.1 && !e.intent.toLowerCase().includes("greet")
+                return e.score > 0.3 && !e.intent.toLowerCase().includes("greet")
             })
 
             //Valid Classifications found

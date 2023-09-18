@@ -59,6 +59,7 @@ angular.module("myapp", [])
             let queries = JSON.parse(localStorage.getItem("queries")) || []
             queries.push(msgText)
             localStorage.setItem("queries", JSON.stringify(queries));
+            localStorage.setItem("currentQuery", (queries.length - 1))
 
             appendMessage(PERSON_NAME, PERSON_IMG, "right", msgText);
             msgerInput.value = "";
