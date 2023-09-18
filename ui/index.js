@@ -139,7 +139,7 @@ angular.module("myapp", [])
                         botAnswer += `${groupedData[properties[index]].length} ${properties[index]}, `
                     }
                     botAnswer += totalComments > 0 ? ` and ${totalComments} comments ` : ""
-                    botAnswer += `related to your query, here are the details:</p>`
+                    botAnswer += `related to your question, here are the details:</p>`
 
                     // botAnswer += `I have found ${data.length} posts/queries & ${data.length} comments related to your query, here are the details: <br><br>`
                     for (let i = 0; i < data.length; i++) {
