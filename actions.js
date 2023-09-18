@@ -98,8 +98,6 @@ async function loadActions(manager, jsonArray, classifications) {
                     //Get Posts
                     if (post_type.option == "post") {
                         jsonArray.filter(async (c) => {
-                            console.log("DB: ", c.SubmittedBy.toLowerCase().trim())
-                            console.log("NLP: ", answered_by.sourceText.toLowerCase().trim())
                             if (c && c.SubmittedBy && c.SubmittedBy.toLowerCase().trim().includes(answered_by.sourceText.toLowerCase().trim()) && c.FeedType.toLowerCase().includes("post")) {
                                 let intent = c.Post_ID + `_${c.Topic || "MIF"}` + "_intent_" + c.Subject.replaceAll(" ", "_")
                                 classifications.push({
