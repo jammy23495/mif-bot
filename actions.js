@@ -74,8 +74,10 @@ async function loadActions(manager, jsonArray, classifications) {
                 if (answered_by && post_field) {
                     //Get Comments
                     if (post_field.option == "comment") {
+                        let commentCount = 0;
                         jsonArray.filter(async (c) => {
                             if (c && c.Comment_By && c.Comment_By.toLowerCase().includes(answered_by.sourceText.toLowerCase())) {
+                                commentCount++;
                                 let intent = c.Post_ID + `_${c.Topic || "MIF"}` + "_intent_" + c.Subject.replaceAll(" ", "_")
                                 classifications.push({
                                     "intent": intent,
@@ -85,6 +87,8 @@ async function loadActions(manager, jsonArray, classifications) {
                                 data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showCommentsByName" : "intent_action_showCommentsByName", `I am sorry! I cannot find the comments by ${answered_by.sourceText || "this person"}`)
                             }
                         })
+                        data.commentCount = commentCount
+                        console.log("Comment Count: ", commentCount)
                     }
                 }
                 //Get Post and Queries of a person
@@ -124,6 +128,7 @@ async function loadActions(manager, jsonArray, classifications) {
             }
             data.classifications = classifications;
         });
+
 
         //-------------------------------------------showCountBasedOnPostType------------------------------------------------------------
 

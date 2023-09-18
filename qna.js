@@ -34,6 +34,8 @@ async function qna(question, manager, summarizer) {
     else {
         //Classifcations found
         if (response && response.classifications && response.classifications.length > 0) {
+            
+            let isCommentsAdded = true;
             let classifications = response.classifications;
             let validClassifications = classifications.filter((e) => {
                 return e.score > 0.3 && !e.intent.toLowerCase().includes("greet")
@@ -47,10 +49,19 @@ async function qna(question, manager, summarizer) {
                         let POST_ID = intent[0];
                         let post = await getDataByPOSTID(POST_ID)
                         if (post && post.length > 0) {
+
                             for (let j = 0; j < post.length; j++) {
                                 let comment_summary = post[j].Comment && post[j].Comment != "NULL" ? await generateAnswer(filterString(post[j].Comment), summarizer) : {
                                     "answer_summary": "No comments found!",
                                     "isGreet": false
+                                }
+                                let finalCommentCount = 0;
+                                if (response.commentCount && isCommentsAdded) {
+                                    finalCommentCount = response.commentCount;
+                                    isCommentsAdded = false
+                                }
+                                else {
+                                    finalCommentCount = 0
                                 }
 
                                 let question_summary = await generateAnswer(filterString(post[j].Question), summarizer)
@@ -65,7 +76,7 @@ async function qna(question, manager, summarizer) {
                                         "FeedType": post[j].FeedType,
                                         "Posted_On": moment(post[j].Submitted_On, "YYYY-MM-DD").format('MMMM Do YYYY'),
                                         "Likes": post[j].LikeCount,
-                                        "Comments": post[j].CommentCount,
+                                        "Comments": finalCommentCount,
                                         "Views": post[j].ViewCount,
                                         "Comment_By": post[j].Comment_By,
                                         "Commented_On": moment(post[j].Comment_On, "YYYY-MM-DD").format('MMMM Do YYYY'),
