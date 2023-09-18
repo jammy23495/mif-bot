@@ -26,8 +26,6 @@ async function loadActions(manager, jsonArray, classifications) {
         //Entities
         manager.addNerAfterLastCondition('en', 'answered_by', 'by');
         manager.addNerAfterLastCondition('en', 'answered_by', 'of');
-        manager.addNerAfterLastCondition('en', 'answered_by_person_type', 'by');
-        manager.addNerAfterLastCondition('en', 'answered_by_person_type', 'of');
         manager.addNerAfterLastCondition('en', 'post_number', 'in');
         manager.addNerAfterLastCondition('en', 'post_number', 'post');
         manager.addNerAfterLastCondition('en', 'post_number', 'no');
@@ -42,7 +40,7 @@ async function loadActions(manager, jsonArray, classifications) {
         manager.addNerRuleOptionTexts('en', 'post_type', 'Expert Post', ["Expert Post", "Expert Posts", "expert post", "expert posts"]);
 
         manager.addNerRuleOptionTexts('en', 'answered_by_person_type', 'COM', ["COM", "com"]);
-        manager.addNerRuleOptionTexts('en', 'answered_by_person_type', 'Expert', ["expert", "experts"]);
+        manager.addNerRuleOptionTexts('en', 'answered_by_person_type', 'Expert', ["expert", "experts", "Subject Matter Expert"]);
         manager.addNerRuleOptionTexts('en', 'answered_by_person_type', 'APSOs', ["apsos", "APSOs", "APSO's", "apso's"]);
 
         //-------------------------------------------showCommentsByName------------------------------------------------------------
@@ -137,6 +135,7 @@ async function loadActions(manager, jsonArray, classifications) {
 
         //Documents
         manager.addDocument('en', 'How many @post_type are there in MIF?', "intent_showCountBasedOnPostType")
+        manager.addDocument('en', 'How many queries in MIF?', "intent_showCountBasedOnPostType")
         manager.addDocument('en', 'How many @post_type in MIF?', "intent_showCountBasedOnPostType")
         manager.addDocument('en', 'What are the number of @post_type available in MIF?', "intent_showCountBasedOnPostType")
         manager.addDocument('en', 'How many posts of @post_type available in MIF?', "intent_showCountBasedOnPostType")
@@ -633,6 +632,10 @@ async function loadActions(manager, jsonArray, classifications) {
         manager.addAction("intent_showPersonTypeLikePost", 'showPersonTypeLikePost', [], async (data) => {
             if (data) {
                 if (data && data.entities.length > 0) {
+                    classifications.push({
+                        "intent": "intent_showPersonTypeLikePost",
+                        "score": 1
+                    })
                     let entities = data.entities;
                     let answered_by_person_type = entities.filter((e) => {
                         return e.entity === "answered_by_person_type"
@@ -663,37 +666,29 @@ async function loadActions(manager, jsonArray, classifications) {
                     })
 
                     if (answered_by_person_type && post_field) {
-                        classifications.push({
-                            "intent": "intent_showPersonTypeLikePost",
-                            "score": 1
-                        })
                         //For Likes
                         if (post_field.option == "likes") {
                             if (answered_by_person_type.option == "COM" || answered_by_person_type.sourceText.toLowerCase().includes("com")) {
                                 data = generateActionDataResponse(data, "intent_action_showPersonTypeLikePost", numberCOMLikedList.length > 0 ? `There are ${numberCOMLikedList.length} likes by COM in MIF` : "There are no likes by COM in MIF")
-                                console.log(numberCOMLikedList.length)
                             } else if (answered_by_person_type.option == "Expert" || answered_by_person_type.sourceText.toLowerCase().includes("expert")) {
                                 data = generateActionDataResponse(data, "intent_action_showPersonTypeLikePost", numberExpertLikedList.length > 0 ? `There are ${numberExpertLikedList.length} likes by Experts in MIF` : "There are no likes by Experts in MIF")
-                                console.log(numberExpertLikedList.length)
                             } else if (answered_by_person_type.option == "APSOs" || answered_by_person_type.sourceText.toLowerCase().includes("apso")) {
                                 data = generateActionDataResponse(data, "intent_action_showPersonTypeLikePost", numberAPSOLikedList.length > 0 ? `There are ${numberAPSOLikedList.length} likes by APSOs in MIF` : "There are no likes by APSOs in MIF")
-                                console.log(numberAPSOLikedList.length)
                             }
                         }
                         //For Comments
                         if (post_field.option == "comment") {
                             if (answered_by_person_type.option == "COM" || answered_by_person_type.sourceText.toLowerCase().includes("com")) {
                                 data = generateActionDataResponse(data, "intent_action_showPersonTypeLikePost", numberCOMCommentedList.length > 0 ? `There are ${numberCOMCommentedList.length} comments by COM in MIF` : "There are no comments by COM in MIF")
-                                console.log(numberCOMCommentedList.length)
                             } else if (answered_by_person_type.option == "Expert" || answered_by_person_type.sourceText.toLowerCase().includes("expert")) {
                                 data = generateActionDataResponse(data, "intent_action_showPersonTypeLikePost", numberExpertCommentedList.length > 0 ? `There are ${numberExpertCommentedList.length} comments by Experts in MIF` : "There are no comments by Experts in MIF")
-                                console.log(numberExpertCommentedList.length)
                             } else if (answered_by_person_type.option == "APSOs" || answered_by_person_type.sourceText.toLowerCase().includes("apso")) {
                                 data = generateActionDataResponse(data, "intent_action_showPersonTypeLikePost", numberAPSOCommentedList.length > 0 ? `There are ${numberAPSOCommentedList.length} comments by APSOs in MIF` : "There are no comments by APSOs in MIF")
-                                console.log(numberAPSOCommentedList.length)
                             }
                         }
 
+                    } else {
+                        data = generateActionDataResponse(data, "intent_action_showPersonTypeLikePost", getRandomFallbackAnswers())
                     }
 
                 }
