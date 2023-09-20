@@ -154,6 +154,7 @@ async function loadActions(manager, jsonArray, classifications) {
 
                 //Get Comments and Likes of a person
                 if (post_description) {
+                    console.log(post_description)
                     //Get Comments
                     // if (post_field.option == "comment") {
                     //     let commentCount = 0;
@@ -276,8 +277,8 @@ async function loadActions(manager, jsonArray, classifications) {
         //-------------------------------------------showCountBasedOnPostTypeStatus------------------------------------------------------------
 
         //Documents
-        manager.addDocument('en', 'How many @post_type are valid or invalid?', "intent_showCountBasedOnPostTypeStatus")
-        manager.addDocument('en', 'How many @post_type are active or inactive?', "intent_showCountBasedOnPostTypeStatus")
+        manager.addDocument('en', '@post_type are valid or invalid?', "intent_showCountBasedOnPostTypeStatus")
+        manager.addDocument('en', '@post_type are active or inactive?', "intent_showCountBasedOnPostTypeStatus")
         manager.addDocument('en', 'What are the number of @post_type that are valid or invalid in MIF?', "intent_showCountBasedOnPostTypeStatus")
         manager.addDocument('en', 'What is the status of @post_type?', "intent_showCountBasedOnPostTypeStatus")
 
