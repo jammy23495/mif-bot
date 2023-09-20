@@ -36,9 +36,7 @@ async function loadActions(manager, jsonArray, classifications) {
 
         manager.addNerRuleOptionTexts('en', 'post_type', 'post', ["Posts", "post", "posts", "Post"]);
         manager.addNerRuleOptionTexts('en', 'post_type', 'query', ["Query", "query", "Queries", "queries"]);
-        manager.addNerRuleOptionTexts('en', 'post_type', 'COM Post', ["COM Post", "COM Posts", "COM post", "COM posts"]);
-        manager.addNerRuleOptionTexts('en', 'post_type', 'Expert Post', ["Expert Post", "Expert Posts", "expert post", "expert posts"]);
-
+        
         manager.addNerRuleOptionTexts('en', 'answered_by_person_type', 'COM', ["COM", "com"]);
         manager.addNerRuleOptionTexts('en', 'answered_by_person_type', 'Expert', ["expert", "experts", "Subject Matter Expert"]);
         manager.addNerRuleOptionTexts('en', 'answered_by_person_type', 'APSOs', ["apsos", "APSOs", "APSO's", "apso's"]);
@@ -135,11 +133,13 @@ async function loadActions(manager, jsonArray, classifications) {
 
         //Documents
         manager.addDocument('en', 'How many @post_type are there in MIF?', "intent_showCountBasedOnPostType")
-        manager.addDocument('en', 'How many queries in MIF?', "intent_showCountBasedOnPostType")
         manager.addDocument('en', 'How many @post_type in MIF?', "intent_showCountBasedOnPostType")
         manager.addDocument('en', 'What are the number of @post_type available in MIF?', "intent_showCountBasedOnPostType")
         manager.addDocument('en', 'How many posts of @post_type available in MIF?', "intent_showCountBasedOnPostType")
         manager.addDocument('en', 'How many posts by @post_type available in MIF?', "intent_showCountBasedOnPostType")
+
+        manager.addDocument('en', 'How many queries are there in MIF?', "intent_showCountBasedOnPostType")
+        manager.addDocument('en', 'How many posts are there in MIF?', "intent_showCountBasedOnPostType")
 
         //Actions
         manager.addAction("intent_showCountBasedOnPostType", 'showCountBasedOnPostType', [], async (data) => {
@@ -158,14 +158,6 @@ async function loadActions(manager, jsonArray, classifications) {
                     return e.FeedType === "Query"
                 })
 
-                let numberOfCOMPost = jsonArray.filter((e) => {
-                    return e.FeedType === "COM Post"
-                })
-
-                let numberOfExpertPost = jsonArray.filter((e) => {
-                    e.FeedType === "Expert Post"
-                })
-
                 //Check for post category
                 if (post_type.option === "post") {
                     data = generateActionDataResponse(data, "intent_action_showCountBasedOnPostType", numberOfPosts.length > 0 ? `I found ${numberOfPosts.length} posts in MIF` : "There are no posts available in MIF")
@@ -174,13 +166,59 @@ async function loadActions(manager, jsonArray, classifications) {
                 else if (post_type.option === "query") {
                     data = generateActionDataResponse(data, "intent_action_showCountBasedOnPostType", numberOfQuery.length > 0 ? `I found ${numberOfQuery.length} queries in MIF` : "There are no queries available in MIF")
                 }
+            }
+            data.classifications = classifications;
+        })
+
+        //-------------------------------------------showCountByPersonType------------------------------------------------------------
+
+        
+        manager.addDocument('en', 'How many @answered_by_person_type Post are there in MIF?', "intent_showCountByPersonType")
+        manager.addDocument('en', 'How many COM Post are there in MIF?', "intent_showCountByPersonType")
+        manager.addDocument('en', 'How many Expert Post are there in MIF?', "intent_showCountByPersonType")
+
+        manager.addDocument('en', 'How many posts by @answered_by_person_type in MIF?', "intent_showCountByPersonType")
+        manager.addDocument('en', 'How many posts by COM in MIF?', "intent_showCountByPersonType")
+        manager.addDocument('en', 'How many posts by Experts in MIF?', "intent_showCountByPersonType")
+
+        manager.addDocument('en', 'How many posts of @answered_by_person_type in MIF?', "intent_showCountByPersonType")
+        manager.addDocument('en', 'How many posts of COM in MIF?', "intent_showCountByPersonType")
+        manager.addDocument('en', 'How many posts of Experts in MIF?', "intent_showCountByPersonType")
+
+        manager.addDocument('en', 'Any posts or queries by @answered_by_person_type in MIF?', "intent_showCountByPersonType")
+        manager.addDocument('en', 'Any posts or queries by COM in MIF?', "intent_showCountByPersonType")
+        manager.addDocument('en', 'Any posts or queries by Experts in MIF?', "intent_showCountByPersonType")
+
+        manager.addDocument('en', 'Any @answered_by_person_type Post?', "intent_showCountByPersonType")
+        manager.addDocument('en', 'Any Expert Post?', "intent_showCountByPersonType")
+        manager.addDocument('en', 'Any COM Post?', "intent_showCountByPersonType")
+        manager.addDocument('en', 'Any Expert queries?', "intent_showCountByPersonType")
+        manager.addDocument('en', 'Any COM queries?', "intent_showCountByPersonType")
+
+        //Actions
+        manager.addAction("intent_showCountByPersonType", 'showCountByPersonType', [], async (data) => {
+            let jsonArray = await getDistinctMIFBotData()
+            if (data && data.entities.length > 0) {
+                let entities = data.entities;
+                let answered_by_person_type = entities.filter((e) => {
+                    return e.entity === "answered_by_person_type"
+                })[0]
+
+                let numberOfCOMPost = jsonArray.filter((e) => {
+                    return e.FeedType === "COM Post"
+                })
+
+                let numberOfExpertPost = jsonArray.filter((e) => {
+                    e.FeedType === "Expert Post"
+                })
+
                 //Check for COM Posts category
-                else if (post_type.option.includes("COM")) {
-                    data = generateActionDataResponse(data, "intent_action_showCountBasedOnPostType", numberOfCOMPost.length > 0 ? `I found ${numberOfCOMPost.length} COM Posts in MIF` : "There are no COM posts available in MIF")
+                if (answered_by_person_type.option.includes("COM")) {
+                    data = generateActionDataResponse(data, "intent_action_showCountByPersonType", numberOfCOMPost.length > 0 ? `I found ${numberOfCOMPost.length} COM Posts in MIF` : "There are no COM posts available in MIF")
                 }
                 //Check for Expert Posts category
-                else if (post_type.option.includes("Expert")) {
-                    data = generateActionDataResponse(data, "intent_action_showCountBasedOnPostType", numberOfExpertPost.length > 0 ? `I found ${numberOfExpertPost.length} Expert Posts in MIF` : "There are no Expert posts available in MIF")
+                else if (answered_by_person_type.option.includes("Expert")) {
+                    data = generateActionDataResponse(data, "intent_action_showCountByPersonType", numberOfExpertPost.length > 0 ? `I found ${numberOfExpertPost.length} Expert Posts in MIF` : "There are no Expert posts available in MIF")
                 }
             }
             data.classifications = classifications;
@@ -620,13 +658,13 @@ async function loadActions(manager, jsonArray, classifications) {
         manager.addDocument('en', 'How many likes by Experts?', "intent_showPersonTypeLikePost")
         manager.addDocument('en', 'How many likes by APSOs?', "intent_showPersonTypeLikePost")
 
-        manager.addDocument('en', 'Give me the count of number of posts/queries that COM liked', "intent_showPersonTypeLikePost")
-        manager.addDocument('en', 'Give me the count of number of posts/queries that Experts liked', "intent_showPersonTypeLikePost")
-        manager.addDocument('en', 'Give me the count of number of posts/queries that APSOs liked', "intent_showPersonTypeLikePost")
+        manager.addDocument('en', 'Give me the count of number of posts or queries that COM liked', "intent_showPersonTypeLikePost")
+        manager.addDocument('en', 'Give me the count of number of posts or queries that Experts liked', "intent_showPersonTypeLikePost")
+        manager.addDocument('en', 'Give me the count of number of posts or queries that APSOs liked', "intent_showPersonTypeLikePost")
 
         manager.addDocument('en', 'How many post and query @answered_by_person_type @post_field?', "intent_showPersonTypeLikePost")
         manager.addDocument('en', 'How many @post_field by @answered_by_person_type?', "intent_showPersonTypeLikePost")
-        manager.addDocument('en', 'Give me the count of number of posts/queries that @answered_by_person_type @post_field', "intent_showPersonTypeLikePost")
+        manager.addDocument('en', 'Give me the count of number of posts or queries that @answered_by_person_type @post_field', "intent_showPersonTypeLikePost")
 
         //Actions
         manager.addAction("intent_showPersonTypeLikePost", 'showPersonTypeLikePost', [], async (data) => {
@@ -677,7 +715,7 @@ async function loadActions(manager, jsonArray, classifications) {
                             }
                         }
                         //For Comments
-                        if (post_field.option == "comment") {
+                        else if (post_field.option == "comment") {
                             if (answered_by_person_type.option == "COM" || answered_by_person_type.sourceText.toLowerCase().includes("com")) {
                                 data = generateActionDataResponse(data, "intent_action_showPersonTypeLikePost", numberCOMCommentedList.length > 0 ? `There are ${numberCOMCommentedList.length} comments by COM in MIF` : "There are no comments by COM in MIF")
                             } else if (answered_by_person_type.option == "Expert" || answered_by_person_type.sourceText.toLowerCase().includes("expert")) {
@@ -695,6 +733,7 @@ async function loadActions(manager, jsonArray, classifications) {
             }
             data.classifications = classifications;
         })
+
 
     } catch (error) {
         data.classifications = classifications;
