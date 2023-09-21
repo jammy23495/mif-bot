@@ -7,6 +7,10 @@ let {
     getMIFData
 } = require("./sql")
 
+let {
+    tokenize
+} = require("./utils")
+
 let language = "en"
 
 //Train MIF Dataset
@@ -20,15 +24,17 @@ async function train(manager) {
         //Load Actions & Entities
         await loadActions(manager, jsonArray, classifications)
 
+        let allSubjects = []
+
         //Create Intents and Utterances from Greet
         for (let index = 0; index < jsonArray.length; index++) {
             let topic = jsonArray[index].Topic ? jsonArray[index].Topic : "MIF";
-            
+
             let ID = jsonArray[index].Post_ID.toString();
 
             let filteredSubject = await filterString(jsonArray[index].Subject)
             let subject = jsonArray[index].Subject ? filteredSubject.answer : "";
-            
+
             let filteredQuestion = await filterString(jsonArray[index].Question)
             let question = jsonArray[index].Question ? filteredQuestion.answer : "";
 
@@ -36,6 +42,8 @@ async function train(manager) {
             let answer = jsonArray[index].Comment ? filteredAnswer.answer : "";
 
             let intent = ID + `_${topic}` + "_intent_" + subject.replaceAll(" ", "_")
+
+            allSubjects = [...allSubjects, ...await tokenize(subject)]
 
             manager.addDocument(language, subject, intent);
             manager.addDocument(language, "Is there any post related to " + subject, intent);
@@ -49,6 +57,9 @@ async function train(manager) {
 
             manager.addAnswer(language, intent, answer);
         }
+
+        // manager.addNerRuleOptionTexts('en', 'post_description', 'post_description', [allSubjects]);
+
 
         // Train and save the model.
         await manager.train();

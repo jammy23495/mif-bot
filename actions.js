@@ -37,7 +37,7 @@ async function loadActions(manager, jsonArray, classifications) {
 
         manager.addNerRuleOptionTexts('en', 'post_type', 'post', ["Posts", "post", "posts", "Post"]);
         manager.addNerRuleOptionTexts('en', 'post_type', 'query', ["Query", "query", "Queries", "queries"]);
-        
+
         manager.addNerRuleOptionTexts('en', 'answered_by_person_type', 'COM', ["COM", "com"]);
         manager.addNerRuleOptionTexts('en', 'answered_by_person_type', 'Expert', ["expert", "experts", "Subject Matter Expert"]);
         manager.addNerRuleOptionTexts('en', 'answered_by_person_type', 'APSOs', ["apsos", "APSOs", "APSO's", "apso's"]);
@@ -70,9 +70,15 @@ async function loadActions(manager, jsonArray, classifications) {
                 let answered_by = entities.filter((e) => {
                     return e.entity === "answered_by"
                 })[0]
+                let post_description = entities.filter((e) => {
+                    return e.entity === "post_description"
+                })[0]
 
+                if (post_description) {
+                    console.log(post_description)
+                }
                 //Get Comments and Likes of a person
-                if (answered_by && post_field) {
+                else if (answered_by && post_field) {
                     //Get Comments
                     if (post_field.option == "comment") {
                         let commentCount = 0;
@@ -130,7 +136,7 @@ async function loadActions(manager, jsonArray, classifications) {
         });
 
 
-         //-------------------------------------------showPostQueryOn------------------------------------------------------------
+        //-------------------------------------------showPostQueryOn------------------------------------------------------------
 
         //Documents
         manager.addDocument('en', 'Any post on @post_description', "intent_showPostQueryOn");
@@ -222,7 +228,7 @@ async function loadActions(manager, jsonArray, classifications) {
 
         //-------------------------------------------showCountByPersonType------------------------------------------------------------
 
-        
+
         manager.addDocument('en', 'How many @answered_by_person_type Post are there in MIF?', "intent_showCountByPersonType")
         manager.addDocument('en', 'How many COM Post are there in MIF?', "intent_showCountByPersonType")
         manager.addDocument('en', 'How many Expert Post are there in MIF?', "intent_showCountByPersonType")
@@ -277,67 +283,67 @@ async function loadActions(manager, jsonArray, classifications) {
         //-------------------------------------------showCountBasedOnPostTypeStatus------------------------------------------------------------
 
         //Documents
-        manager.addDocument('en', '@post_type are valid or invalid?', "intent_showCountBasedOnPostTypeStatus")
-        manager.addDocument('en', '@post_type are active or inactive?', "intent_showCountBasedOnPostTypeStatus")
-        manager.addDocument('en', 'What are the number of @post_type that are valid or invalid in MIF?', "intent_showCountBasedOnPostTypeStatus")
-        manager.addDocument('en', 'What is the status of @post_type?', "intent_showCountBasedOnPostTypeStatus")
+        // manager.addDocument('en', '@post_type are valid or invalid?', "intent_showCountBasedOnPostTypeStatus")
+        // manager.addDocument('en', '@post_type are active or inactive?', "intent_showCountBasedOnPostTypeStatus")
+        // manager.addDocument('en', 'What are the number of @post_type that are valid or invalid in MIF?', "intent_showCountBasedOnPostTypeStatus")
+        // manager.addDocument('en', 'What is the status of @post_type?', "intent_showCountBasedOnPostTypeStatus")
 
-        //Actions
-        manager.addAction("intent_showCountBasedOnPostTypeStatus", 'showCountBasedOnPostTypeStatus', [], async (data) => {
-            let jsonArray = await getDistinctMIFBotData()
-            if (data && data.entities.length > 0) {
-                let entities = data.entities;
-                let post_type = entities.filter((e) => {
-                    return e.entity === "post_type"
-                })[0]
+        // //Actions
+        // manager.addAction("intent_showCountBasedOnPostTypeStatus", 'showCountBasedOnPostTypeStatus', [], async (data) => {
+        //     let jsonArray = await getDistinctMIFBotData()
+        //     if (data && data.entities.length > 0) {
+        //         let entities = data.entities;
+        //         let post_type = entities.filter((e) => {
+        //             return e.entity === "post_type"
+        //         })[0]
 
-                let numberOfPosts = jsonArray.filter((e) => {
-                    return e.FeedType === "Post"
-                })
-                let numberOfPostsActive = jsonArray.filter((e) => {
-                    return e.FeedType === "Post" && e.IsActive == 1
-                })
+        //         let numberOfPosts = jsonArray.filter((e) => {
+        //             return e.FeedType === "Post"
+        //         })
+        //         let numberOfPostsActive = jsonArray.filter((e) => {
+        //             return e.FeedType === "Post" && e.IsActive == 1
+        //         })
 
-                let numberOfQuery = jsonArray.filter((e) => {
-                    return e.FeedType === "Query"
-                })
-                let numberOfQueryActive = jsonArray.filter((e) => {
-                    return e.FeedType === "Query" && e.IsActive == 1
-                })
+        //         let numberOfQuery = jsonArray.filter((e) => {
+        //             return e.FeedType === "Query"
+        //         })
+        //         let numberOfQueryActive = jsonArray.filter((e) => {
+        //             return e.FeedType === "Query" && e.IsActive == 1
+        //         })
 
-                let numberOfCOMPost = jsonArray.filter((e) => {
-                    return e.FeedType === "COM Post"
-                })
-                let numberOfCOMPostActive = jsonArray.filter((e) => {
-                    return e.FeedType === "COM Post" && e.IsActive == 1
-                })
+        //         let numberOfCOMPost = jsonArray.filter((e) => {
+        //             return e.FeedType === "COM Post"
+        //         })
+        //         let numberOfCOMPostActive = jsonArray.filter((e) => {
+        //             return e.FeedType === "COM Post" && e.IsActive == 1
+        //         })
 
-                let numberOfExpertPost = jsonArray.filter((e) => {
-                    e.FeedType === "Expert Post"
-                })
-                let numberOfExpertPostActive = jsonArray.filter((e) => {
-                    e.FeedType === "Expert Post" && e.IsActive == 1
-                })
+        //         let numberOfExpertPost = jsonArray.filter((e) => {
+        //             e.FeedType === "Expert Post"
+        //         })
+        //         let numberOfExpertPostActive = jsonArray.filter((e) => {
+        //             e.FeedType === "Expert Post" && e.IsActive == 1
+        //         })
 
-                //Check for post category
-                if (post_type.option === "post") {
-                    data = generateActionDataResponse(data, "intent_action_showCountBasedOnPostTypeStatus", numberOfPosts.length > 0 ? `There are ${numberOfPosts.length} posts in MIF where ${numberOfPostsActive.length} are active & ${(numberOfPosts.length - numberOfPostsActive.length)} posts are inactive` : "There are no posts available in MIF")
-                }
-                //Check for query category
-                else if (post_type.option === "query") {
-                    data = generateActionDataResponse(data, "intent_action_showCountBasedOnPostTypeStatus", numberOfQuery.length > 0 ? `There are ${numberOfQuery.length} queries in MIF where ${numberOfQueryActive.length} are active & ${(numberOfQuery.length - numberOfQueryActive.length)} queries are inactive` : "There are no queries available in MIF")
-                }
-                //Check for COM Posts category
-                else if (post_type.option === "COM Post") {
-                    data = generateActionDataResponse(data, "intent_action_showCountBasedOnPostTypeStatus", numberOfCOMPost.length > 0 ? `There are ${numberOfCOMPost.length} COM posts in MIF where ${numberOfCOMPostActive.length} are active & ${(numberOfCOMPost.length - numberOfCOMPostActive.length)} COM posts are inactive` : "There are no COM posts available in MIF")
-                }
-                //Check for Expert Posts category
-                else if (post_type.option === "Expert Post") {
-                    data = generateActionDataResponse(data, "intent_action_showCountBasedOnPostTypeStatus", numberOfExpertPost.length > 0 ? `There are ${numberOfExpertPost.length} Expert posts in MIF where ${numberOfExpertPostActive.length} are active & ${(numberOfExpertPost.length - numberOfExpertPostActive.length)} Expert posts are inactive` : "There are Expert posts available in MIF")
-                }
-            }
-            data.classifications = classifications;
-        })
+        //         //Check for post category
+        //         if (post_type.option === "post") {
+        //             data = generateActionDataResponse(data, "intent_action_showCountBasedOnPostTypeStatus", numberOfPosts.length > 0 ? `There are ${numberOfPosts.length} posts in MIF where ${numberOfPostsActive.length} are active & ${(numberOfPosts.length - numberOfPostsActive.length)} posts are inactive` : "There are no posts available in MIF")
+        //         }
+        //         //Check for query category
+        //         else if (post_type.option === "query") {
+        //             data = generateActionDataResponse(data, "intent_action_showCountBasedOnPostTypeStatus", numberOfQuery.length > 0 ? `There are ${numberOfQuery.length} queries in MIF where ${numberOfQueryActive.length} are active & ${(numberOfQuery.length - numberOfQueryActive.length)} queries are inactive` : "There are no queries available in MIF")
+        //         }
+        //         //Check for COM Posts category
+        //         else if (post_type.option === "COM Post") {
+        //             data = generateActionDataResponse(data, "intent_action_showCountBasedOnPostTypeStatus", numberOfCOMPost.length > 0 ? `There are ${numberOfCOMPost.length} COM posts in MIF where ${numberOfCOMPostActive.length} are active & ${(numberOfCOMPost.length - numberOfCOMPostActive.length)} COM posts are inactive` : "There are no COM posts available in MIF")
+        //         }
+        //         //Check for Expert Posts category
+        //         else if (post_type.option === "Expert Post") {
+        //             data = generateActionDataResponse(data, "intent_action_showCountBasedOnPostTypeStatus", numberOfExpertPost.length > 0 ? `There are ${numberOfExpertPost.length} Expert posts in MIF where ${numberOfExpertPostActive.length} are active & ${(numberOfExpertPost.length - numberOfExpertPostActive.length)} Expert posts are inactive` : "There are Expert posts available in MIF")
+        //         }
+        //     }
+        //     data.classifications = classifications;
+        // })
 
         //-------------------------------------------showCountBasedOnPostFieldAndPostNumber------------------------------------------------------------
 

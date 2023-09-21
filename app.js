@@ -24,6 +24,9 @@ let manager;
                 forceNER: true,
                 languages: ['en'],
                 executeActionsBeforeAnswers: true
+            },
+            ner: {
+                threshold: 1
             }
         },
         use: ['Basic', 'LangEn'],

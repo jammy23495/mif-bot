@@ -1,5 +1,7 @@
 let checkInternetConnected = require('check-internet-connected');
 
+const { StopwordsEn, TokenizerEn } = require('@nlpjs/lang-en');
+
 const fallBackAnswers = ["I am sorry, I don't understand this. I am still learning. Please ask me something related to forum. Please share your feedback on admin@hq.indiannavy.mil",
     "I am sorry, I have found no such discussions on this matter in the forum. Please share your feedback on admin@hq.indiannavy.mil",
     "I am sorry, I have found no such discussions in the forum. Please check with designated Subject Matter Expert. Please share your feedback on admin@hq.indiannavy.mil"
@@ -42,10 +44,19 @@ async function checkInternet() {
     }
 }
 
+async function tokenize(input) {
+    const tokenizer = new TokenizerEn();
+    const result = tokenizer.tokenize(input);
+    const stopwords = new StopwordsEn();
+    let finalResult = stopwords.removeStopwords(result)
+    return finalResult
+}
+
 module.exports = {
     isNULL,
     isBot,
     getRandomFallbackAnswers,
     filterString,
-    checkInternet
+    checkInternet,
+    tokenize
 }
