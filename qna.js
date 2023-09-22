@@ -74,14 +74,14 @@ async function qna(question, manager, summarizer) {
                                 let question_summary = filterString(post[j].Question)
                                 finalAnswers.push({
                                     // "answer_summary": comment_summary.answer_summary,
-                                    "answer_summary": comment_summary,
+                                    "answer_summary": comment_summary.answer_summary ? comment_summary.answer_summary : comment_summary,
                                     "isGreet": comment_summary.isGreet,
                                     "props": {
                                         "ID": post[j].Post_ID,
                                         "Posted_By": post[j].SubmittedBy,
                                         "Subject": post[j].Subject,
                                         // "Question": question_summary.answer_summary,
-                                        "Question": question_summary,
+                                        "Question": question_summary.answer_summary ? question_summary.answer_summary : question_summary,
                                         "FeedType": post[j].FeedType,
                                         "Posted_On": moment(post[j].Submitted_On, "YYYY-MM-DD").format('MMMM Do YYYY'),
                                         "Likes": post[j].LikeCount,

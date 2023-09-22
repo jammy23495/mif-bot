@@ -52,6 +52,10 @@ async function tokenize(input) {
     return finalResult
 }
 
+async function getData(params) {
+    
+}
+
 module.exports = {
     isNULL,
     isBot,
