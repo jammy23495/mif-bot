@@ -74,6 +74,10 @@ async function loadActions(manager, jsonArray, classifications) {
         manager.addDocument('en', 'Any query on @post_description?', "intent_showPostDetails");
         manager.addDocument('en', 'Any comment on @post_description?', "intent_showPostDetails");
 
+        manager.addDocument('en', 'post on @post_description?', "intent_showPostDetails");
+        manager.addDocument('en', 'query on @post_description?', "intent_showPostDetails");
+        manager.addDocument('en', 'comment on @post_description?', "intent_showPostDetails");
+
         //Action
         manager.addAction("intent_showPostDetails", 'showPostDetails', [], async (data) => {
             let jsonArray = await getMIFData()
@@ -337,6 +341,7 @@ async function loadActions(manager, jsonArray, classifications) {
 
         //Actions
         manager.addAction("intent_showCountBasedOnPostTypeStatus", 'showCountBasedOnPostTypeStatus', [], async (data) => {
+            classifications = []
             let jsonArray = await getDistinctMIFBotData()
             if (data && data.entities.length > 0) {
                 let entities = data.entities;
@@ -371,9 +376,92 @@ async function loadActions(manager, jsonArray, classifications) {
                 let numberOfExpertPostActive = jsonArray.filter((e) => {
                     e.FeedType === "Expert Post" && e.IsActive == 1
                 })
+                
+                let post_description = entities.filter((e) => {
+                    return e.entity === "post_description"
+                })[0]
+                //If post description is present
+                if (post_description) {
+                    let allMIFData = await getMIFData();
+                    let allMIFDistinctData = [...new Map(allMIFData.map(item => [item["Post_ID"], item])).values()]
+                    let allMIFPostData = allMIFDistinctData.filter((e) => {
+                        return e.FeedType == "Post"
+                    })
+                    let allMIFQueryData = allMIFDistinctData.filter((e) => {
+                        return e.FeedType == "Query"
+                    })
+                    let tokens = await tokenize(post_description.sourceText)
+                    if (tokens.length > 0) {
+                        //Get Data for Post
+                        if (post_type && post_type.option == "post") {
+                            for (let j = 0; j < allMIFPostData.length; j++) {
+                                let availableTokens = 0;
+                                let context = filterString(allMIFPostData[j].Subject) + filterString(allMIFPostData[j].Question);
+                                for (let i = 0; i < tokens.length; i++) {
+                                    if (context && context.toLowerCase().includes(tokens[i].toLowerCase())) {
+                                        availableTokens++;
+                                    }
+                                }
+                                let score = (availableTokens / (tokens.length)) || 0;
+                                if (score > 0.5) {
+                                    let intent = allMIFPostData[j].Post_ID + `_${allMIFPostData[j].Topic || "MIF"}` + "_intent_" + allMIFPostData[j].Subject.replaceAll(" ", "_")
+                                    classifications.push({
+                                        "intent": intent,
+                                        "score": 1
+                                    })
+                                } else {
+                                    data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showPostDetails" : "intent_action_showPostDetails", `I am sorry! I cannot find the posts on ${post_description.sourceText || "the question you asked"}`)
+                                }
+                            }
+                        }
+                        //Get Data for Query
+                        else if (post_type && post_type.option == "query") {
+                            for (let j = 0; j < allMIFQueryData.length; j++) {
+                                let availableTokens = 0;
+                                let context = filterString(allMIFQueryData[j].Subject) + filterString(allMIFQueryData[j].Question);
+                                for (let i = 0; i < tokens.length; i++) {
+                                    if (context && context.toLowerCase().includes(tokens[i].toLowerCase())) {
+                                        availableTokens++;
+                                    }
+                                }
+                                let score = (availableTokens / (tokens.length)) || 0;
+                                if (score > 0.5) {
+                                    let intent = allMIFQueryData[j].Post_ID + `_${allMIFQueryData[j].Topic || "MIF"}` + "_intent_" + allMIFQueryData[j].Subject.replaceAll(" ", "_")
+                                    classifications.push({
+                                        "intent": intent,
+                                        "score": 1
+                                    })
+                                } else {
+                                    data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showPostDetails" : "intent_action_showPostDetails", `I am sorry! I cannot find the queries on ${post_description.sourceText || "the question you asked"}`)
+                                }
+                            }
+                        }//Get Data for Query
+                        else if (post_field.option == "comment") {
+                            for (let j = 0; j < allMIFData.length; j++) {
+                                let availableTokens = 0;
+                                let context = filterString(allMIFData[j].Comment);
+                                for (let i = 0; i < tokens.length; i++) {
+                                    if (context && context.toLowerCase().includes(tokens[i].toLowerCase())) {
+                                        availableTokens++;
+                                    }
+                                }
+                                let score = (availableTokens / (tokens.length)) || 0;
+                                if (score > 0.5) {
+                                    let intent = allMIFData[j].Post_ID + `_${allMIFData[j].Topic || "MIF"}` + "_intent_" + allMIFData[j].Subject.replaceAll(" ", "_")
+                                    classifications.push({
+                                        "intent": intent,
+                                        "score": 1
+                                    })
+                                } else {
+                                    data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showPostDetails" : "intent_action_showPostDetails", `I am sorry! I cannot find any comments on ${post_description.sourceText || "the question you asked"}`)
+                                }
+                            }
+                        }
+                    }
+                }
 
                 //Check for post category
-                if (post_type.option === "post") {
+                else if (post_type.option === "post") {
                     data = generateActionDataResponse(data, "intent_action_showCountBasedOnPostTypeStatus", numberOfPosts.length > 0 ? `There are ${numberOfPosts.length} posts in MIF where ${numberOfPostsActive.length} are active & ${(numberOfPosts.length - numberOfPostsActive.length)} posts are inactive` : "There are no posts available in MIF")
                 }
                 //Check for query category
@@ -683,8 +771,8 @@ async function loadActions(manager, jsonArray, classifications) {
                 let announcementsList = await getAnnouncements();
 
                 if (announcementsList.length > 0) {
-                    let announcementsString = `There are ${announcementsList.length} announcements in MIF.`
-                    announcementsString += " Below are the list of announcements:\n"
+                    let announcementsString = `I found ${announcementsList.length} latest announcement in MIF.`
+                    announcementsString += " Below are the details:\n"
                     announcementsString += "<ul style='padding: revert; '>"
                     announcementsList.map((e) => {
                         announcementsString += "<li>"
