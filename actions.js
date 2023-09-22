@@ -33,6 +33,7 @@ async function loadActions(manager, jsonArray, classifications) {
         manager.addNerAfterLastCondition('en', 'post_number', 'no');
         manager.addNerAfterLastCondition('en', 'post_number', 'number');
         manager.addNerAfterLastCondition('en', 'post_description', 'on');
+        manager.addNerAfterLastCondition('en', 'post_description', 'to');
 
         manager.addNerRuleOptionTexts('en', 'post_field', 'comment', ["Comment", "comment", "Comments", "comments", "Commented", "commented"]);
         manager.addNerRuleOptionTexts('en', 'post_field', 'likes', ["Likes", "likes", "Like", "like", "Liked", "liked"]);
@@ -61,6 +62,14 @@ async function loadActions(manager, jsonArray, classifications) {
         manager.addDocument('en', 'Is there any query on @post_description?', "intent_showPostDetails");
         manager.addDocument('en', 'Is there any comment on @post_description?', "intent_showPostDetails");
 
+        manager.addDocument('en', 'Is there any post related to @post_description?', "intent_showPostDetails");
+        manager.addDocument('en', 'Is there any query related to @post_description?', "intent_showPostDetails");
+        manager.addDocument('en', 'Is there any comment related to @post_description?', "intent_showPostDetails");
+
+        manager.addDocument('en', 'Are there any posts related to @post_description?', "intent_showPostDetails");
+        manager.addDocument('en', 'Are there any queries related to @post_description?', "intent_showPostDetails");
+        manager.addDocument('en', 'Are there any comments related to @post_description?', "intent_showPostDetails");
+
         manager.addDocument('en', 'Any post on @post_description?', "intent_showPostDetails");
         manager.addDocument('en', 'Any query on @post_description?', "intent_showPostDetails");
         manager.addDocument('en', 'Any comment on @post_description?', "intent_showPostDetails");
@@ -86,7 +95,6 @@ async function loadActions(manager, jsonArray, classifications) {
 
                 //If post description is present
                 if (post_description) {
-                    
                     let allMIFData = await getMIFData();
                     let allMIFDistinctData = [...new Map(allMIFData.map(item => [item["Post_ID"], item])).values()]
                     let allMIFPostData = allMIFDistinctData.filter((e) => {
@@ -96,7 +104,6 @@ async function loadActions(manager, jsonArray, classifications) {
                         return e.FeedType == "Query"
                     })
                     let tokens = await tokenize(post_description.sourceText)
-                    console.log(tokens)
                     if (tokens.length > 0) {
                         //Get Data for Post
                         if (post_type && post_type.option == "post") {

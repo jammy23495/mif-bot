@@ -46,20 +46,11 @@ async function train(manager) {
             allSubjects = [...allSubjects, ...await tokenize(subject)]
 
             manager.addDocument(language, subject, intent);
-            manager.addDocument(language, "Is there any post related to " + subject, intent);
-            manager.addDocument(language, "Are there any post related to " + subject, intent);
-            manager.addDocument(language, "Are there any post on " + subject, intent);
-            // manager.addDocument(language, "Any post on " + subject, intent);
 
             manager.addDocument(language, question, intent);
-            manager.addDocument(language, "Is there any post related to " + question, intent);
-            manager.addDocument(language, "Are there any post related to " + question, intent);
-            // manager.addDocument(language, "Any post on " + question, intent);
 
             manager.addAnswer(language, intent, answer);
         }
-
-        // manager.addNerRuleOptionTexts('en', 'post_description', 'post_description', [allSubjects]);
 
 
         // Train and save the model.
