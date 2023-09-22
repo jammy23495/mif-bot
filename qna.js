@@ -4,7 +4,9 @@ let {
     checkInternet
 } = require("./utils")
 
-let { summarize } = require("./hf")
+let {
+    summarize
+} = require("./hf")
 const moment = require('moment');
 require('dotenv').config()
 
@@ -34,7 +36,7 @@ async function qna(question, manager, summarizer) {
     else {
         //Classifcations found
         if (response && response.classifications && response.classifications.length > 0) {
-            
+
             let isCommentsAdded = true;
             let classifications = response.classifications;
             let validClassifications = classifications.filter((e) => {
@@ -48,10 +50,15 @@ async function qna(question, manager, summarizer) {
                         let intent = validClassifications[i].intent.split("_");
                         let POST_ID = intent[0];
                         let post = await getDataByPOSTID(POST_ID)
+                        post = [...new Map(post.map(item => [item["Post_ID"], item])).values()]
                         if (post && post.length > 0) {
 
                             for (let j = 0; j < post.length; j++) {
-                                let comment_summary = post[j].Comment && post[j].Comment != "NULL" ? await generateAnswer(filterString(post[j].Comment), summarizer) : {
+                                // let comment_summary = post[j].Comment && post[j].Comment != "NULL" ? await generateAnswer(filterString(post[j].Comment), summarizer) : {
+                                //     "answer_summary": "No comments found!",
+                                //     "isGreet": false
+                                // }
+                                let comment_summary = post[j].Comment && post[j].Comment != "NULL" ? filterString(post[j].Comment) : {
                                     "answer_summary": "No comments found!",
                                     "isGreet": false
                                 }
@@ -59,20 +66,22 @@ async function qna(question, manager, summarizer) {
                                 if (response.commentCount && isCommentsAdded) {
                                     finalCommentCount = response.commentCount;
                                     isCommentsAdded = false
-                                }
-                                else {
+                                } else {
                                     finalCommentCount = 0
                                 }
 
-                                let question_summary = await generateAnswer(filterString(post[j].Question), summarizer)
+                                // let question_summary = await generateAnswer(filterString(post[j].Question), summarizer)
+                                let question_summary = filterString(post[j].Question)
                                 finalAnswers.push({
-                                    "answer_summary": comment_summary.answer_summary,
+                                    // "answer_summary": comment_summary.answer_summary,
+                                    "answer_summary": comment_summary,
                                     "isGreet": comment_summary.isGreet,
                                     "props": {
                                         "ID": post[j].Post_ID,
                                         "Posted_By": post[j].SubmittedBy,
                                         "Subject": post[j].Subject,
-                                        "Question": question_summary.answer_summary,
+                                        // "Question": question_summary.answer_summary,
+                                        "Question": question_summary,
                                         "FeedType": post[j].FeedType,
                                         "Posted_On": moment(post[j].Submitted_On, "YYYY-MM-DD").format('MMMM Do YYYY'),
                                         "Likes": post[j].LikeCount,
@@ -120,7 +129,7 @@ async function generateAnswer(answer, offlineSummarizer) {
             let internet = await checkInternet()
 
             // Using huggingfacejs inference if internet is available
-            if (internet && process?.env?.runOffline?.toLocaleLowerCase() === "false") {
+            if (internet && process.env.runOffline.toLocaleLowerCase() === "false") {
                 console.log("Running on Huggingface online inference")
                 let response = await summarize(answer)
                 answer_summary = response ? response.summary_text : ""
