@@ -486,6 +486,7 @@ async function loadActions(manager, jsonArray, classifications) {
         manager.addDocument('en', 'How many @post_field are there in post @post_number?', "intent_showCountBasedOnPostTypeAndPostNumber")
         manager.addDocument('en', 'How many @post_field are there on post @post_number?', "intent_showCountBasedOnPostTypeAndPostNumber")
         manager.addDocument('en', 'How many people @post_field on post @post_number?', "intent_showCountBasedOnPostTypeAndPostNumber")
+        manager.addDocument('en', 'How many @post_field on post @post_number?', "intent_showCountBasedOnPostTypeAndPostNumber")
 
 
         //Actions
@@ -523,6 +524,7 @@ async function loadActions(manager, jsonArray, classifications) {
 
         //Documents
         manager.addDocument('en', 'Give me the list of categories', "intent_showListOfCategories")
+        manager.addDocument('en', 'Types of categories', "intent_showListOfCategories")
         manager.addDocument('en', 'Provide me the list of categories', "intent_showListOfCategories")
         manager.addDocument('en', 'Which categories are available?', "intent_showListOfCategories")
         manager.addDocument('en', 'How many categories are there in MIF?', "intent_showListOfCategories")
