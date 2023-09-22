@@ -76,6 +76,8 @@ async function loadActions(manager, jsonArray, classifications) {
 
                 if (post_description) {
                     console.log(post_description)
+                    
+                    
                 }
                 //Get Comments and Likes of a person
                 else if (answered_by && post_field) {
@@ -136,55 +138,6 @@ async function loadActions(manager, jsonArray, classifications) {
         });
 
 
-        //-------------------------------------------showPostQueryOn------------------------------------------------------------
-
-        //Documents
-        manager.addDocument('en', 'Any post on @post_description', "intent_showPostQueryOn");
-        manager.addDocument('en', 'Any query on @post_description', "intent_showPostQueryOn");
-        manager.addDocument('en', 'Any comment on @post_description', "intent_showPostQueryOn");
-
-        manager.addDocument('en', 'Post on @post_description', "intent_showPostQueryOn");
-        manager.addDocument('en', 'Query on @post_description', "intent_showPostQueryOn");
-        manager.addDocument('en', 'Comment on @post_description', "intent_showPostQueryOn");
-
-
-        //Action
-        manager.addAction("intent_showPostQueryOn", 'showPostQueryOn', [], async (data) => {
-            let jsonArray = await getMIFData()
-            classifications = []
-            if (data && data.entities.length > 0) {
-                let entities = data.entities;
-                let post_description = entities.filter((e) => {
-                    return e.entity === "post_description"
-                })[0]
-
-                //Get Comments and Likes of a person
-                if (post_description) {
-                    console.log(post_description)
-                    //Get Comments
-                    // if (post_field.option == "comment") {
-                    //     let commentCount = 0;
-                    //     jsonArray.filter(async (c) => {
-                    //         if (c && c.Comment_By && c.Comment_By.toLowerCase().includes(answered_by.sourceText.toLowerCase())) {
-                    //             commentCount++;
-                    //             let intent = c.Post_ID + `_${c.Topic || "MIF"}` + "_intent_" + c.Subject.replaceAll(" ", "_")
-                    //             classifications.push({
-                    //                 "intent": intent,
-                    //                 "score": 1
-                    //             })
-                    //         } else {
-                    //             data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showCommentsByName" : "intent_action_showCommentsByName", `I am sorry! I cannot find the comments by ${answered_by.sourceText || "this person"}`)
-                    //         }
-                    //     })
-                    //     data.commentCount = commentCount
-                    //     console.log("Comment Count: ", commentCount)
-                    // }
-                }
-            }
-            data.classifications = classifications;
-        });
-
-
         //-------------------------------------------showCountBasedOnPostType------------------------------------------------------------
 
         //Documents
@@ -193,6 +146,7 @@ async function loadActions(manager, jsonArray, classifications) {
         manager.addDocument('en', 'What are the number of @post_type available in MIF?', "intent_showCountBasedOnPostType")
         manager.addDocument('en', 'How many posts of @post_type available in MIF?', "intent_showCountBasedOnPostType")
         manager.addDocument('en', 'How many posts by @post_type available in MIF?', "intent_showCountBasedOnPostType")
+
 
         manager.addDocument('en', 'How many queries are there in MIF?', "intent_showCountBasedOnPostType")
         manager.addDocument('en', 'How many posts are there in MIF?', "intent_showCountBasedOnPostType")
