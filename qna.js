@@ -40,7 +40,7 @@ async function qna(question, manager, summarizer) {
             let isCommentsAdded = true;
             let classifications = response.classifications;
             let validClassifications = classifications.filter((e) => {
-                return e.score > 0.5 && !e.intent.toLowerCase().includes("greet")
+                return e.score > 0.1 && !e.intent.toLowerCase().includes("greet")
             })
 
             //Valid Classifications found

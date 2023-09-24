@@ -71,6 +71,12 @@ app.post('/ask', async (req, res) => {
     try {
         let question = req && req.body && req.body.question ? req.body.question : "hi";
         let response = await qna(question, manager, summarizer);
+        if (response && response.response && response.response.intent && response.response.intent == "None") {
+            response = await qna(`Any post on ${question}`, manager, summarizer)
+            if(response && response && response.response && response.response.intent && response.response.intent.includes("action")){
+                response = await qna(`Any query on ${question}`, manager, summarizer)
+            }
+        }
         res.send(response)
     } catch (error) {
         console.log(error)

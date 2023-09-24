@@ -168,7 +168,7 @@ angular.module("myapp", [])
 
                             // botAnswer += `<br><b>Comment: </b>"${data[i].answer_summary}"<br>`
 
-                            botAnswer += `<br><span>Click on the below link to view the post</span> <br> <a href="${data[i].props.post_url !== "null" ? data[i].props.post_url : "#"}" target="_blank"> View Post</a>`
+                            botAnswer += `<br><span>Click on the below link to view the post</span> <br> <a href="${data[i].props.post_url !== "null" ? data[i].props.post_url : "#"}" target="_blank"> View ${data[i].props.FeedType}</a>`
 
                             botAnswer += `
                         <div class="widgets_div">

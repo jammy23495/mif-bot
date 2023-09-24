@@ -101,3 +101,4 @@ Greet_99,Bot_97,Bot,Greet,Can we generate weekly/monthly/yearly report of Query 
 Greet_100,Bot_98,Bot,Greet,Can we attached any image as attachment?,Can we attached any image as attachment?,NULL,"Yes, that feature is available in MIF.",Bot,NULL,0,0,0,Bot,NULL
 Greet_101,Bot_99,Bot,Greet,What is code of conduct?,What is code of conduct?,NULL,Go to Settings (in the header) -> Code of Conduct  in forum to view Code of conduct,Bot,NULL,0,0,0,Bot,NULL
 Greet_102,Bot_100,Bot,Greet,What are the policies?,What are the policies?,NULL,"To view the policies in forum, you can either visit Information basket -> DOP URL or get it from the Information menu in left panel of the forum",Bot,NULL,0,0,0,Bot,NULL
+Greet_102,Bot_100,Bot,Greet,Name of links mention in information basket,Name of links mention in information basket,NULL,"There are 6 links in Information basket. The links are CMMS, Standards, NPO, DOP, Navy orders and Telephone directory",Bot,NULL,0,0,0,Bot,NULL
