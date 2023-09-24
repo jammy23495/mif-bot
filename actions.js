@@ -90,6 +90,10 @@ async function loadActions(manager, jsonArray, classifications) {
         manager.addDocument('en', 'Is there any query related to @post_description?', "intent_showPostDetails");
         manager.addDocument('en', 'Is there any comment related to @post_description?', "intent_showPostDetails");
 
+        manager.addDocument('en', 'Is any post related to @post_description?', "intent_showPostDetails");
+        manager.addDocument('en', 'Is any query related to @post_description?', "intent_showPostDetails");
+        manager.addDocument('en', 'Is any comment related to @post_description?', "intent_showPostDetails");
+
         manager.addDocument('en', 'Are there any posts related to @post_description?', "intent_showPostDetails");
         manager.addDocument('en', 'Are there any queries related to @post_description?', "intent_showPostDetails");
         manager.addDocument('en', 'Are there any comments related to @post_description?', "intent_showPostDetails");
@@ -173,7 +177,6 @@ async function loadActions(manager, jsonArray, classifications) {
                                     data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showPostDetails" : "intent_action_showPostDetails", `I am sorry! I cannot find the posts on ${post_description.sourceText || "the question you asked"}`)
                                 }
                             }
-                            console.log("hi")
                         }
                         //Get Data for Query
                         else if (post_type && post_type.option == "query") {
