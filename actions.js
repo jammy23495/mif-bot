@@ -1411,18 +1411,6 @@ async function loadActions(manager, jsonArray, classifications) {
             if (data) {
                 if (data) {
                     let trendingList = await getTrending();
-                    let queries = trendingList.filter((t) => {
-                        return t.IsQuery == 1
-                    }) || []
-                    let post = trendingList.filter((t) => {
-                        return t.IsPost == 1
-                    }) || []
-                    let experts = trendingList.filter((t) => {
-                        return t.IsExpert == 1
-                    }) || []
-                    let com = trendingList.filter((t) => {
-                        return t.IsCOM == 1
-                    }) || []
 
                     if (trendingList.length > 0) {
                         let trendingString = `<div style='padding: revert'>There are ${trendingList.length} trending feeds in MIF. Here are the details:`
