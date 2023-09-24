@@ -15,7 +15,8 @@ let {
     getTechBytesHistory,
     getBookMarks,
     getMostActiveMember,
-    getPieChartData
+    getPieChartData,
+    getTrending
 } = require("./sql");
 
 let {
@@ -1394,6 +1395,46 @@ async function loadActions(manager, jsonArray, classifications) {
                         data = generateActionDataResponse(data, "intent_action_showPostQueryCountByCategory", "I am not able answer this. Seems like either the category you entered is not present in MIF or you have not added it yet. To view the valid list of categories, ask 'List of categories' in MIF bot")
                     }
 
+                }
+            }
+            data.classifications = classifications;
+        })
+
+        //-------------------------------------------showTrending------------------------------------------------------------
+
+        //Documents
+
+        manager.addDocument('en', 'Trending feed', "intent_showTrending")
+        manager.addDocument('en', 'Latest feed', "intent_showTrending")
+
+        manager.addAction("intent_showTrending", 'showTrending', [], async (data) => {
+            if (data) {
+                if (data) {
+                    let trendingList = await getTrending();
+                    let queries = trendingList.filter((t) => {
+                        return t.IsQuery == 1
+                    }) || []
+                    let post = trendingList.filter((t) => {
+                        return t.IsPost == 1
+                    }) || []
+                    let experts = trendingList.filter((t) => {
+                        return t.IsExpert == 1
+                    }) || []
+                    let com = trendingList.filter((t) => {
+                        return t.IsCOM == 1
+                    }) || []
+
+                    if (trendingList.length > 0) {
+                        let trendingString = `<div style='padding: revert'>There are ${trendingList.length} trending feeds in MIF. Here are the details:`
+                        trendingString += "<ol>"
+                        trendingList.map((t) => {
+                            trendingString += `<li>${t.Name}</li>`
+                        })
+                        trendingString += "</ol></div>"
+                        data = generateActionDataResponse(data, "intent_action_showTrending", trendingString)
+                    } else {
+                        data = generateActionDataResponse(data, "intent_action_showTrending", "I am not able to find trending/latest feed in MIF forum")
+                    }
                 }
             }
             data.classifications = classifications;

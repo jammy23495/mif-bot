@@ -177,6 +177,16 @@ async function getPieChartData() {
     }
 }
 
+async function getTrending() {
+    try {
+        await sql.connect(sqlConfig)
+        const result = await sql.query `exec Treding`
+        return result.recordsets[0]
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 
 
 module.exports = {
@@ -195,5 +205,6 @@ module.exports = {
     getTechBytesHistory,
     getBookMarks,
     getMostActiveMember,
-    getPieChartData
+    getPieChartData,
+    getTrending
 }
