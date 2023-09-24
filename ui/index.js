@@ -149,9 +149,9 @@ angular.module("myapp", [])
                         let properties = Object.keys(groupedData)
                         botAnswer += "<p>I have found ";
                         for (let index = 0; index < properties.length; index++) {
-                            botAnswer += `${groupedData[properties[index]].length} ${properties[index]}, `
+                            botAnswer += (index != properties.length - 1) ? `${groupedData[properties[index]].length} ${properties[index]}(s), ` : `${groupedData[properties[index]].length} ${properties[index]}(s) `
                         }
-                        botAnswer += totalComments > 0 ? ` and ${totalComments} comments ` : ""
+                        botAnswer += totalComments > 0 ? ` and ${totalComments} comment(s) ` : ""
                         botAnswer += `related to your question, here are the details:</p>`
 
                         // botAnswer += `I have found ${data.length} posts/queries & ${data.length} comments related to your query, here are the details: <br><br>`
