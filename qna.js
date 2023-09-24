@@ -67,7 +67,7 @@ async function qna(question, manager, summarizer) {
                                     finalCommentCount = response.commentCount;
                                     isCommentsAdded = false
                                 } else {
-                                    finalCommentCount = 0
+                                    finalCommentCount = post[j].CommentCount
                                 }
 
                                 // let question_summary = await generateAnswer(filterString(post[j].Question), summarizer)
@@ -101,14 +101,16 @@ async function qna(question, manager, summarizer) {
                 console.log("No Valid Classifications found!")
                 finalAnswers.push({
                     "answer_summary": getRandomFallbackAnswers(),
-                    "isGreet": true
+                    "isGreet": true,
+                    "isFallback": true
                 })
             }
         } else {
             console.log("No Classifications found!")
             finalAnswers.push({
                 "answer_summary": getRandomFallbackAnswers(),
-                "isGreet": true
+                "isGreet": true,
+                "isFallback": true
             })
         }
     }
@@ -146,12 +148,14 @@ async function generateAnswer(answer, offlineSummarizer) {
 
         return {
             answer_summary: answer_summary,
-            isGreet: false
+            isGreet: false,
+            isFallback: true
         }
     } catch (error) {
         return {
             answer_summary: "I am sorry! I don't know about this. Please ask questions related to forum.",
-            isGreet: true
+            isGreet: true,
+            isFallback: true
         }
     }
 }

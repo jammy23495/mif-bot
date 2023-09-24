@@ -13,18 +13,26 @@ let {
     getDistinctMIFBotData,
     getAPSOsPosts,
     getAttachmentsInIS,
-    getTechBytesHistory
+    getTechBytesHistory,
+    getBookMarks,
+    getMostActiveMember,
+    getPieChartData
 } = require("./sql");
 
 let {
     getRandomFallbackAnswers,
     tokenize,
     filterString
-} = require("./utils")
+} = require("./utils");
 
 
 async function loadActions(manager, jsonArray, classifications) {
     try {
+        let categories = await getListOfCategories();
+        categories = categories.map((c) => {
+            return c.Name
+        })
+
         //Entities
         manager.addNerAfterLastCondition('en', 'answered_by', 'by');
         manager.addNerAfterLastCondition('en', 'answered_by', 'of');
@@ -45,6 +53,8 @@ async function loadActions(manager, jsonArray, classifications) {
         manager.addNerRuleOptionTexts('en', 'answered_by_person_type', 'Expert', ["expert", "experts", "Subject Matter Expert"]);
         manager.addNerRuleOptionTexts('en', 'answered_by_person_type', 'APSOs', ["apsos", "APSOs", "APSO's", "apso's"]);
 
+        manager.addNerRuleOptionTexts('en', 'category', 'category', categories);
+
         //-------------------------------------------showPostDetails------------------------------------------------------------
 
         //Documents
@@ -57,6 +67,20 @@ async function loadActions(manager, jsonArray, classifications) {
         manager.addDocument('en', 'Show me the @post_type of @answered_by', "intent_showPostDetails");
         manager.addDocument('en', 'Is there any @post_type given by @answered_by', "intent_showPostDetails");
         manager.addDocument('en', 'How many @post_type by @answered_by?', "intent_showPostDetails");
+        
+        manager.addDocument('en', 'Any post by COM?', "intent_showPostDetails");
+        manager.addDocument('en', 'Any post by Expert?', "intent_showPostDetails");
+        manager.addDocument('en', 'Any post by APSOs?', "intent_showPostDetails");
+
+        manager.addDocument('en', 'Show me the @post_field given by @answered_by_person_type', "intent_showPostDetails");
+        manager.addDocument('en', 'Show me the @post_field of @answered_by_person_type', "intent_showPostDetails");
+        manager.addDocument('en', 'Is there any @post_field given by @answered_by_person_type', "intent_showPostDetails");
+        manager.addDocument('en', 'How many @post_field by @answered_by_person_type?', "intent_showPostDetails");
+
+        manager.addDocument('en', 'Show me the @post_type given by @answered_by_person_type', "intent_showPostDetails");
+        manager.addDocument('en', 'Show me the @post_type of @answered_by_person_type', "intent_showPostDetails");
+        manager.addDocument('en', 'Is there any @post_type given by @answered_by_person_type', "intent_showPostDetails");
+        manager.addDocument('en', 'How many @post_type by @answered_by_person_type?', "intent_showPostDetails");
 
         manager.addDocument('en', 'Is there any post on @post_description?', "intent_showPostDetails");
         manager.addDocument('en', 'Is there any query on @post_description?', "intent_showPostDetails");
@@ -78,6 +102,17 @@ async function loadActions(manager, jsonArray, classifications) {
         manager.addDocument('en', 'query on @post_description?', "intent_showPostDetails");
         manager.addDocument('en', 'comment on @post_description?', "intent_showPostDetails");
 
+        manager.addDocument('en', 'Any posts or queries by @answered_by_person_type in MIF?', "intent_showCountByPersonType")
+        manager.addDocument('en', 'Any posts or queries by COM in MIF?', "intent_showCountByPersonType")
+        manager.addDocument('en', 'Any posts or queries by Experts in MIF?', "intent_showCountByPersonType")
+        manager.addDocument('en', 'Any posts or queries by APSOs in MIF?', "intent_showCountByPersonType")
+
+        manager.addDocument('en', 'Any @answered_by_person_type Post?', "intent_showCountByPersonType")
+        manager.addDocument('en', 'Any Expert Post?', "intent_showCountByPersonType")
+        manager.addDocument('en', 'Any COM Post?', "intent_showCountByPersonType")
+        manager.addDocument('en', 'Any Expert queries?', "intent_showCountByPersonType")
+        manager.addDocument('en', 'Any COM queries?', "intent_showCountByPersonType")
+
         //Action
         manager.addAction("intent_showPostDetails", 'showPostDetails', [], async (data) => {
             let jsonArray = await getMIFData()
@@ -96,6 +131,14 @@ async function loadActions(manager, jsonArray, classifications) {
                 let post_description = entities.filter((e) => {
                     return e.entity === "post_description"
                 })[0]
+                let category = entities.filter((e) => {
+                    return e.entity === "category"
+                })[0]
+                let answered_by_person_type = entities.filter((e) => {
+                    return e.entity === "answered_by_person_type"
+                })[0]
+
+                let mifData = await getDistinctMIFBotData();
 
                 //If post description is present
                 if (post_description) {
@@ -130,6 +173,7 @@ async function loadActions(manager, jsonArray, classifications) {
                                     data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showPostDetails" : "intent_action_showPostDetails", `I am sorry! I cannot find the posts on ${post_description.sourceText || "the question you asked"}`)
                                 }
                             }
+                            console.log("hi")
                         }
                         //Get Data for Query
                         else if (post_type && post_type.option == "query") {
@@ -152,8 +196,9 @@ async function loadActions(manager, jsonArray, classifications) {
                                     data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showPostDetails" : "intent_action_showPostDetails", `I am sorry! I cannot find the queries on ${post_description.sourceText || "the question you asked"}`)
                                 }
                             }
-                        }//Get Data for Query
+                        } //Get Data for Query
                         else if (post_field.option == "comment") {
+                            let commentCount = 0;
                             for (let j = 0; j < allMIFData.length; j++) {
                                 let availableTokens = 0;
                                 let context = filterString(allMIFData[j].Comment);
@@ -165,10 +210,13 @@ async function loadActions(manager, jsonArray, classifications) {
                                 let score = (availableTokens / (tokens.length)) || 0;
                                 if (score > 0.5) {
                                     let intent = allMIFData[j].Post_ID + `_${allMIFData[j].Topic || "MIF"}` + "_intent_" + allMIFData[j].Subject.replaceAll(" ", "_")
+                                    commentCount++;
                                     classifications.push({
                                         "intent": intent,
                                         "score": 1
                                     })
+
+                                    data.commentCount = commentCount
                                 } else {
                                     data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showPostDetails" : "intent_action_showPostDetails", `I am sorry! I cannot find any comments on ${post_description.sourceText || "the question you asked"}`)
                                 }
@@ -176,7 +224,36 @@ async function loadActions(manager, jsonArray, classifications) {
                         }
                     }
                 }
-                //Get Comments and Likes of a person
+                if (category && post_type) {
+                    let numberPostByCategory = await mifData.filter((e) => {
+                        return e.Category && e.Category != "NULL" && e.FeedType == "Post" ? e.Category.includes(category.sourceText) : ""
+                    })
+                    let numberQueryByCategory = await mifData.filter((e) => {
+                        return e.Category && e.Category != "NULL" && e.FeedType == "Query" ? e.Category.includes(category.sourceText) : ""
+                    })
+                    let numberCOMPostByCategory = await mifData.filter((e) => {
+                        return e.Category && e.Category != "NULL" && e.FeedType == "COM Post" ? e.Category.includes(category.sourceText) : ""
+                    })
+                    let numberExpertPostByCategory = await mifData.filter((e) => {
+                        return e.Category && e.Category != "NULL" && e.FeedType == "Expert Post" ? e.Category.includes(category.sourceText) : ""
+                    })
+                    if (post_type && answered_by_person_type) {
+                        if (answered_by_person_type.option == "COM") {
+                            data = generateActionDataResponse(data, "intent_action_showPostQueryCountByCategory", `I found ${numberCOMPostByCategory.length} COM posts in ${category.sourceText} category`)
+                        } else if (answered_by_person_type.option == "Expert") {
+                            data = generateActionDataResponse(data, "intent_action_showPostQueryCountByCategory", `I found ${numberExpertPostByCategory.length} Expert posts in ${category.sourceText} category`)
+                        }
+                    }
+                    //For Post
+                    else if (post_type.option == "post") {
+                        data = generateActionDataResponse(data, "intent_action_showPostQueryCountByCategory", `I found ${numberPostByCategory.length} posts in ${category.sourceText} category`)
+                    }
+                    //For Query
+                    else if (post_type.option == "query") {
+                        data = generateActionDataResponse(data, "intent_action_showPostQueryCountByCategory", `I found ${numberQueryByCategory.length} queries in ${category.sourceText} category`)
+                    }
+                }
+                //Get Comments of a person
                 else if (answered_by && post_field) {
                     //Get Comments
                     if (post_field.option == "comment") {
@@ -196,6 +273,107 @@ async function loadActions(manager, jsonArray, classifications) {
                         data.commentCount = commentCount
                         console.log("Comment Count: ", commentCount)
                     }
+                }
+                //Get Comments by person type
+                else if (answered_by_person_type && post_field) {
+                    jsonArray = [...new Map(jsonArray.map(item => [item["Post_ID"], item])).values()]
+                    //Get Comments
+                    if (post_field.option == "comment") {
+                        let commentCount = 0;
+                        if (answered_by_person_type.option == "COM") {
+                            jsonArray.filter(async (c) => {
+                                if (c && c.IsCOMCommented == 1) {
+                                    commentCount++;
+                                    let intent = c.Post_ID + `_${c.Topic || "MIF"}` + "_intent_" + c.Subject.replaceAll(" ", "_")
+                                    classifications.push({
+                                        "intent": intent,
+                                        "score": 1
+                                    })
+                                } else {
+                                    data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showPostDetails" : "intent_action_showPostDetails", `I am sorry! I cannot find the comments by COM`)
+                                }
+                            })
+                            data.commentCount = commentCount
+                        } else if (answered_by_person_type.option == "Expert") {
+                            jsonArray.filter(async (c) => {
+                                if (c && c.IsExpertCommented == 1) {
+                                    commentCount++;
+                                    let intent = c.Post_ID + `_${c.Topic || "MIF"}` + "_intent_" + c.Subject.replaceAll(" ", "_")
+                                    classifications.push({
+                                        "intent": intent,
+                                        "score": 1
+                                    })
+                                } else {
+                                    data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showPostDetails" : "intent_action_showPostDetails", `I am sorry! I cannot find the comments by Expert`)
+                                }
+                            })
+                            data.commentCount = commentCount
+                        } else if (answered_by_person_type.option == "APSOs") {
+                            jsonArray.filter(async (c) => {
+                                if (c && c.IsAPSOsCommented == 1) {
+                                    commentCount++;
+                                    let intent = c.Post_ID + `_${c.Topic || "MIF"}` + "_intent_" + c.Subject.replaceAll(" ", "_")
+                                    classifications.push({
+                                        "intent": intent,
+                                        "score": 1
+                                    })
+                                } else {
+                                    data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showPostDetails" : "intent_action_showPostDetails", `I am sorry! I cannot find the comments by APSOs`)
+                                }
+                            })
+                            data.commentCount = commentCount
+                        }
+                    }
+                }
+                //Get Post/Query by person type
+                else if (answered_by_person_type && post_type) {
+                    //Get Comments
+                    let commentCount = 0;
+                    jsonArray = [...new Map(jsonArray.map(item => [item["Post_ID"], item])).values()]
+                    if (answered_by_person_type.option == "COM") {
+                        jsonArray.filter(async (c) => {
+                            if (c && c.IsFeedByCOM == 1) {
+                                commentCount++;
+                                let intent = c.Post_ID + `_${c.Topic || "MIF"}` + "_intent_" + c.Subject.replaceAll(" ", "_")
+                                classifications.push({
+                                    "intent": intent,
+                                    "score": 1
+                                })
+                            } else {
+                                data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showPostDetails" : "intent_action_showPostDetails", `I am sorry! I cannot find the post by COM`)
+                            }
+                        })
+                        data.commentCount = commentCount
+                    } else if (answered_by_person_type.option == "Expert") {
+                        jsonArray.filter(async (c) => {
+                            if (c && c.IsFeedByExpert == 1) {
+                                commentCount++;
+                                let intent = c.Post_ID + `_${c.Topic || "MIF"}` + "_intent_" + c.Subject.replaceAll(" ", "_")
+                                classifications.push({
+                                    "intent": intent,
+                                    "score": 1
+                                })
+                            } else {
+                                data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showPostDetails" : "intent_action_showPostDetails", `I am sorry! I cannot find the post by Expert`)
+                            }
+                        })
+                        data.commentCount = commentCount
+                    } else if (answered_by_person_type.option == "APSOs") {
+                        jsonArray.filter(async (c) => {
+                            if (c && c.IsFeedByAPSOs == 1) {
+                                commentCount++;
+                                let intent = c.Post_ID + `_${c.Topic || "MIF"}` + "_intent_" + c.Subject.replaceAll(" ", "_")
+                                classifications.push({
+                                    "intent": intent,
+                                    "score": 1
+                                })
+                            } else {
+                                data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showPostDetails" : "intent_action_showPostDetails", `I am sorry! I cannot find the post by APSOs`)
+                            }
+                        })
+                        data.commentCount = commentCount
+                    }
+
                 }
                 //Get Post and Queries of a person
                 else if (answered_by && post_type) {
@@ -228,7 +406,7 @@ async function loadActions(manager, jsonArray, classifications) {
                         })
                     }
                 } else {
-                    data = await generateActionDataResponse(data, "intent_action_showPostDetails", getRandomFallbackAnswers())
+                    data = await generateActionDataResponse(data,classifications.length > 0 ? "intent_showPostDetails" : "intent_action_showPostDetails", getRandomFallbackAnswers(), true)
                 }
             }
             data.classifications = classifications;
@@ -247,6 +425,9 @@ async function loadActions(manager, jsonArray, classifications) {
 
         manager.addDocument('en', 'How many queries are there in MIF?', "intent_showCountBasedOnPostType")
         manager.addDocument('en', 'How many posts are there in MIF?', "intent_showCountBasedOnPostType")
+
+        manager.addDocument('en', 'How many queries in MIF?', "intent_showCountBasedOnPostType")
+        manager.addDocument('en', 'How many posts in MIF?', "intent_showCountBasedOnPostType")
 
         //Actions
         manager.addAction("intent_showCountBasedOnPostType", 'showCountBasedOnPostType', [], async (data) => {
@@ -283,24 +464,23 @@ async function loadActions(manager, jsonArray, classifications) {
         manager.addDocument('en', 'How many @answered_by_person_type Post are there in MIF?', "intent_showCountByPersonType")
         manager.addDocument('en', 'How many COM Post are there in MIF?', "intent_showCountByPersonType")
         manager.addDocument('en', 'How many Expert Post are there in MIF?', "intent_showCountByPersonType")
+        manager.addDocument('en', 'How many APSOs Post are there in MIF?', "intent_showCountByPersonType")
 
         manager.addDocument('en', 'How many posts by @answered_by_person_type in MIF?', "intent_showCountByPersonType")
         manager.addDocument('en', 'How many posts by COM in MIF?', "intent_showCountByPersonType")
         manager.addDocument('en', 'How many posts by Experts in MIF?', "intent_showCountByPersonType")
+        manager.addDocument('en', 'How many posts by COM?', "intent_showCountByPersonType")
+        manager.addDocument('en', 'How many posts by Experts?', "intent_showCountByPersonType")
+        manager.addDocument('en', 'How many queries by COM in MIF?', "intent_showCountByPersonType")
+        manager.addDocument('en', 'How many queries by Experts in MIF?', "intent_showCountByPersonType")
+        manager.addDocument('en', 'How many queries by COM?', "intent_showCountByPersonType")
+        manager.addDocument('en', 'How many queries by Experts?', "intent_showCountByPersonType")
 
         manager.addDocument('en', 'How many posts of @answered_by_person_type in MIF?', "intent_showCountByPersonType")
         manager.addDocument('en', 'How many posts of COM in MIF?', "intent_showCountByPersonType")
         manager.addDocument('en', 'How many posts of Experts in MIF?', "intent_showCountByPersonType")
+        manager.addDocument('en', 'How many posts of APSOs in MIF?', "intent_showCountByPersonType")
 
-        manager.addDocument('en', 'Any posts or queries by @answered_by_person_type in MIF?', "intent_showCountByPersonType")
-        manager.addDocument('en', 'Any posts or queries by COM in MIF?', "intent_showCountByPersonType")
-        manager.addDocument('en', 'Any posts or queries by Experts in MIF?', "intent_showCountByPersonType")
-
-        manager.addDocument('en', 'Any @answered_by_person_type Post?', "intent_showCountByPersonType")
-        manager.addDocument('en', 'Any Expert Post?', "intent_showCountByPersonType")
-        manager.addDocument('en', 'Any COM Post?', "intent_showCountByPersonType")
-        manager.addDocument('en', 'Any Expert queries?', "intent_showCountByPersonType")
-        manager.addDocument('en', 'Any COM queries?', "intent_showCountByPersonType")
 
         //Actions
         manager.addAction("intent_showCountByPersonType", 'showCountByPersonType', [], async (data) => {
@@ -312,11 +492,15 @@ async function loadActions(manager, jsonArray, classifications) {
                 })[0]
 
                 let numberOfCOMPost = jsonArray.filter((e) => {
-                    return e.FeedType === "COM Post"
+                    return e.IsFeedByCOM === 1
                 })
 
                 let numberOfExpertPost = jsonArray.filter((e) => {
-                    e.FeedType === "Expert Post"
+                    return e.IsFeedByExpert === 1
+                })
+
+                let numberOfAPSOsPost = jsonArray.filter((e) => {
+                    return e.IsFeedByAPSOs === 1
                 })
 
                 //Check for COM Posts category
@@ -326,6 +510,99 @@ async function loadActions(manager, jsonArray, classifications) {
                 //Check for Expert Posts category
                 else if (answered_by_person_type.option.includes("Expert")) {
                     data = generateActionDataResponse(data, "intent_action_showCountByPersonType", numberOfExpertPost.length > 0 ? `I found ${numberOfExpertPost.length} Expert Posts in MIF` : "There are no Expert posts available in MIF")
+                }
+                //Check for APSOs Posts category
+                else if (answered_by_person_type.option.includes("APSOs")) {
+                    data = generateActionDataResponse(data, "intent_action_showCountByPersonType", numberOfAPSOsPost.length > 0 ? `I found ${numberOfAPSOsPost.length} APSOs Posts in MIF` : "There are no APSOs posts available in MIF")
+                }
+            }
+            data.classifications = classifications;
+        })
+
+
+        //-------------------------------------------showPersonTypeLikePost------------------------------------------------------------
+
+        //Documents
+
+        manager.addDocument('en', 'How many post and query COM liked?', "intent_showPersonTypeLikePost")
+        manager.addDocument('en', 'How many post and query Expert liked?', "intent_showPersonTypeLikePost")
+        manager.addDocument('en', 'How many post and query APSOs liked?', "intent_showPersonTypeLikePost")
+
+        manager.addDocument('en', 'How many likes by COM?', "intent_showPersonTypeLikePost")
+        manager.addDocument('en', 'How many likes by Experts?', "intent_showPersonTypeLikePost")
+        manager.addDocument('en', 'How many likes by APSOs?', "intent_showPersonTypeLikePost")
+
+        manager.addDocument('en', 'Give me the count of number of posts or queries that COM liked', "intent_showPersonTypeLikePost")
+        manager.addDocument('en', 'Give me the count of number of posts or queries that Experts liked', "intent_showPersonTypeLikePost")
+        manager.addDocument('en', 'Give me the count of number of posts or queries that APSOs liked', "intent_showPersonTypeLikePost")
+
+        manager.addDocument('en', 'How many post and query @answered_by_person_type @post_field?', "intent_showPersonTypeLikePost")
+        manager.addDocument('en', 'How many @post_field by @answered_by_person_type?', "intent_showPersonTypeLikePost")
+        manager.addDocument('en', 'Give me the count of number of posts or queries that @answered_by_person_type @post_field', "intent_showPersonTypeLikePost")
+
+        //Actions
+        manager.addAction("intent_showPersonTypeLikePost", 'showPersonTypeLikePost', [], async (data) => {
+            if (data) {
+                if (data && data.entities.length > 0) {
+                    classifications.push({
+                        "intent": "intent_showPersonTypeLikePost",
+                        "score": 1
+                    })
+                    let entities = data.entities;
+                    let answered_by_person_type = entities.filter((e) => {
+                        return e.entity === "answered_by_person_type"
+                    })[0]
+                    let post_field = entities.filter((e) => {
+                        return e.entity === "post_field"
+                    })[0]
+
+                    let mifData = await getDistinctMIFBotData();
+                    let numberCOMLikedList = await mifData.filter((e) => {
+                        return e.Feed_COM_LIKE == 1
+                    })
+                    let numberExpertLikedList = await mifData.filter((e) => {
+                        return e.IsExpertLiked == 1
+                    })
+                    let numberAPSOLikedList = await mifData.filter((e) => {
+                        return e.IsAPSOsLiked == 1
+                    })
+
+                    let numberCOMCommentedList = await mifData.filter((e) => {
+                        return e.IsCOMCommented == 1
+                    })
+                    let numberExpertCommentedList = await mifData.filter((e) => {
+                        return e.IsExpertCommented == 1
+                    })
+                    let numberAPSOCommentedList = await mifData.filter((e) => {
+                        return e.IsAPSOsCommented == 1
+                    })
+
+                    if (answered_by_person_type && post_field) {
+                        //For Likes
+                        if (post_field.option == "likes") {
+                            if (answered_by_person_type.option == "COM" || answered_by_person_type.sourceText.toLowerCase().includes("com")) {
+                                data = generateActionDataResponse(data, "intent_action_showPersonTypeLikePost", numberCOMLikedList.length > 0 ? `There are ${numberCOMLikedList.length} likes by COM in MIF` : "There are no likes by COM in MIF")
+                            } else if (answered_by_person_type.option == "Expert" || answered_by_person_type.sourceText.toLowerCase().includes("expert")) {
+                                data = generateActionDataResponse(data, "intent_action_showPersonTypeLikePost", numberExpertLikedList.length > 0 ? `There are ${numberExpertLikedList.length} likes by Experts in MIF` : "There are no likes by Experts in MIF")
+                            } else if (answered_by_person_type.option == "APSOs" || answered_by_person_type.sourceText.toLowerCase().includes("apso")) {
+                                data = generateActionDataResponse(data, "intent_action_showPersonTypeLikePost", numberAPSOLikedList.length > 0 ? `There are ${numberAPSOLikedList.length} likes by APSOs in MIF` : "There are no likes by APSOs in MIF")
+                            }
+                        }
+                        //For Comments
+                        else if (post_field.option == "comment") {
+                            if (answered_by_person_type.option == "COM" || answered_by_person_type.sourceText.toLowerCase().includes("com")) {
+                                data = generateActionDataResponse(data, "intent_action_showPersonTypeLikePost", numberCOMCommentedList.length > 0 ? `There are ${numberCOMCommentedList.length} comments by COM in MIF` : "There are no comments by COM in MIF")
+                            } else if (answered_by_person_type.option == "Expert" || answered_by_person_type.sourceText.toLowerCase().includes("expert")) {
+                                data = generateActionDataResponse(data, "intent_action_showPersonTypeLikePost", numberExpertCommentedList.length > 0 ? `There are ${numberExpertCommentedList.length} comments by Experts in MIF` : "There are no comments by Experts in MIF")
+                            } else if (answered_by_person_type.option == "APSOs" || answered_by_person_type.sourceText.toLowerCase().includes("apso")) {
+                                data = generateActionDataResponse(data, "intent_action_showPersonTypeLikePost", numberAPSOCommentedList.length > 0 ? `There are ${numberAPSOCommentedList.length} comments by APSOs in MIF` : "There are no comments by APSOs in MIF")
+                            }
+                        }
+
+                    } else {
+                        data = generateActionDataResponse(data, "intent_action_showPersonTypeLikePost", getRandomFallbackAnswers(), true)
+                    }
+
                 }
             }
             data.classifications = classifications;
@@ -376,7 +653,7 @@ async function loadActions(manager, jsonArray, classifications) {
                 let numberOfExpertPostActive = jsonArray.filter((e) => {
                     e.FeedType === "Expert Post" && e.IsActive == 1
                 })
-                
+
                 let post_description = entities.filter((e) => {
                     return e.entity === "post_description"
                 })[0]
@@ -435,7 +712,7 @@ async function loadActions(manager, jsonArray, classifications) {
                                     data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showPostDetails" : "intent_action_showPostDetails", `I am sorry! I cannot find the queries on ${post_description.sourceText || "the question you asked"}`)
                                 }
                             }
-                        }//Get Data for Query
+                        } //Get Data for Query
                         else if (post_field.option == "comment") {
                             for (let j = 0; j < allMIFData.length; j++) {
                                 let availableTokens = 0;
@@ -760,6 +1037,83 @@ async function loadActions(manager, jsonArray, classifications) {
             data.classifications = classifications;
         })
 
+        //-------------------------------------------showBookMarkCount------------------------------------------------------------
+
+        //Documents
+        manager.addDocument('en', 'How many post or Query people bookmarked?', "intent_showBookMarkCount")
+        manager.addDocument('en', 'How many bookmarks are there?', "intent_showBookMarkCount")
+        manager.addDocument('en', 'List of bookmarks', "intent_showBookMarkCount")
+
+        //Actions
+        manager.addAction("intent_showBookMarkCount", 'showBookMarkCount', [], async (data) => {
+            if (data) {
+                let BookMarksList = await getBookMarks();
+                if (BookMarksList.length > 0) {
+                    let BookMarksString = `There are ${BookMarksList.length} Bookmarks in MIF.`
+                    data = generateActionDataResponse(data, "intent_action_showBookMarkCount", BookMarksString)
+                } else {
+                    data = generateActionDataResponse(data, "intent_action_showBookMarkCount", "There are no Bookmarks available in MIF")
+                }
+            }
+            data.classifications = classifications;
+        })
+
+
+        //-------------------------------------------showMostActiveMember------------------------------------------------------------
+
+        //Documents
+        manager.addDocument('en', 'Who is latest most active member of previous week?', "intent_showMostActiveMember")
+
+        //Actions
+        manager.addAction("intent_showMostActiveMember", 'showMostActiveMember', [], async (data) => {
+            if (data) {
+                let MAMList = await getMostActiveMember();
+                if (MAMList.length > 0) {
+                    let MAMString = `There are ${MAMList.length} Most Active Members of previous week in MIF.`
+                    MAMString += " Below are the list of members:\n"
+                    MAMString += "<ul style='padding: revert; '>"
+                    MAMList.map((e) => {
+                        MAMString += "<li>"
+                        MAMString += `${e.Name}`
+                        MAMString += "</li>"
+                    })
+                    MAMString += "</ul>"
+                    data = generateActionDataResponse(data, "intent_action_showMostActiveMember", MAMString)
+                } else {
+                    data = generateActionDataResponse(data, "intent_action_showMostActiveMember", "I couldn't find any most active members for previous week in our database.")
+                }
+            }
+            data.classifications = classifications;
+        })
+
+        //-------------------------------------------showPieChartData------------------------------------------------------------
+
+        //Documents
+        manager.addDocument('en', 'According to stack How many people comments, likes, views?', "intent_showPieChartData")
+
+        //Actions
+        manager.addAction("intent_showPieChartData", 'showPieChartData', [], async (data) => {
+            if (data) {
+                let PieChartList = await getPieChartData();
+                if (PieChartList.length > 0) {
+                    let PieChartString = "Following are the details:\n"
+                    PieChartString += "<ul style='padding: revert; '>"
+                    PieChartString += `<li>Number of Posts: ${PieChartList[0].PostCount || 0}</li>`
+                    PieChartString += `<li>Number of Queries: ${PieChartList[0].QueryCount || 0}</li>`
+                    PieChartString += `<li>Number of Comments: ${PieChartList[0].CommentCount || 0}</li>`
+                    PieChartString += `<li>Number of Likes: ${PieChartList[0].LikeCount || 0}</li>`
+                    PieChartString += `<li>Number of Views: ${PieChartList[0].ViewCount || 0}</li>`
+                    PieChartString += `<li>Number of Expert Comments: ${PieChartList[0].ExpertCommentCount || 0}</li>`
+                    PieChartString += "</ul>"
+                    data = generateActionDataResponse(data, "intent_action_showPieChartData", PieChartString)
+                } else {
+                    data = generateActionDataResponse(data, "intent_action_showPieChartData", "I couldn't find data related to your question in our database.")
+                }
+            }
+            data.classifications = classifications;
+        })
+
+
         //-------------------------------------------showAnnouncements------------------------------------------------------------
 
         //Documents
@@ -792,31 +1146,6 @@ async function loadActions(manager, jsonArray, classifications) {
         })
 
 
-        //-------------------------------------------showAPSOsPosts------------------------------------------------------------
-
-        //Documents
-        manager.addDocument('en', 'How many posts of APSOs?', "intent_showAPSOsPosts")
-        manager.addDocument('en', 'What is the count of posts that are posted by APSOs?', "intent_showAPSOsPosts")
-
-        //Actions
-        manager.addAction("intent_showAPSOsPosts", 'showAPSOsPosts', [], async (data) => {
-            if (data) {
-                let APSOsPostList = await getAPSOsPosts();
-
-                if (APSOsPostList[0].APSOsFeedCount > 0) {
-                    let APSOsString = `There are ${APSOsPostList[0].APSOsFeedCount} posts by APSO's in MIF.`
-                    data = generateActionDataResponse(data, "intent_action_showAPSOsPosts", APSOsString)
-                } else {
-                    data = generateActionDataResponse(data, "intent_action_showAPSOsPosts", "There are no posts by APSOs in MIF")
-                }
-
-            }
-            data.classifications = classifications;
-        })
-
-
-
-
         //-------------------------------------------showAttachmentsInIS------------------------------------------------------------
 
         //Documents
@@ -839,87 +1168,70 @@ async function loadActions(manager, jsonArray, classifications) {
         })
 
 
-        //-------------------------------------------showPersonTypeLikePost------------------------------------------------------------
+        //-------------------------------------------showPostQueryCountByCategory------------------------------------------------------------
 
         //Documents
 
-        manager.addDocument('en', 'How many post and query COM liked?', "intent_showPersonTypeLikePost")
-        manager.addDocument('en', 'How many post and query Expert liked?', "intent_showPersonTypeLikePost")
-        manager.addDocument('en', 'How many post and query APSOs liked?', "intent_showPersonTypeLikePost")
-
-        manager.addDocument('en', 'How many likes by COM?', "intent_showPersonTypeLikePost")
-        manager.addDocument('en', 'How many likes by Experts?', "intent_showPersonTypeLikePost")
-        manager.addDocument('en', 'How many likes by APSOs?', "intent_showPersonTypeLikePost")
-
-        manager.addDocument('en', 'Give me the count of number of posts or queries that COM liked', "intent_showPersonTypeLikePost")
-        manager.addDocument('en', 'Give me the count of number of posts or queries that Experts liked', "intent_showPersonTypeLikePost")
-        manager.addDocument('en', 'Give me the count of number of posts or queries that APSOs liked', "intent_showPersonTypeLikePost")
-
-        manager.addDocument('en', 'How many post and query @answered_by_person_type @post_field?', "intent_showPersonTypeLikePost")
-        manager.addDocument('en', 'How many @post_field by @answered_by_person_type?', "intent_showPersonTypeLikePost")
-        manager.addDocument('en', 'Give me the count of number of posts or queries that @answered_by_person_type @post_field', "intent_showPersonTypeLikePost")
+        manager.addDocument('en', 'How many @post_type on category @category?', "intent_showPostQueryCountByCategory")
+        manager.addDocument('en', 'How many @post_type on @category category?', "intent_showPostQueryCountByCategory")
+        manager.addDocument('en', 'How many @post_type by @answered_by_person_type on @category category?', "intent_showPostQueryCountByCategory")
+        manager.addDocument('en', 'How many @post_type by expert on @category category?', "intent_showPostQueryCountByCategory")
+        manager.addDocument('en', 'How many @post_type by COM on @category category?', "intent_showPostQueryCountByCategory")
+        manager.addDocument('en', 'How many expert posts on @category category?', "intent_showPostQueryCountByCategory")
+        manager.addDocument('en', 'How many COM posts on @category category?', "intent_showPostQueryCountByCategory")
 
         //Actions
-        manager.addAction("intent_showPersonTypeLikePost", 'showPersonTypeLikePost', [], async (data) => {
+        manager.addAction("intent_showPostQueryCountByCategory", 'showPostQueryCountByCategory', [], async (data) => {
             if (data) {
                 if (data && data.entities.length > 0) {
                     classifications.push({
-                        "intent": "intent_showPersonTypeLikePost",
+                        "intent": "intent_showPostQueryCountByCategory",
                         "score": 1
                     })
                     let entities = data.entities;
+                    let category = entities.filter((e) => {
+                        return e.entity === "category"
+                    })[0]
+                    let post_type = entities.filter((e) => {
+                        return e.entity === "post_type"
+                    })[0]
                     let answered_by_person_type = entities.filter((e) => {
                         return e.entity === "answered_by_person_type"
                     })[0]
-                    let post_field = entities.filter((e) => {
-                        return e.entity === "post_field"
-                    })[0]
 
                     let mifData = await getDistinctMIFBotData();
-                    let numberCOMLikedList = await mifData.filter((e) => {
-                        return e.Feed_COM_LIKE == 1
-                    })
-                    let numberExpertLikedList = await mifData.filter((e) => {
-                        return e.IsExpertLiked == 1
-                    })
-                    let numberAPSOLikedList = await mifData.filter((e) => {
-                        return e.IsAPSOsLiked == 1
-                    })
 
-                    let numberCOMCommentedList = await mifData.filter((e) => {
-                        return e.IsCOMCommented == 1
-                    })
-                    let numberExpertCommentedList = await mifData.filter((e) => {
-                        return e.IsExpertCommented == 1
-                    })
-                    let numberAPSOCommentedList = await mifData.filter((e) => {
-                        return e.IsAPSOsCommented == 1
-                    })
 
-                    if (answered_by_person_type && post_field) {
-                        //For Likes
-                        if (post_field.option == "likes") {
-                            if (answered_by_person_type.option == "COM" || answered_by_person_type.sourceText.toLowerCase().includes("com")) {
-                                data = generateActionDataResponse(data, "intent_action_showPersonTypeLikePost", numberCOMLikedList.length > 0 ? `There are ${numberCOMLikedList.length} likes by COM in MIF` : "There are no likes by COM in MIF")
-                            } else if (answered_by_person_type.option == "Expert" || answered_by_person_type.sourceText.toLowerCase().includes("expert")) {
-                                data = generateActionDataResponse(data, "intent_action_showPersonTypeLikePost", numberExpertLikedList.length > 0 ? `There are ${numberExpertLikedList.length} likes by Experts in MIF` : "There are no likes by Experts in MIF")
-                            } else if (answered_by_person_type.option == "APSOs" || answered_by_person_type.sourceText.toLowerCase().includes("apso")) {
-                                data = generateActionDataResponse(data, "intent_action_showPersonTypeLikePost", numberAPSOLikedList.length > 0 ? `There are ${numberAPSOLikedList.length} likes by APSOs in MIF` : "There are no likes by APSOs in MIF")
+                    if (category && post_type) {
+                        let numberPostByCategory = await mifData.filter((e) => {
+                            return e.Category && e.Category != "NULL" && e.FeedType == "Post" ? e.Category.includes(category.sourceText) : ""
+                        })
+                        let numberQueryByCategory = await mifData.filter((e) => {
+                            return e.Category && e.Category != "NULL" && e.FeedType == "Query" ? e.Category.includes(category.sourceText) : ""
+                        })
+                        let numberCOMPostByCategory = await mifData.filter((e) => {
+                            return e.Category && e.Category != "NULL" && e.FeedType == "COM Post" ? e.Category.includes(category.sourceText) : ""
+                        })
+                        let numberExpertPostByCategory = await mifData.filter((e) => {
+                            return e.Category && e.Category != "NULL" && e.FeedType == "Expert Post" ? e.Category.includes(category.sourceText) : ""
+                        })
+                        if (post_type && answered_by_person_type) {
+                            if (answered_by_person_type.option == "COM") {
+                                data = generateActionDataResponse(data, "intent_action_showPostQueryCountByCategory", `I found ${numberCOMPostByCategory.length} COM posts in ${category.sourceText} category`)
+                            } else if (answered_by_person_type.option == "Expert") {
+                                data = generateActionDataResponse(data, "intent_action_showPostQueryCountByCategory", `I found ${numberExpertPostByCategory.length} Expert posts in ${category.sourceText} category`)
                             }
                         }
-                        //For Comments
-                        else if (post_field.option == "comment") {
-                            if (answered_by_person_type.option == "COM" || answered_by_person_type.sourceText.toLowerCase().includes("com")) {
-                                data = generateActionDataResponse(data, "intent_action_showPersonTypeLikePost", numberCOMCommentedList.length > 0 ? `There are ${numberCOMCommentedList.length} comments by COM in MIF` : "There are no comments by COM in MIF")
-                            } else if (answered_by_person_type.option == "Expert" || answered_by_person_type.sourceText.toLowerCase().includes("expert")) {
-                                data = generateActionDataResponse(data, "intent_action_showPersonTypeLikePost", numberExpertCommentedList.length > 0 ? `There are ${numberExpertCommentedList.length} comments by Experts in MIF` : "There are no comments by Experts in MIF")
-                            } else if (answered_by_person_type.option == "APSOs" || answered_by_person_type.sourceText.toLowerCase().includes("apso")) {
-                                data = generateActionDataResponse(data, "intent_action_showPersonTypeLikePost", numberAPSOCommentedList.length > 0 ? `There are ${numberAPSOCommentedList.length} comments by APSOs in MIF` : "There are no comments by APSOs in MIF")
-                            }
+                        //For Post
+                        else if (post_type.option == "post") {
+                            data = generateActionDataResponse(data, "intent_action_showPostQueryCountByCategory", `I found ${numberPostByCategory.length} posts in ${category.sourceText} category`)
                         }
-
+                        //For Query
+                        else if (post_type.option == "query") {
+                            data = generateActionDataResponse(data, "intent_action_showPostQueryCountByCategory", `I found ${numberQueryByCategory.length} queries in ${category.sourceText} category`)
+                        }
                     } else {
-                        data = generateActionDataResponse(data, "intent_action_showPersonTypeLikePost", getRandomFallbackAnswers())
+                        data = generateActionDataResponse(data, "intent_action_showPostQueryCountByCategory", "I am not able answer this. Seems like either the category you entered is not present in MIF or you have not added it yet. To view the valid list of categories, ask 'List of categories' in MIF bot")
                     }
 
                 }
@@ -927,16 +1239,16 @@ async function loadActions(manager, jsonArray, classifications) {
             data.classifications = classifications;
         })
 
-
     } catch (error) {
         data.classifications = classifications;
     }
 
 }
 
-async function generateActionDataResponse(data, intent, answer) {
+async function generateActionDataResponse(data, intent, answer, isFallback) {
     data.intent = intent
     data.answer = answer
+    data.isFallback = isFallback ? isFallback : false
     return data;
 }
 

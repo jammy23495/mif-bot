@@ -110,53 +110,67 @@ angular.module("myapp", [])
         }
 
         function botResponse(userMessage) {
-            $http({
-                method: 'GET',
-                url: `${HOST}/ask/${userMessage}`
-            }).then(function successCallback(response) {
-                console.log(response.data.data);
-
-                hideLoader()
-                let data = response.data.data;
-                let botAnswer = ""
-                let groups = []
-                if (data[0].isGreet) {
-                    botAnswer += data[0].answer_summary
-                    console.log(botAnswer)
-                    appendMessage(BOT_NAME, BOT_IMG, "left", botAnswer);
-                } else {
-                    let totalComments = 0;
-                    data.map((d) => {
-                        groups.push(d.props)
-                        totalComments += d.props.Comments
-                    })
-                    console.log(groups)
-                    let groupedData = groupBy(groups, "FeedType")
-                    let properties = Object.keys(groupedData)
-                    botAnswer += "<p>I have found ";
-                    for (let index = 0; index < properties.length; index++) {
-                        botAnswer += `${groupedData[properties[index]].length} ${properties[index]}, `
-                    }
-                    botAnswer += totalComments > 0 ? ` and ${totalComments} comments ` : ""
-                    botAnswer += `related to your question, here are the details:</p>`
-
-                    // botAnswer += `I have found ${data.length} posts/queries & ${data.length} comments related to your query, here are the details: <br><br>`
-                    for (let i = 0; i < data.length; i++) {
-                        botAnswer += data[i].props.Posted_By !== "NULL" ? `<br><p>As posted by <b>${data[i].props.Posted_By}</b> ` : ""
-                        botAnswer += data[i].props.Posted_On !== "NULL" && data[i].props.Posted_On !== "Invalid date" ? `on <b>${data[i].props.Posted_On}</b>, </p>` : "</p>";
-                        botAnswer += `<br><p><b>Subject: </b> ${data[i].props.Subject}</p>`
-                        botAnswer += `<br><p><b>${data[i].props.FeedType}: </b> ${data[i].props.Question}</p><br>`
-
-                        if (data[i].props.Comments > 0) {
-                            botAnswer += `<p>As commented by <b>${data[i].props.Comment_By}</b> `
-                            botAnswer += `on <b>${data[i].props.Commented_On}</b>, </p>`;
+            let data = {
+                "question": userMessage
+            }
+            $http.post(`${HOST}/ask`, JSON.stringify(data))
+                .then(function successCallback(response) {
+                    console.log(response.data.data);
+                    hideLoader()
+                    let data = response.data.data;
+                    let botAnswer = ""
+                    let groups = []
+                    if (data[0].isGreet) {
+                        if (data[0].isFallback) {
+                            let fallBackCount = localStorage.getItem("fallBackCount") || 0
+                            if (fallBackCount < 3) {
+                                fallBackCount++
+                                localStorage.setItem("fallBackCount", fallBackCount)
+                                botAnswer += data[0].answer_summary
+                                console.log(botAnswer)
+                                appendMessage(BOT_NAME, BOT_IMG, "left", botAnswer);
+                            } else {
+                                appendMessage(BOT_NAME, BOT_IMG, "left", "<div><p>Please email your query to us on <a href='mailto:admin@hq.indiannavy.mil'>admin@hq.indiannavy.mil</a>. I am learning and your feedback will help me to train better</p></div>");
+                                localStorage.setItem("fallBackCount", 0)
+                            }
+                        } else {
+                            botAnswer += data[0].answer_summary
+                            console.log(botAnswer)
+                            appendMessage(BOT_NAME, BOT_IMG, "left", botAnswer);
                         }
+                    } else {
+                        let totalComments = 0;
+                        data.map((d) => {
+                            groups.push(d.props)
+                            totalComments += d.props.Comments
+                        })
+                        console.log(groups)
+                        let groupedData = groupBy(groups, "FeedType")
+                        let properties = Object.keys(groupedData)
+                        botAnswer += "<p>I have found ";
+                        for (let index = 0; index < properties.length; index++) {
+                            botAnswer += `${groupedData[properties[index]].length} ${properties[index]}, `
+                        }
+                        botAnswer += totalComments > 0 ? ` and ${totalComments} comments ` : ""
+                        botAnswer += `related to your question, here are the details:</p>`
 
-                        botAnswer += `<br><b>Comment: </b>"${data[i].answer_summary}"<br>`
+                        // botAnswer += `I have found ${data.length} posts/queries & ${data.length} comments related to your query, here are the details: <br><br>`
+                        for (let i = 0; i < data.length; i++) {
+                            botAnswer += data[i].props.Posted_By !== "NULL" ? `<br><p>As posted by <b>${data[i].props.Posted_By}</b> ` : ""
+                            botAnswer += data[i].props.Posted_On !== "NULL" && data[i].props.Posted_On !== "Invalid date" ? `on <b>${data[i].props.Posted_On}</b>, </p>` : "</p>";
+                            botAnswer += `<br><p><b>Subject: </b> ${data[i].props.Subject}</p>`
+                            // botAnswer += `<br><p><b>${data[i].props.FeedType}: </b> ${data[i].props.Question}</p><br>`
 
-                        botAnswer += `<br><span>Click on the below link to view the post</span> <br> <a href="${data[i].props.post_url !== "null" ? data[i].props.post_url : "#"}" target="_blank"> View Post</a>`
+                            // if (data[i].props.Comments > 0) {
+                            //     botAnswer += `<p>As commented by <b>${data[i].props.Comment_By}</b> `
+                            //     botAnswer += `on <b>${data[i].props.Commented_On}</b>, </p>`;
+                            // }
 
-                        botAnswer += `
+                            // botAnswer += `<br><b>Comment: </b>"${data[i].answer_summary}"<br>`
+
+                            botAnswer += `<br><span>Click on the below link to view the post</span> <br> <a href="${data[i].props.post_url !== "null" ? data[i].props.post_url : "#"}" target="_blank"> View Post</a>`
+
+                            botAnswer += `
                         <div class="widgets_div">
                             <div class="icon_div">
                                 <span><img src="./assets/thumbs-up.png"></img></span>
@@ -174,19 +188,19 @@ angular.module("myapp", [])
                             </div>
                         </div>
                         <br>`
-                        botAnswer += i !== (data.length - 1) ? `<br>` : ``
-                        // groups.push(data[i].props)
+                            botAnswer += i !== (data.length - 1) ? `<br>` : ``
+                            // groups.push(data[i].props)
+                        }
+                        appendMessage(BOT_NAME, BOT_IMG, "left", botAnswer);
                     }
-                    appendMessage(BOT_NAME, BOT_IMG, "left", botAnswer);
-                }
 
-            }, function errorCallback(response) {
-                // called asynchronously if an error occurs
-                // or server returns response with an error status.
-                console.log(response)
-                hideLoader()
-                appendMessage(BOT_NAME, BOT_IMG, "left", "Error in sending message. Please connect with Administrator");
-            });
+                }, function errorCallback(response) {
+                    // called asynchronously if an error occurs
+                    // or server returns response with an error status.
+                    console.log(response)
+                    hideLoader()
+                    appendMessage(BOT_NAME, BOT_IMG, "left", "Error in sending message. Please connect with Administrator");
+                });
         }
 
         let groupBy = function (xs, key) {

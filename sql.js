@@ -114,7 +114,11 @@ async function getAnnouncements() {
 async function getDistinctMIFBotData() {
     try {
         await sql.connect(sqlConfig)
-        const result = await sql.query `select distinct POST_ID, FeedType, IsActive, Feed_COM_LIKE, IsExpertLiked,IsAPSOsLiked from MIFBOT`
+        const result = await sql.query `select distinct POST_ID, FeedType, IsActive, 
+        Feed_COM_LIKE, IsExpertLiked, IsAPSOsLiked, 
+        IsCOMCommented, IsExpertCommented, IsAPSOsCommented,
+        IsFeedByCOM, IsFeedByExpert, IsFeedByAPSOs,
+        Category from MIFBOT`
         return result.recordsets[0]
     } catch (error) {
         console.log(error)
@@ -143,6 +147,36 @@ async function getAttachmentsInIS() {
     }
 }
 
+async function getBookMarks() {
+    try {
+        await sql.connect(sqlConfig)
+        const result = await sql.query `select * from BookMarks`
+        return result.recordsets[0]
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+async function getMostActiveMember() {
+    try {
+        await sql.connect(sqlConfig)
+        const result = await sql.query `exec MostActiveMember`
+        return result.recordsets[0]
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+async function getPieChartData() {
+    try {
+        await sql.connect(sqlConfig)
+        const result = await sql.query `exec GetPieChartData`
+        return result.recordsets[0]
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 
 
 module.exports = {
@@ -158,5 +192,8 @@ module.exports = {
     getDistinctMIFBotData,
     getAPSOsPosts,
     getAttachmentsInIS,
-    getTechBytesHistory
+    getTechBytesHistory,
+    getBookMarks,
+    getMostActiveMember,
+    getPieChartData
 }

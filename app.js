@@ -1,16 +1,37 @@
-const { dockStart } = require('@nlpjs/basic');
-let { train } = require("./train")
-let { qna } = require("./qna")
-let { getMIFData } = require("./sql")
+const {
+    dockStart
+} = require('@nlpjs/basic');
+let {
+    train
+} = require("./train")
+let {
+    qna
+} = require("./qna")
+let {
+    getMIFData
+} = require("./sql")
 const csv = require('csvtojson');
-let { loadActions } = require("./actions")
-let { SummarizationPipeline } = require("./summarizer")
+let {
+    loadActions
+} = require("./actions")
+let {
+    SummarizationPipeline
+} = require("./summarizer")
 let summarizer;
 const express = require('express')
 const app = express()
 const port = process.env.PORT || 3000
 app.use(express.static('ui'))
 var cors = require('cors')
+var bodyParser = require('body-parser')
+
+// parse application/x-www-form-urlencoded
+app.use(bodyParser.urlencoded({
+    extended: false
+}))
+
+// parse application/json
+app.use(bodyParser.json())
 app.use(cors({
     origin: '*'
 }))
@@ -46,9 +67,10 @@ app.get('/', async (req, res) => {
     res.sendFile(ui / index.html)
 })
 
-app.get('/ask/:question', async (req, res) => {
+app.post('/ask', async (req, res) => {
     try {
-        let response = await qna(req.params.question, manager, summarizer);
+        let question = req && req.body && req.body.question ? req.body.question : "hi";
+        let response = await qna(question, manager, summarizer);
         res.send(response)
     } catch (error) {
         console.log(error)
