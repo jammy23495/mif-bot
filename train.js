@@ -1,10 +1,10 @@
-const csv = require('csvtojson');
 let {
     loadActions
 } = require("./actions")
 
 let {
-    getMIFData
+    getMIFData,
+    getFAQs
 } = require("./sql")
 
 let {
@@ -16,7 +16,7 @@ let language = "en"
 //Train MIF Dataset
 async function train(manager) {
     try {
-        let jsonArray = await csv().fromFile("./mif.csv");
+        let jsonArray = await getFAQs();
         let sqlData = await getMIFData();
         jsonArray = [...jsonArray, ...sqlData]
         let classifications = []

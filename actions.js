@@ -6,7 +6,6 @@ let {
     getListOfCategories,
     getListOfAPSOS,
     getWeeklyQuizAnswers,
-    getInformationBasket,
     getNodalDTE,
     getTechBytes,
     getAnnouncements,
@@ -25,6 +24,11 @@ let {
     filterString
 } = require("./utils");
 
+let {
+    loadUtterances,
+    loadEntities
+} = require("./entitiesUtterances")
+
 
 async function loadActions(manager, jsonArray, classifications) {
     jsonArray = await getMIFData();
@@ -34,93 +38,14 @@ async function loadActions(manager, jsonArray, classifications) {
             return c.Name
         })
 
-        //Entities
-        manager.addNerAfterLastCondition('en', 'answered_by', 'by');
-        manager.addNerAfterLastCondition('en', 'answered_by', 'of');
-        manager.addNerAfterLastCondition('en', 'post_number', 'in');
-        manager.addNerAfterLastCondition('en', 'post_number', 'post');
-        manager.addNerAfterLastCondition('en', 'post_number', 'no');
-        manager.addNerAfterLastCondition('en', 'post_number', 'number');
-        manager.addNerAfterLastCondition('en', 'post_description', 'on');
-        manager.addNerAfterLastCondition('en', 'post_description', 'to');
+        //Loading Entities
+        await loadEntities(manager);
 
-        manager.addNerRuleOptionTexts('en', 'post_field', 'comment', ["Comment", "comment", "Comments", "comments", "Commented", "commented", "remark", "remarks"]);
-        manager.addNerRuleOptionTexts('en', 'post_field', 'likes', ["Likes", "likes", "Like", "like", "Liked", "liked"]);
-
-        manager.addNerRuleOptionTexts('en', 'post_type', 'post', ["Posts", "post", "posts", "Post"]);
-        manager.addNerRuleOptionTexts('en', 'post_type', 'query', ["Query", "query", "Queries", "queries"]);
-
-        manager.addNerRuleOptionTexts('en', 'answered_by_person_type', 'COM', ["COM", "com"]);
-        manager.addNerRuleOptionTexts('en', 'answered_by_person_type', 'Expert', ["expert", "experts", "Subject Matter Expert"]);
-        manager.addNerRuleOptionTexts('en', 'answered_by_person_type', 'APSOs', ["apsos", "APSOs", "APSO's", "apso's"]);
-
-        manager.addNerRuleOptionTexts('en', 'category', 'category', categories);
+        //Loading Utterances
+        await loadUtterances(manager)
 
         //-------------------------------------------showPostDetails------------------------------------------------------------
 
-        //Documents
-        manager.addDocument('en', 'Show me the @post_field given by @answered_by', "intent_showPostDetails");
-        manager.addDocument('en', 'Show me the @post_field of @answered_by', "intent_showPostDetails");
-        manager.addDocument('en', 'Is there any @post_field given by @answered_by', "intent_showPostDetails");
-        manager.addDocument('en', 'How many @post_field by @answered_by?', "intent_showPostDetails");
-        manager.addDocument('en', 'How many @post_field of @answered_by?', "intent_showPostDetails");
-
-        manager.addDocument('en', 'Show me the @post_type given by @answered_by', "intent_showPostDetails");
-        manager.addDocument('en', 'Show me the @post_type of @answered_by', "intent_showPostDetails");
-        manager.addDocument('en', 'Is there any @post_type given by @answered_by', "intent_showPostDetails");
-        manager.addDocument('en', 'How many @post_type by @answered_by?', "intent_showPostDetails");
-        manager.addDocument('en', 'How many @post_type of @answered_by?', "intent_showPostDetails");
-
-        manager.addDocument('en', 'Any post by COM?', "intent_showPostDetails");
-        manager.addDocument('en', 'Any post by Expert?', "intent_showPostDetails");
-        manager.addDocument('en', 'Any post by APSOs?', "intent_showPostDetails");
-
-        manager.addDocument('en', 'Show me the @post_field given by @answered_by_person_type', "intent_showPostDetails");
-        manager.addDocument('en', 'Show me the @post_field of @answered_by_person_type', "intent_showPostDetails");
-        manager.addDocument('en', 'Is there any @post_field given by @answered_by_person_type', "intent_showPostDetails");
-        manager.addDocument('en', 'How many @post_field by @answered_by_person_type?', "intent_showPostDetails");
-
-        manager.addDocument('en', 'Show me the @post_type given by @answered_by_person_type', "intent_showPostDetails");
-        manager.addDocument('en', 'Show me the @post_type of @answered_by_person_type', "intent_showPostDetails");
-        manager.addDocument('en', 'Is there any @post_type given by @answered_by_person_type', "intent_showPostDetails");
-        manager.addDocument('en', 'How many @post_type by @answered_by_person_type?', "intent_showPostDetails");
-
-        manager.addDocument('en', 'Is there any post on @post_description?', "intent_showPostDetails");
-        manager.addDocument('en', 'Is there any query on @post_description?', "intent_showPostDetails");
-        manager.addDocument('en', 'Is there any comment on @post_description?', "intent_showPostDetails");
-
-        manager.addDocument('en', 'Is there any post related to @post_description?', "intent_showPostDetails");
-        manager.addDocument('en', 'Is there any query related to @post_description?', "intent_showPostDetails");
-        manager.addDocument('en', 'Is there any comment related to @post_description?', "intent_showPostDetails");
-
-        manager.addDocument('en', 'Is any post related to @post_description?', "intent_showPostDetails");
-        manager.addDocument('en', 'Is any query related to @post_description?', "intent_showPostDetails");
-        manager.addDocument('en', 'Is any comment related to @post_description?', "intent_showPostDetails");
-
-        manager.addDocument('en', 'Are there any posts related to @post_description?', "intent_showPostDetails");
-        manager.addDocument('en', 'Are there any queries related to @post_description?', "intent_showPostDetails");
-        manager.addDocument('en', 'Are there any comments related to @post_description?', "intent_showPostDetails");
-
-        manager.addDocument('en', 'Any post on @post_description?', "intent_showPostDetails");
-        manager.addDocument('en', 'Any query on @post_description?', "intent_showPostDetails");
-        manager.addDocument('en', 'Any comment on @post_description?', "intent_showPostDetails");
-
-        manager.addDocument('en', 'post on @post_description?', "intent_showPostDetails");
-        manager.addDocument('en', 'query on @post_description?', "intent_showPostDetails");
-        manager.addDocument('en', 'comment on @post_description?', "intent_showPostDetails");
-
-        manager.addDocument('en', 'Any posts or queries by @answered_by_person_type in MIF?', "intent_showCountByPersonType")
-        manager.addDocument('en', 'Any posts or queries by COM in MIF?', "intent_showCountByPersonType")
-        manager.addDocument('en', 'Any posts or queries by Experts in MIF?', "intent_showCountByPersonType")
-        manager.addDocument('en', 'Any posts or queries by APSOs in MIF?', "intent_showCountByPersonType")
-
-        manager.addDocument('en', 'Any @answered_by_person_type Post?', "intent_showCountByPersonType")
-        manager.addDocument('en', 'Any Expert Post?', "intent_showCountByPersonType")
-        manager.addDocument('en', 'Any COM Post?', "intent_showCountByPersonType")
-        manager.addDocument('en', 'Any Expert queries?', "intent_showCountByPersonType")
-        manager.addDocument('en', 'Any COM queries?', "intent_showCountByPersonType")
-
-        //Action
         manager.addAction("intent_showPostDetails", 'showPostDetails', [], async (data) => {
             let jsonArray = await getMIFData()
             classifications = []
@@ -174,7 +99,7 @@ async function loadActions(manager, jsonArray, classifications) {
                                         }
                                     }
                                     let score = (availableTokens / (tokens.length)) || 0;
-                                    if (score > 0.1) {
+                                    if (score > 0.5) {
                                         let intent = allMIFPostData[j].Post_ID + `_${allMIFPostData[j].Topic || "MIF"}` + "_intent_" + allMIFPostData[j].Subject.replaceAll(" ", "_")
                                         classifications.push({
                                             "intent": intent,
@@ -194,7 +119,7 @@ async function loadActions(manager, jsonArray, classifications) {
                                         }
                                     }
                                     let score = (availableTokens / (tokens.length)) || 0;
-                                    if (score > 0.1) {
+                                    if (score > 0.5) {
                                         let intent = allMIFQueryData[j].Post_ID + `_${allMIFQueryData[j].Topic || "MIF"}` + "_intent_" + allMIFQueryData[j].Subject.replaceAll(" ", "_")
                                         classifications.push({
                                             "intent": intent,
@@ -220,7 +145,7 @@ async function loadActions(manager, jsonArray, classifications) {
                                     }
                                 }
                                 let score = (availableTokens / (tokens.length)) || 0;
-                                if (score > 0.1) {
+                                if (score > 0.5) {
                                     let intent = allMIFData[j].Post_ID + `_${allMIFData[j].Topic || "MIF"}` + "_intent_" + allMIFData[j].Subject.replaceAll(" ", "_")
                                     commentCount++;
                                     classifications.push({
@@ -430,21 +355,6 @@ async function loadActions(manager, jsonArray, classifications) {
 
         //-------------------------------------------showCountBasedOnPostType------------------------------------------------------------
 
-        //Documents
-        manager.addDocument('en', 'How many @post_type are there in MIF?', "intent_showCountBasedOnPostType")
-        manager.addDocument('en', 'How many @post_type in MIF?', "intent_showCountBasedOnPostType")
-        manager.addDocument('en', 'What are the number of @post_type available in MIF?', "intent_showCountBasedOnPostType")
-        manager.addDocument('en', 'How many posts of @post_type available in MIF?', "intent_showCountBasedOnPostType")
-        manager.addDocument('en', 'How many posts by @post_type available in MIF?', "intent_showCountBasedOnPostType")
-
-
-        manager.addDocument('en', 'How many queries are there in MIF?', "intent_showCountBasedOnPostType")
-        manager.addDocument('en', 'How many posts are there in MIF?', "intent_showCountBasedOnPostType")
-
-        manager.addDocument('en', 'How many queries in MIF?', "intent_showCountBasedOnPostType")
-        manager.addDocument('en', 'How many posts in MIF?', "intent_showCountBasedOnPostType")
-
-        //Actions
         manager.addAction("intent_showCountBasedOnPostType", 'showCountBasedOnPostType', [], async (data) => {
             let jsonArray = await getDistinctMIFBotData()
             if (data && data.entities.length > 0) {
@@ -475,29 +385,6 @@ async function loadActions(manager, jsonArray, classifications) {
 
         //-------------------------------------------showCountByPersonType------------------------------------------------------------
 
-
-        manager.addDocument('en', 'How many @answered_by_person_type Post are there in MIF?', "intent_showCountByPersonType")
-        manager.addDocument('en', 'How many COM Post are there in MIF?', "intent_showCountByPersonType")
-        manager.addDocument('en', 'How many Expert Post are there in MIF?', "intent_showCountByPersonType")
-        manager.addDocument('en', 'How many APSOs Post are there in MIF?', "intent_showCountByPersonType")
-
-        manager.addDocument('en', 'How many posts by @answered_by_person_type in MIF?', "intent_showCountByPersonType")
-        manager.addDocument('en', 'How many posts by COM in MIF?', "intent_showCountByPersonType")
-        manager.addDocument('en', 'How many posts by Experts in MIF?', "intent_showCountByPersonType")
-        manager.addDocument('en', 'How many posts by COM?', "intent_showCountByPersonType")
-        manager.addDocument('en', 'How many posts by Experts?', "intent_showCountByPersonType")
-        manager.addDocument('en', 'How many queries by COM in MIF?', "intent_showCountByPersonType")
-        manager.addDocument('en', 'How many queries by Experts in MIF?', "intent_showCountByPersonType")
-        manager.addDocument('en', 'How many queries by COM?', "intent_showCountByPersonType")
-        manager.addDocument('en', 'How many queries by Experts?', "intent_showCountByPersonType")
-
-        manager.addDocument('en', 'How many posts of @answered_by_person_type in MIF?', "intent_showCountByPersonType")
-        manager.addDocument('en', 'How many posts of COM in MIF?', "intent_showCountByPersonType")
-        manager.addDocument('en', 'How many posts of Experts in MIF?', "intent_showCountByPersonType")
-        manager.addDocument('en', 'How many posts of APSOs in MIF?', "intent_showCountByPersonType")
-
-
-        //Actions
         manager.addAction("intent_showCountByPersonType", 'showCountByPersonType', [], async (data) => {
             let jsonArray = await getDistinctMIFBotData()
             if (data && data.entities.length > 0) {
@@ -564,41 +451,6 @@ async function loadActions(manager, jsonArray, classifications) {
 
         //-------------------------------------------showPersonTypeLikePost------------------------------------------------------------
 
-        //Documents
-
-        manager.addDocument('en', 'How many post and query COM liked?', "intent_showPersonTypeLikePost")
-        manager.addDocument('en', 'How many post and query Expert liked?', "intent_showPersonTypeLikePost")
-        manager.addDocument('en', 'How many post and query APSOs liked?', "intent_showPersonTypeLikePost")
-
-        manager.addDocument('en', 'How many post and query COM commented?', "intent_showPersonTypeLikePost")
-        manager.addDocument('en', 'How many post and query Expert commented?', "intent_showPersonTypeLikePost")
-        manager.addDocument('en', 'How many post and query APSOs commented?', "intent_showPersonTypeLikePost")
-
-        manager.addDocument('en', 'How many likes by COM?', "intent_showPersonTypeLikePost")
-        manager.addDocument('en', 'How many likes by Experts?', "intent_showPersonTypeLikePost")
-        manager.addDocument('en', 'How many likes by APSOs?', "intent_showPersonTypeLikePost")
-
-        manager.addDocument('en', 'How many comments by COM?', "intent_showPersonTypeLikePost")
-        manager.addDocument('en', 'How many comments by Experts?', "intent_showPersonTypeLikePost")
-        manager.addDocument('en', 'How many comments by APSOs?', "intent_showPersonTypeLikePost")
-
-        manager.addDocument('en', 'Post or query in which we have COM remarks', "intent_showPersonTypeLikePost")
-        manager.addDocument('en', 'Post or query in which we have Experts remarks', "intent_showPersonTypeLikePost")
-        manager.addDocument('en', 'Post or query in which we have APSOs remarks', "intent_showPersonTypeLikePost")
-
-        manager.addDocument('en', 'Give me the count of number of posts or queries that COM liked', "intent_showPersonTypeLikePost")
-        manager.addDocument('en', 'Give me the count of number of posts or queries that Experts liked', "intent_showPersonTypeLikePost")
-        manager.addDocument('en', 'Give me the count of number of posts or queries that APSOs liked', "intent_showPersonTypeLikePost")
-
-        manager.addDocument('en', 'Give me the count of number of posts or queries that COM commented', "intent_showPersonTypeLikePost")
-        manager.addDocument('en', 'Give me the count of number of posts or queries that Experts commented', "intent_showPersonTypeLikePost")
-        manager.addDocument('en', 'Give me the count of number of posts or queries that APSOs commented', "intent_showPersonTypeLikePost")
-
-        manager.addDocument('en', 'How many post and query @answered_by_person_type @post_field?', "intent_showPersonTypeLikePost")
-        manager.addDocument('en', 'How many @post_field by @answered_by_person_type?', "intent_showPersonTypeLikePost")
-        manager.addDocument('en', 'Give me the count of number of posts or queries that @answered_by_person_type @post_field', "intent_showPersonTypeLikePost")
-
-        //Actions
         manager.addAction("intent_showPersonTypeLikePost", 'showPersonTypeLikePost', [], async (data) => {
             if (data) {
                 if (data && data.entities.length > 0) {
@@ -668,13 +520,6 @@ async function loadActions(manager, jsonArray, classifications) {
 
         //-------------------------------------------showCountBasedOnPostTypeStatus------------------------------------------------------------
 
-        //Documents
-        manager.addDocument('en', '@post_type are valid or invalid?', "intent_showCountBasedOnPostTypeStatus")
-        manager.addDocument('en', '@post_type are active or inactive?', "intent_showCountBasedOnPostTypeStatus")
-        manager.addDocument('en', 'What are the number of @post_type that are valid or invalid in MIF?', "intent_showCountBasedOnPostTypeStatus")
-        manager.addDocument('en', 'What is the status of @post_type?', "intent_showCountBasedOnPostTypeStatus")
-
-        //Actions
         manager.addAction("intent_showCountBasedOnPostTypeStatus", 'showCountBasedOnPostTypeStatus', [], async (data) => {
             jsonArray = await getMIFData();
             classifications = []
@@ -743,7 +588,7 @@ async function loadActions(manager, jsonArray, classifications) {
                                     }
                                 }
                                 let score = (availableTokens / (tokens.length)) || 0;
-                                if (score > 0.1) {
+                                if (score > 0.5) {
                                     let intent = allMIFPostData[j].Post_ID + `_${allMIFPostData[j].Topic || "MIF"}` + "_intent_" + allMIFPostData[j].Subject.replaceAll(" ", "_")
                                     classifications.push({
                                         "intent": intent,
@@ -765,7 +610,7 @@ async function loadActions(manager, jsonArray, classifications) {
                                     }
                                 }
                                 let score = (availableTokens / (tokens.length)) || 0;
-                                if (score > 0.1) {
+                                if (score > 0.5) {
                                     let intent = allMIFQueryData[j].Post_ID + `_${allMIFQueryData[j].Topic || "MIF"}` + "_intent_" + allMIFQueryData[j].Subject.replaceAll(" ", "_")
                                     classifications.push({
                                         "intent": intent,
@@ -786,7 +631,7 @@ async function loadActions(manager, jsonArray, classifications) {
                                     }
                                 }
                                 let score = (availableTokens / (tokens.length)) || 0;
-                                if (score > 0.1) {
+                                if (score > 0.5) {
                                     let intent = allMIFData[j].Post_ID + `_${allMIFData[j].Topic || "MIF"}` + "_intent_" + allMIFData[j].Subject.replaceAll(" ", "_")
                                     classifications.push({
                                         "intent": intent,
@@ -822,38 +667,6 @@ async function loadActions(manager, jsonArray, classifications) {
 
         //-------------------------------------------showCountBasedOnPostFieldAndPostNumber------------------------------------------------------------
 
-        //Documents
-        manager.addDocument('en', 'How many @post_field are there in post @post_number?', "intent_showCountBasedOnPostTypeAndPostNumber")
-        manager.addDocument('en', 'How many @post_field are there on post @post_number?', "intent_showCountBasedOnPostTypeAndPostNumber")
-        manager.addDocument('en', 'How many people @post_field on post @post_number?', "intent_showCountBasedOnPostTypeAndPostNumber")
-        manager.addDocument('en', 'How many @post_field on post @post_number?', "intent_showCountBasedOnPostTypeAndPostNumber")
-
-        manager.addDocument('en', 'How many likes are there in post @post_number?', "intent_showCountBasedOnPostTypeAndPostNumber")
-        manager.addDocument('en', 'How many likes are there on post @post_number?', "intent_showCountBasedOnPostTypeAndPostNumber")
-        manager.addDocument('en', 'How many people likes on post @post_number?', "intent_showCountBasedOnPostTypeAndPostNumber")
-        manager.addDocument('en', 'How many likes on post @post_number?', "intent_showCountBasedOnPostTypeAndPostNumber")
-        manager.addDocument('en', 'How many likes on post no @post_number?', "intent_showCountBasedOnPostTypeAndPostNumber")
-
-        manager.addDocument('en', 'How many likes are there in query @post_number?', "intent_showCountBasedOnPostTypeAndPostNumber")
-        manager.addDocument('en', 'How many likes are there on query @post_number?', "intent_showCountBasedOnPostTypeAndPostNumber")
-        manager.addDocument('en', 'How many people likes on query @post_number?', "intent_showCountBasedOnPostTypeAndPostNumber")
-        manager.addDocument('en', 'How many likes on query @post_number?', "intent_showCountBasedOnPostTypeAndPostNumber")
-        manager.addDocument('en', 'How many likes on query no @post_number?', "intent_showCountBasedOnPostTypeAndPostNumber")
-
-        manager.addDocument('en', 'How many comments are there in post @post_number?', "intent_showCountBasedOnPostTypeAndPostNumber")
-        manager.addDocument('en', 'How many comments are there on post @post_number?', "intent_showCountBasedOnPostTypeAndPostNumber")
-        manager.addDocument('en', 'How many people comments on post @post_number?', "intent_showCountBasedOnPostTypeAndPostNumber")
-        manager.addDocument('en', 'How many people comments on post no @post_number?', "intent_showCountBasedOnPostTypeAndPostNumber")
-        manager.addDocument('en', 'How many comments on post no @post_number?', "intent_showCountBasedOnPostTypeAndPostNumber")
-
-        manager.addDocument('en', 'How many comments are there in query @post_number?', "intent_showCountBasedOnPostTypeAndPostNumber")
-        manager.addDocument('en', 'How many comments are there on query @post_number?', "intent_showCountBasedOnPostTypeAndPostNumber")
-        manager.addDocument('en', 'How many people comments on query @post_number?', "intent_showCountBasedOnPostTypeAndPostNumber")
-        manager.addDocument('en', 'How many people comments on query no @post_number?', "intent_showCountBasedOnPostTypeAndPostNumber")
-        manager.addDocument('en', 'How many comments on query no @post_number?', "intent_showCountBasedOnPostTypeAndPostNumber")
-
-
-        //Actions
         manager.addAction("intent_showCountBasedOnPostTypeAndPostNumber", 'showCountBasedOnPostTypeAndPostNumber', [], async (data) => {
             jsonArray = await getMIFData();
             classifications = []
@@ -927,7 +740,7 @@ async function loadActions(manager, jsonArray, classifications) {
                                     }
                                 }
                                 let score = (availableTokens / (tokens.length)) || 0;
-                                if (score > 0.1) {
+                                if (score > 0.5) {
                                     let intent = allMIFPostData[j].Post_ID + `_${allMIFPostData[j].Topic || "MIF"}` + "_intent_" + allMIFPostData[j].Subject.replaceAll(" ", "_")
                                     classifications.push({
                                         "intent": intent,
@@ -949,7 +762,7 @@ async function loadActions(manager, jsonArray, classifications) {
                                     }
                                 }
                                 let score = (availableTokens / (tokens.length)) || 0;
-                                if (score > 0.1) {
+                                if (score > 0.5) {
                                     let intent = allMIFQueryData[j].Post_ID + `_${allMIFQueryData[j].Topic || "MIF"}` + "_intent_" + allMIFQueryData[j].Subject.replaceAll(" ", "_")
                                     classifications.push({
                                         "intent": intent,
@@ -970,7 +783,7 @@ async function loadActions(manager, jsonArray, classifications) {
                                     }
                                 }
                                 let score = (availableTokens / (tokens.length)) || 0;
-                                if (score > 0.1) {
+                                if (score > 0.5) {
                                     let intent = allMIFData[j].Post_ID + `_${allMIFData[j].Topic || "MIF"}` + "_intent_" + allMIFData[j].Subject.replaceAll(" ", "_")
                                     classifications.push({
                                         "intent": intent,
@@ -989,14 +802,6 @@ async function loadActions(manager, jsonArray, classifications) {
 
         //-------------------------------------------showListOfCategories------------------------------------------------------------
 
-        //Documents
-        manager.addDocument('en', 'Give me the list of categories', "intent_showListOfCategories")
-        manager.addDocument('en', 'Types of categories', "intent_showListOfCategories")
-        manager.addDocument('en', 'Provide me the list of categories', "intent_showListOfCategories")
-        manager.addDocument('en', 'Which categories are available?', "intent_showListOfCategories")
-        manager.addDocument('en', 'How many categories are there in MIF?', "intent_showListOfCategories")
-
-        //Actions
         manager.addAction("intent_showListOfCategories", 'showListOfCategories', [], async (data) => {
             if (data) {
                 let categoryList = await getListOfCategories();
@@ -1021,13 +826,6 @@ async function loadActions(manager, jsonArray, classifications) {
 
         //-------------------------------------------showListOfExperts------------------------------------------------------------
 
-        //Documents
-        manager.addDocument('en', 'Give me the list of experts', "intent_showListOfExperts")
-        manager.addDocument('en', 'Provide me the list of experts', "intent_showListOfExperts")
-        manager.addDocument('en', 'Who are the experts in MIF?', "intent_showListOfExperts")
-        manager.addDocument('en', 'How many experts are there in MIF?', "intent_showListOfExperts")
-
-        //Actions
         manager.addAction("intent_showListOfExperts", 'showListOfExperts', [], async (data) => {
             if (data) {
                 let expertList = await getListOfExperts();
@@ -1051,13 +849,6 @@ async function loadActions(manager, jsonArray, classifications) {
 
         //-------------------------------------------showListOfAPSOs------------------------------------------------------------
 
-        //Documents
-        manager.addDocument('en', 'Give me the list of APSOs', "intent_showListOfAPSOs")
-        manager.addDocument('en', 'Provide me the list of APSOs', "intent_showListOfAPSOs")
-        manager.addDocument('en', 'Who are the APSOs in MIF?', "intent_showListOfAPSOs")
-        manager.addDocument('en', 'How many APSOs are there in MIF?', "intent_showListOfAPSOs")
-
-        //Actions
         manager.addAction("intent_showListOfAPSOs", 'showListOfAPSOs', [], async (data) => {
             if (data) {
                 let APSOsList = await getListOfAPSOS();
@@ -1082,11 +873,6 @@ async function loadActions(manager, jsonArray, classifications) {
 
         //-------------------------------------------showWeeklyQuizAnswerList------------------------------------------------------------
 
-        //Documents
-        manager.addDocument('en', 'How many people answered in weekly quiz?', "intent_showWeeklyQuizAnswerList")
-        manager.addDocument('en', 'Provide me the details about the members who answered correctly in weekly quiz', "intent_showWeeklyQuizAnswerList")
-
-        //Actions
         manager.addAction("intent_showWeeklyQuizAnswerList", 'showWeeklyQuizAnswerList', [], async (data) => {
             if (data) {
                 let weeklyQuizList = await getWeeklyQuizAnswers();
@@ -1111,14 +897,6 @@ async function loadActions(manager, jsonArray, classifications) {
 
         //-------------------------------------------showListOfTechBytes------------------------------------------------------------
 
-        //Documents
-        manager.addDocument('en', 'Give me the list of Tech Bytes', "intent_showListOfTechBytes")
-        manager.addDocument('en', 'Provide me the list of Tech Bytes', "intent_showListOfTechBytes")
-        manager.addDocument('en', 'What are the Tech bytes in MIF?', "intent_showListOfTechBytes")
-        manager.addDocument('en', 'How many tech bytes are there in MIF?', "intent_showListOfTechBytes")
-        manager.addDocument('en', 'List of tech bytes', "intent_showListOfTechBytes")
-
-        //Actions
         manager.addAction("intent_showListOfTechBytes", 'showListOfTechBytes', [], async (data) => {
             if (data) {
                 let TechBytesList = await getTechBytesHistory();
@@ -1142,11 +920,6 @@ async function loadActions(manager, jsonArray, classifications) {
 
         //-------------------------------------------showListOfLatestTechBytes------------------------------------------------------------
 
-        //Documents
-        manager.addDocument('en', 'What are latest Tech Bytes', "intent_showListOfLatestTechBytes")
-        manager.addDocument('en', 'latest Tech Bytes', "intent_showListOfLatestTechBytes")
-
-        //Actions
         manager.addAction("intent_showListOfLatestTechBytes", 'showListOfLatestTechBytes', [], async (data) => {
             if (data) {
                 let TechBytesList = await getTechBytes();
@@ -1170,14 +943,6 @@ async function loadActions(manager, jsonArray, classifications) {
 
         //-------------------------------------------showListOfNodalDTE------------------------------------------------------------
 
-        //Documents
-        manager.addDocument('en', 'Give me the list of nodal DTE', "intent_showListOfNodalDTE")
-        manager.addDocument('en', 'Provide me the list of  nodal DTE', "intent_showListOfNodalDTE")
-        manager.addDocument('en', 'What are the  nodal DTE in MIF?', "intent_showListOfNodalDTE")
-        manager.addDocument('en', 'How many  nodal DTE are there in MIF?', "intent_showListOfNodalDTE")
-        manager.addDocument('en', 'list of nodal DTE', "intent_showListOfNodalDTE")
-
-        //Actions
         manager.addAction("intent_showListOfNodalDTE", 'showListOfNodalDTE', [], async (data) => {
             if (data) {
                 let nodalDTEList = await getNodalDTE();
@@ -1201,12 +966,6 @@ async function loadActions(manager, jsonArray, classifications) {
 
         //-------------------------------------------showBookMarkCount------------------------------------------------------------
 
-        //Documents
-        manager.addDocument('en', 'How many post or Query people bookmarked?', "intent_showBookMarkCount")
-        manager.addDocument('en', 'How many bookmarks are there?', "intent_showBookMarkCount")
-        manager.addDocument('en', 'List of bookmarks', "intent_showBookMarkCount")
-
-        //Actions
         manager.addAction("intent_showBookMarkCount", 'showBookMarkCount', [], async (data) => {
             if (data) {
                 let BookMarksList = await getBookMarks();
@@ -1223,10 +982,6 @@ async function loadActions(manager, jsonArray, classifications) {
 
         //-------------------------------------------showMostActiveMember------------------------------------------------------------
 
-        //Documents
-        manager.addDocument('en', 'Who is latest most active member of previous week?', "intent_showMostActiveMember")
-
-        //Actions
         manager.addAction("intent_showMostActiveMember", 'showMostActiveMember', [], async (data) => {
             if (data) {
                 let MAMList = await getMostActiveMember();
@@ -1250,10 +1005,6 @@ async function loadActions(manager, jsonArray, classifications) {
 
         //-------------------------------------------showPieChartData------------------------------------------------------------
 
-        //Documents
-        manager.addDocument('en', 'According to stack How many people comments, likes, views?', "intent_showPieChartData")
-
-        //Actions
         manager.addAction("intent_showPieChartData", 'showPieChartData', [], async (data) => {
             if (data) {
                 let PieChartList = await getPieChartData();
@@ -1278,12 +1029,6 @@ async function loadActions(manager, jsonArray, classifications) {
 
         //-------------------------------------------showAnnouncements------------------------------------------------------------
 
-        //Documents
-        manager.addDocument('en', 'Give me the list of Announcements', "intent_showAnnouncements")
-        manager.addDocument('en', 'Give me the list of latest Announcements', "intent_showAnnouncements")
-        manager.addDocument('en', 'What are the announcements available in MIF?', "intent_showAnnouncements")
-
-        //Actions
         manager.addAction("intent_showAnnouncements", 'showAnnouncements', [], async (data) => {
             if (data) {
                 let announcementsList = await getAnnouncements();
@@ -1309,11 +1054,6 @@ async function loadActions(manager, jsonArray, classifications) {
 
         //-------------------------------------------showAttachmentsInIS------------------------------------------------------------
 
-        //Documents
-        manager.addDocument('en', 'How many attachment or pdf are there in information section?', "intent_showAttachmentsInIS")
-        manager.addDocument('en', 'Give me the list of attachment or pdf that are available in information section', "intent_showAttachmentsInIS")
-
-        //Actions
         manager.addAction("intent_showAttachmentsInIS", 'showAttachmentsInIS', [], async (data) => {
             if (data) {
                 let attachmentsList = await getAttachmentsInIS();
@@ -1331,17 +1071,6 @@ async function loadActions(manager, jsonArray, classifications) {
 
         //-------------------------------------------showPostQueryCountByCategory------------------------------------------------------------
 
-        //Documents
-
-        manager.addDocument('en', 'How many @post_type on category @category?', "intent_showPostQueryCountByCategory")
-        manager.addDocument('en', 'How many @post_type on @category category?', "intent_showPostQueryCountByCategory")
-        manager.addDocument('en', 'How many @post_type by @answered_by_person_type on @category category?', "intent_showPostQueryCountByCategory")
-        manager.addDocument('en', 'How many @post_type by expert on @category category?', "intent_showPostQueryCountByCategory")
-        manager.addDocument('en', 'How many @post_type by COM on @category category?', "intent_showPostQueryCountByCategory")
-        manager.addDocument('en', 'How many expert posts on @category category?', "intent_showPostQueryCountByCategory")
-        manager.addDocument('en', 'How many COM posts on @category category?', "intent_showPostQueryCountByCategory")
-
-        //Actions
         manager.addAction("intent_showPostQueryCountByCategory", 'showPostQueryCountByCategory', [], async (data) => {
             if (data) {
                 if (data && data.entities.length > 0) {
@@ -1401,11 +1130,6 @@ async function loadActions(manager, jsonArray, classifications) {
         })
 
         //-------------------------------------------showTrending------------------------------------------------------------
-
-        //Documents
-
-        manager.addDocument('en', 'Trending feed', "intent_showTrending")
-        manager.addDocument('en', 'Latest feed', "intent_showTrending")
 
         manager.addAction("intent_showTrending", 'showTrending', [], async (data) => {
             if (data) {

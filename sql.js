@@ -21,6 +21,26 @@ async function getMIFData() {
     }
 }
 
+async function getFAQs() {
+    try {
+        await sql.connect(sqlConfig)
+        const result = await sql.query `select * from FAQ`
+        return result.recordsets[0]
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+async function getUtterances() {
+    try {
+        await sql.connect(sqlConfig)
+        const result = await sql.query `select * from Utterances`
+        return result.recordsets[0]
+    } catch (error) {
+        console.log(error)
+    }
+}
+
 async function getListOfExperts() {
     try {
         await sql.connect(sqlConfig)
@@ -206,5 +226,7 @@ module.exports = {
     getBookMarks,
     getMostActiveMember,
     getPieChartData,
-    getTrending
+    getTrending,
+    getFAQs,
+    getUtterances
 }
