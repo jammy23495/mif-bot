@@ -28,7 +28,7 @@
 <body ng-cloak ng-app="myUtteranceApp" ng-controller="UtteranceController">
 
     <div class="mt-3" style="padding: 20px;">
-        <h2 style="text-align: center;">Utterances</h2>
+        <h2 style="text-align: center;"><a href="/index.html" style="cursor: pointer;">Utterances</a></h2>
         <div class="row" style="margin-bottom: 20px;">
             <div class="mb-3 mt-3 col-md-3">
                 <label for="utterance">Utterance</label>
@@ -50,6 +50,8 @@
             <div class="mb-3 mt-3 col-md-3">
                 <button type="submit" class="btn btn-primary" style="margin-top: 32px;"
                     ng-click="addUtterance()">Submit</button>
+                <button type="submit" class="btn btn-primary" style="margin-top: 32px;" data-toggle="modal"
+                    data-target="#myModal">Show Entities</button>
             </div>
         </div>
 
@@ -69,7 +71,7 @@
                     <tbody>
                         <tr ng-repeat="Utterance in Utterances">
                             <td>{{Utterance.ID}}</td>
-                            <td>{{Utterance.Utterance}}</td>
+                            <td><span ng-bind-html="Utterance.Utterance | trustHtml"></span></td>
                             <td>{{Utterance.Intent}}</td>
                             <td>{{Utterance.Language}}</td>
                         </tr>
@@ -77,6 +79,129 @@
                 </table>
             </div>
 
+        </div>
+
+        <!-- Modal -->
+
+        <div class="modal fade" id="myModal">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+
+                    <!-- Modal Header -->
+                    <div class="modal-header">
+                        <h4 class="modal-title">Entities Description</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+
+                    <!-- Modal body -->
+                    <div class="modal-body">
+                        <div id="accordion">
+                            <div class="card">
+                                <div class="card-header">
+                                    <a class="card-link" data-toggle="collapse" href="#collapseOne">
+                                        Post Type (@post_type)
+                                    </a>
+                                </div>
+                                <div id="collapseOne" class="collapse show" data-parent="#accordion">
+                                    <div class="card-body">
+                                        <ol>
+                                            <li><b>post </b>(Valid words are "Posts", "post", "posts" and "Post")</li>
+                                            <li><b>query</b> (Valid words are "Query", "query", "Queries" and "queries")
+                                            </li>
+                                        </ol>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-header">
+                                    <a class="collapsed card-link" data-toggle="collapse" href="#collapseTwo">
+                                        Post Field (@post_field)
+                                    </a>
+                                </div>
+                                <div id="collapseTwo" class="collapse" data-parent="#accordion">
+                                    <div class="card-body">
+                                        <ol>
+                                            <li><b>comment </b>(Valid words are "Comment", "comment", "Comments",
+                                                "comments", "Commented", "commented", "remark" and "remarks")</li>
+                                            <li><b>likes</b> (Valid words are "Likes", "likes", "Like", "like", "Liked"
+                                                and "liked")</li>
+                                        </ol>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-header">
+                                    <a class="collapsed card-link" data-toggle="collapse" href="#collapseThree">
+                                        Answered By Person Type (@answered_by_person_type)
+                                    </a>
+                                </div>
+                                <div id="collapseThree" class="collapse" data-parent="#accordion">
+                                    <div class="card-body">
+                                        <ol>
+                                            <li><b>COM</b> (Valid words are "COM" and "com")</li>
+                                            <li><b>Expert</b> (Valid words are "expert", "experts" and "Subject Matter
+                                                Expert")</li>
+                                            <li><b>APSOs</b> (Valid words are "apsos", "APSOs", "APSO's" and "apso's")
+                                            </li>
+                                        </ol>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-header">
+                                    <a class="collapsed card-link" data-toggle="collapse" href="#collapseSeven">
+                                        Category (@category)
+                                    </a>
+                                </div>
+                                <div id="collapseSeven" class="collapse" data-parent="#accordion">
+                                    <div class="card-body">
+                                        <ol>
+                                            <li><b>category</b> (Valid words are <span>{{categoryString}}</span>)</li>
+                                        </ol>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-header">
+                                    <a class="collapsed card-link" data-toggle="collapse" href="#collapseFour">
+                                        Answered By (@answered_by)
+                                    </a>
+                                </div>
+                                <div id="collapseFour" class="collapse" data-parent="#accordion">
+                                    <div class="card-body">
+                                        Anything that comes after "by" or "of"
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-header">
+                                    <a class="collapsed card-link" data-toggle="collapse" href="#collapseFive">
+                                        Post Number (@post_number)
+                                    </a>
+                                </div>
+                                <div id="collapseFive" class="collapse" data-parent="#accordion">
+                                    <div class="card-body">
+                                        Anything that comes after "in", "post", "no" or "number"
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card">
+                                <div class="card-header">
+                                    <a class="collapsed card-link" data-toggle="collapse" href="#collapseSix">
+                                        Post Description (@post_description)
+                                    </a>
+                                </div>
+                                <div id="collapseSix" class="collapse" data-parent="#accordion">
+                                    <div class="card-body">
+                                        Anything that comes after "on" or "to"
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
         </div>
     </div>
 
@@ -98,6 +223,19 @@
             }
             let response = await $http.get(`${HOST}/utterances/get`)
             if (response.data.length > 0) {
+                let allUtterances = response.data;
+                allUtterances.map((u) => {
+                    let allUtteranceWords = u.Utterance.split(" ")
+                    let utteranceString = ""
+                    allUtteranceWords.map((uw) => {
+                        if (uw.startsWith("@")) {
+                            utteranceString += ` <code>${uw}</code>`
+                        } else {
+                            utteranceString += ` ${uw}`
+                        }
+                    })
+                    u.Utterance = utteranceString
+                })
                 $scope.$apply(() => {
                     $scope.Utterances = response.data
                 });
@@ -112,7 +250,7 @@
                     [5, 10, 25, 50, -1],
                     [5, 10, 25, 50, 'All'],
                 ],
-                order: [0, 'desc'],
+                order: [0, 'asc'],
             });
         }
 
@@ -127,15 +265,35 @@
             }
         }
 
+
+        async function getCategories() {
+            let response = await $http.get(`${HOST}/categories/get`)
+            if (response.data.length > 0) {
+                $scope.$apply(() => {
+                    $scope.categories = response.data
+                });
+                let categoryString = ""
+                $scope.categories.map((c, index) => {
+                    if (index < ($scope.categories.length - 1)) {
+                        categoryString += c.Name + " ,"
+                    } else {
+                        categoryString += " or " + c.Name
+                    }
+                })
+                $scope.$apply(() => {
+                    $scope.categoryString = categoryString
+                });
+            } else {
+                $scope.Intents = []
+            }
+        }
+
         $scope.addUtterance = async function () {
             let data = {
                 "utterance": $scope.utterance,
                 "language": $scope.language,
                 "intent": $scope.intent
             }
-            console.log("Utterance: ", $scope.utterance)
-            console.log("Intent: ", $scope.intent)
-            console.log("Language: ", $scope.language)
 
             $http.post(`${HOST}/utterances/add`, JSON.stringify(data))
                 .then(async function successCallback(response) {
@@ -163,5 +321,11 @@
 
         await getUtterance()
         await getIntents()
+        await getCategories()
+    })
+    app.filter('trustHtml', function ($sce) {
+        return function (html) {
+            return $sce.trustAsHtml(html)
+        }
     })
 </script>

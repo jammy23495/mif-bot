@@ -18,9 +18,14 @@
       <div class="msger-header-options">
         <span><i class="fas fa-cog"></i></span>
       </div>
-
-      <button type="submit" class="msger-send-btn" ng-click="train()"
-        style="padding: 5px !important; border: 1px solid #397fd9;">{{train_button}}</button>
+      <div>
+        <button type="submit" class="msger-send-btn" ng-click="train()"
+          style="padding: 5px !important; border: 1px solid #397fd9;">{{train_button}}</button>
+        <a href="/utterances"><button type="submit" class="msger-send-btn"
+            style="padding: 5px !important; border: 1px solid #397fd9;">Utterances</button></a>
+        <a href="/faqs"><button type="submit" class="msger-send-btn"
+            style="padding: 5px !important; border: 1px solid #397fd9;">FAQs</button></a>
+      </div>
     </header>
 
     <main class="msger-chat">

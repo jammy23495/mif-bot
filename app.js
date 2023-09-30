@@ -13,6 +13,7 @@ let {
     addFAQs,
     getUtterances,
     getDistinctIntents,
+    getListOfCategories,
     addUtterances
 } = require("./sql")
 let {
@@ -100,6 +101,10 @@ app.get('/intents/get', async (req, res) => {
 
 app.post('/utterances/add', async (req, res) => {
     res.send(await addUtterances(req.body.utterance, req.body.language, req.body.intent))
+})
+
+app.get('/categories/get', async (req, res) => {
+    res.send(await getListOfCategories())
 })
 
 app.post('/ask', async (req, res) => {
