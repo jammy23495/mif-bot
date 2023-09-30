@@ -10,7 +10,10 @@ let {
 let {
     getMIFData,
     getFAQs,
-    addFAQs
+    addFAQs,
+    getUtterances,
+    getDistinctIntents,
+    addUtterances
 } = require("./sql")
 let {
     loadActions
@@ -25,7 +28,9 @@ const port = process.env.PORT || 3000
 app.use(express.static('ui'))
 var cors = require('cors')
 var bodyParser = require('body-parser');
-const { getRandomFallbackAnswers } = require('./utils');
+const {
+    getRandomFallbackAnswers
+} = require('./utils');
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({
@@ -79,6 +84,22 @@ app.get('/faqs/get', async (req, res) => {
 
 app.post('/faqs/add', async (req, res) => {
     res.send(await addFAQs(req.body.question, req.body.answer))
+})
+
+app.get('/utterances', async (req, res) => {
+    res.sendFile(__dirname + "/ui/utterances.html")
+})
+
+app.get('/utterances/get', async (req, res) => {
+    res.send(await getUtterances())
+})
+
+app.get('/intents/get', async (req, res) => {
+    res.send(await getDistinctIntents())
+})
+
+app.post('/utterances/add', async (req, res) => {
+    res.send(await addUtterances(req.body.utterance, req.body.language, req.body.intent))
 })
 
 app.post('/ask', async (req, res) => {

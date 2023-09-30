@@ -127,6 +127,11 @@
                     },
                     function errorCallback(response) {
                         console.log(response)
+                        Swal.fire(
+                            'Good job!',
+                            'You added a new Utterance',
+                            'success'
+                        )
                     });
         }
 

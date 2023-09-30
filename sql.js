@@ -66,10 +66,56 @@ async function addFAQs(question, answer) {
     }
 }
 
+async function addUtterances(utterance, language, intent) {
+    try {
+        await sql.connect(sqlConfig)
+        const getLastFAQ = await sql.query `SELECT Top 1 ID FROM Utterances order by ID desc`
+        let result = getLastFAQ.recordsets[0]
+        let ID = result[0].ID
+        if (ID) {
+            ID = parseInt(ID) + 1
+            let pool = await sql.connect(sqlConfig);
+            let results = await pool.request()
+                .input('ID', sql.Int, ID)
+                .input('Utterance', sql.VarChar(sql.MAX), utterance)
+                .input('Intent', sql.VarChar(100), intent)
+                .input('Language', sql.VarChar(20), language || "en")
+                .execute('SP_InsertUtterance')
+
+            if (results && results.returnValue && results.returnValue == 1) {
+                return {
+                    "status": 200
+                }
+            } else {
+                return {
+                    "status": 400
+                }
+            }
+        }
+        // return result.recordsets[0]
+    } catch (error) {
+        console.log(error)
+        return {
+            "error": error,
+            "status": 400
+        }
+    }
+}
+
 async function getUtterances() {
     try {
         await sql.connect(sqlConfig)
         const result = await sql.query `select * from Utterances`
+        return result.recordsets[0]
+    } catch (error) {
+        console.log(error)
+    }
+}
+
+async function getDistinctIntents() {
+    try {
+        await sql.connect(sqlConfig)
+        const result = await sql.query `select distinct Intent from Utterances`
         return result.recordsets[0]
     } catch (error) {
         console.log(error)
@@ -264,5 +310,7 @@ module.exports = {
     getTrending,
     getFAQs,
     getUtterances,
-    addFAQs
+    addFAQs,
+    getDistinctIntents,
+    addUtterances
 }
