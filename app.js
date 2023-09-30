@@ -8,9 +8,10 @@ let {
     qna
 } = require("./qna")
 let {
-    getMIFData
+    getMIFData,
+    getFAQs,
+    addFAQs
 } = require("./sql")
-const csv = require('csvtojson');
 let {
     loadActions
 } = require("./actions")
@@ -23,7 +24,8 @@ const app = express()
 const port = process.env.PORT || 3000
 app.use(express.static('ui'))
 var cors = require('cors')
-var bodyParser = require('body-parser')
+var bodyParser = require('body-parser');
+const { getRandomFallbackAnswers } = require('./utils');
 
 // parse application/x-www-form-urlencoded
 app.use(bodyParser.urlencoded({
@@ -54,7 +56,7 @@ let manager;
     });
 
     manager = dock.get('nlp');
-    let jsonArray = await csv().fromFile("./mif.csv");
+    let jsonArray = await getFAQs();
     let sqlData = await getMIFData();
     jsonArray = [...jsonArray, ...sqlData]
     let classifications = []
@@ -67,13 +69,25 @@ app.get('/', async (req, res) => {
     res.sendFile(ui / index.html)
 })
 
+app.get('/faqs', async (req, res) => {
+    res.sendFile(__dirname + "/ui/faq.html")
+})
+
+app.get('/faqs/get', async (req, res) => {
+    res.send(await getFAQs())
+})
+
+app.post('/faqs/add', async (req, res) => {
+    res.send(await addFAQs(req.body.question, req.body.answer))
+})
+
 app.post('/ask', async (req, res) => {
     try {
         let question = req && req.body && req.body.question ? req.body.question : "hi";
         let response = await qna(question, manager, summarizer);
         if (response && response.response && response.response.intent && response.response.intent == "None") {
             response = await qna(`Any post on ${question}`, manager, summarizer)
-            if(response && response && response.response && response.response.intent && response.response.intent.includes("action")){
+            if (response && response && response.response && response.response.intent && response.response.intent.includes("action")) {
                 response = await qna(`Any query on ${question}`, manager, summarizer)
             }
         }

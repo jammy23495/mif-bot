@@ -24,10 +24,45 @@ async function getMIFData() {
 async function getFAQs() {
     try {
         await sql.connect(sqlConfig)
-        const result = await sql.query `select * from FAQ`
+        const result = await sql.query `select * from FAQ order by ID desc`
         return result.recordsets[0]
     } catch (error) {
         console.log(error)
+    }
+}
+
+async function addFAQs(question, answer) {
+    try {
+        await sql.connect(sqlConfig)
+        const getLastFAQ = await sql.query `SELECT Top 1 ID FROM FAQ order by ID desc`
+        let result = getLastFAQ.recordsets[0]
+        let ID = result[0].ID
+        if (ID) {
+            ID = parseInt(ID) + 1
+            let pool = await sql.connect(sqlConfig);
+            let results = await pool.request()
+                .input('ID', sql.VarChar(10), ID.toString())
+                .input('Question', sql.VarChar(sql.MAX), question)
+                .input('Answer', sql.VarChar(sql.MAX), answer)
+                .execute('SP_InsertFAQ')
+
+            if (results && results.returnValue && results.returnValue == 1) {
+                return {
+                    "status": 200
+                }
+            } else {
+                return {
+                    "status": 400
+                }
+            }
+        }
+        // return result.recordsets[0]
+    } catch (error) {
+        console.log(error)
+        return {
+            "error": error,
+            "status": 400
+        }
     }
 }
 
@@ -228,5 +263,6 @@ module.exports = {
     getPieChartData,
     getTrending,
     getFAQs,
-    getUtterances
+    getUtterances,
+    addFAQs
 }
