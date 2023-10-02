@@ -69,6 +69,9 @@ async function loadActions(manager, jsonArray, classifications) {
                 let answered_by_person_type = entities.filter((e) => {
                     return e.entity === "answered_by_person_type"
                 })[0]
+                let post_number = entities.filter((e) => {
+                    return e.entity === "post_number"
+                })[0]
 
                 let mifData = await getDistinctMIFBotData();
 
@@ -161,6 +164,18 @@ async function loadActions(manager, jsonArray, classifications) {
                     if (classifications.length === 0) {
                         data = await generateActionDataResponse(data, "intent_action_showPostDetails", `I am sorry! I cannot find the ${post_type.sourceText || post_field.sourceText} on ${post_description.sourceText || "the question you asked"}`)
                     }
+                }
+                //Get post by post number
+                else if (post_number) {
+                    jsonArray.filter(async (c) => {
+                        if (c && c.QueryNumber && c.QueryNumber.toString() == post_number.sourceText.replace(/[^0-9]/g, "")) {
+                            let intent = c.Post_ID + `_${c.Topic || "MIF"}` + "_intent_" + c.Subject.replaceAll(" ", "_")
+                            classifications.push({
+                                "intent": intent,
+                                "score": 1
+                            })
+                        }
+                    })
                 }
                 //Get post/query based on category 
                 else if (category && post_type) {
