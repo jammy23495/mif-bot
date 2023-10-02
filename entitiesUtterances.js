@@ -22,6 +22,7 @@ async function loadEntities(manager) {
 
     manager.addNerRuleOptionTexts('en', 'post_field', 'comment', ["Comment", "comment", "Comments", "comments", "Commented", "commented", "remark", "remarks"]);
     manager.addNerRuleOptionTexts('en', 'post_field', 'likes', ["Likes", "likes", "Like", "like", "Liked", "liked"]);
+    manager.addNerRuleOptionTexts('en', 'post_field', 'views', ["Views", "views", "view", "View", "Viewed", "viewed"]);
 
     manager.addNerRuleOptionTexts('en', 'post_type', 'post', ["Posts", "post", "posts", "Post"]);
     manager.addNerRuleOptionTexts('en', 'post_type', 'query', ["Query", "query", "Queries", "queries"]);

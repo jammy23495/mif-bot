@@ -161,7 +161,9 @@ async function loadActions(manager, jsonArray, classifications) {
                     if (classifications.length === 0) {
                         data = await generateActionDataResponse(data, "intent_action_showPostDetails", `I am sorry! I cannot find the ${post_type.sourceText || post_field.sourceText} on ${post_description.sourceText || "the question you asked"}`)
                     }
-                } else if (category && post_type) {
+                }
+                //Get post/query based on category 
+                else if (category && post_type) {
                     let numberPostByCategory = await mifData.filter((e) => {
                         return e.Category && e.Category != "NULL" && e.FeedType == "Post" ? e.Category.includes(category.sourceText) : ""
                     })
@@ -741,6 +743,8 @@ async function loadActions(manager, jsonArray, classifications) {
                             data = generateActionDataResponse(data, "intent_action_showCountBasedOnPostTypeAndPostNumber", `There are ${numberOfPosts.CommentCount} comments on post ${post_number.sourceText.replace(/[^0-9]/g, "")} in MIF`)
                         } else if (post_field.option === "likes") {
                             data = generateActionDataResponse(data, "intent_action_showCountBasedOnPostTypeAndPostNumber", `There are ${numberOfPosts.LikeCount} likes on post ${post_number.sourceText.replace(/[^0-9]/g, "")} in MIF`)
+                        } else if (post_field.option === "views") {
+                            data = generateActionDataResponse(data, "intent_action_showCountBasedOnPostTypeAndPostNumber", `There are ${numberOfPosts.ViewCount} views on post ${post_number.sourceText.replace(/[^0-9]/g, "")} in MIF`)
                         }
                     } else if (post_type.option == "query" && numberOfQueries) {
                         //For comments
@@ -748,6 +752,8 @@ async function loadActions(manager, jsonArray, classifications) {
                             data = generateActionDataResponse(data, "intent_action_showCountBasedOnPostTypeAndPostNumber", `There are ${numberOfQueries.CommentCount} comments on query ${post_number.sourceText.replace(/[^0-9]/g, "")} in MIF`)
                         } else if (post_field.option === "likes") {
                             data = generateActionDataResponse(data, "intent_action_showCountBasedOnPostTypeAndPostNumber", `There are ${numberOfQueries.LikeCount} likes on query ${post_number.sourceText.replace(/[^0-9]/g, "")} in MIF`)
+                        } else if (post_field.option === "views") {
+                            data = generateActionDataResponse(data, "intent_action_showCountBasedOnPostTypeAndPostNumber", `There are ${numberOfQueries.ViewCount} views on query ${post_number.sourceText.replace(/[^0-9]/g, "")} in MIF`)
                         }
                     } else {
                         data = generateActionDataResponse(data, "intent_action_showCountBasedOnPostTypeAndPostNumber", `There are no ${post_type.sourceText} ${post_number.sourceText} available in MIF`)
@@ -868,11 +874,11 @@ async function loadActions(manager, jsonArray, classifications) {
                 let category = entities.filter((e) => {
                     return e.entity === "category"
                 })[0]
-                
+
                 let expertList = await getListOfExperts();
-                
+
                 if (category) {
-                    let expertListByCategory = expertList.filter((e)=>{
+                    let expertListByCategory = expertList.filter((e) => {
                         return e.Category.includes(category.sourceText)
                     })
                     if (expertListByCategory.length > 0) {
@@ -1200,6 +1206,46 @@ async function loadActions(manager, jsonArray, classifications) {
                         data = generateActionDataResponse(data, "intent_action_showTrending", trendingString)
                     } else {
                         data = generateActionDataResponse(data, "intent_action_showTrending", "I am not able to find trending/latest feed in MIF forum")
+                    }
+                }
+            }
+            data.classifications = classifications;
+        })
+
+
+        //-------------------------------------------showTotalPostTypeCount------------------------------------------------------------
+
+        manager.addAction("intent_showTotalPostTypeCount", 'showTotalPostTypeCount', [], async (data) => {
+            if (data) {
+                if (data) {
+                    if (data && data.entities.length > 0) {
+                        let entities = data.entities;
+                        classifications.push({
+                            "intent": "intent_showTotalPostTypeCount",
+                            "score": 1
+                        })
+                        let post_type = entities.filter((e) => {
+                            return e.entity === "post_type"
+                        })[0]
+
+                        let mifData = await getDistinctMIFBotData();
+
+                        let totalPostData = mifData.filter((m) => {
+                            return m.FeedType == "Post"
+                        })
+                        let totalQueryData = mifData.filter((m) => {
+                            return m.FeedType == "Query"
+                        })
+
+                        if (post_type) {
+                            if (post_type.option == "post") {
+                                data = generateActionDataResponse(data, "intent_action_showTotalPostTypeCount", `There are ${totalPostData.length} total posts in MIF`)
+                            } else if (post_type.option == "query") {
+                                data = generateActionDataResponse(data, "intent_action_showTotalPostTypeCount", `There are ${totalQueryData.length} total queries in MIF`)
+                            }
+                        } else {
+                            data = generateActionDataResponse(data, "intent_action_showTotalPostTypeCount", `I am soory. i couldn't find any ${post_type.sourceText || "posts/queries"} related your search`)
+                        }
                     }
                 }
             }
