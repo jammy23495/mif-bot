@@ -145,7 +145,10 @@ async function getListOfAPSOS() {
 async function getWeeklyQuizAnswers() {
     try {
         await sql.connect(sqlConfig)
-        const result = await sql.query `exec GetCorrectAnsMemberList`
+        const result = await sql.query `SELECT top 1 WKID, COUNT(*) AS Count
+        FROM MIFApp4.dbo.WeeklyQuizsAns
+        GROUP BY WKID
+        order by wkid desc`
         return result.recordsets[0]
     } catch (error) {
         console.log(error)

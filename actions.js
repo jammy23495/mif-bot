@@ -69,9 +69,6 @@ async function loadActions(manager, jsonArray, classifications) {
                 let answered_by_person_type = entities.filter((e) => {
                     return e.entity === "answered_by_person_type"
                 })[0]
-                let post_number = entities.filter((e) => {
-                    return e.entity === "post_number"
-                })[0]
 
                 let mifData = await getDistinctMIFBotData();
 
@@ -272,43 +269,82 @@ async function loadActions(manager, jsonArray, classifications) {
                     jsonArray = [...new Map(jsonArray.map(item => [item["Post_ID"], item])).values()]
                     if (answered_by_person_type.option == "COM") {
                         jsonArray.filter(async (c) => {
-                            if (c && c.IsFeedByCOM == 1) {
-                                commentCount++;
-                                let intent = c.Post_ID + `_${c.Topic || "MIF"}` + "_intent_" + c.Subject.replaceAll(" ", "_")
-                                classifications.push({
-                                    "intent": intent,
-                                    "score": 1
-                                })
-                            } else {
-                                data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showPostDetails" : "intent_action_showPostDetails", `I am sorry! I cannot find the post by COM`)
+                            if (post_type.option == "post") {
+                                if (c && c.IsFeedByCOM == 1 && c.FeedType == "Post") {
+                                    commentCount++;
+                                    let intent = c.Post_ID + `_${c.Topic || "MIF"}` + "_intent_" + c.Subject.replaceAll(" ", "_")
+                                    classifications.push({
+                                        "intent": intent,
+                                        "score": 1
+                                    })
+                                } else {
+                                    data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showPostDetails" : "intent_action_showPostDetails", `I am sorry! I cannot find the post by COM`)
+                                }
+                            } else if (post_type.option == "query") {
+                                if (c && c.IsFeedByCOM == 1 && c.FeedType == "Query") {
+                                    commentCount++;
+                                    let intent = c.Post_ID + `_${c.Topic || "MIF"}` + "_intent_" + c.Subject.replaceAll(" ", "_")
+                                    classifications.push({
+                                        "intent": intent,
+                                        "score": 1
+                                    })
+                                } else {
+                                    data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showPostDetails" : "intent_action_showPostDetails", `I am sorry! I cannot find any query by COM`)
+                                }
                             }
                         })
                         data.commentCount = commentCount
                     } else if (answered_by_person_type.option == "Expert") {
                         jsonArray.filter(async (c) => {
-                            if (c && c.IsFeedByExpert == 1) {
-                                commentCount++;
-                                let intent = c.Post_ID + `_${c.Topic || "MIF"}` + "_intent_" + c.Subject.replaceAll(" ", "_")
-                                classifications.push({
-                                    "intent": intent,
-                                    "score": 1
-                                })
-                            } else {
-                                data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showPostDetails" : "intent_action_showPostDetails", `I am sorry! I cannot find the post by Expert`)
+                            if (post_type.option == "post") {
+                                if (c && c.IsFeedByExpert == 1 && c.FeedType == "Post") {
+                                    commentCount++;
+                                    let intent = c.Post_ID + `_${c.Topic || "MIF"}` + "_intent_" + c.Subject.replaceAll(" ", "_")
+                                    classifications.push({
+                                        "intent": intent,
+                                        "score": 1
+                                    })
+                                } else {
+                                    data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showPostDetails" : "intent_action_showPostDetails", `I am sorry! I cannot find any post by Expert`)
+                                }
+                            } else if (post_type.option == "query") {
+                                if (c && c.IsFeedByExpert == 1 && c.FeedType == "Query") {
+                                    commentCount++;
+                                    let intent = c.Post_ID + `_${c.Topic || "MIF"}` + "_intent_" + c.Subject.replaceAll(" ", "_")
+                                    classifications.push({
+                                        "intent": intent,
+                                        "score": 1
+                                    })
+                                } else {
+                                    data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showPostDetails" : "intent_action_showPostDetails", `I am sorry! I cannot find any query by Expert`)
+                                }
                             }
                         })
                         data.commentCount = commentCount
                     } else if (answered_by_person_type.option == "APSOs") {
                         jsonArray.filter(async (c) => {
-                            if (c && c.IsFeedByAPSOs == 1) {
-                                commentCount++;
-                                let intent = c.Post_ID + `_${c.Topic || "MIF"}` + "_intent_" + c.Subject.replaceAll(" ", "_")
-                                classifications.push({
-                                    "intent": intent,
-                                    "score": 1
-                                })
-                            } else {
-                                data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showPostDetails" : "intent_action_showPostDetails", `I am sorry! I cannot find the post by APSOs`)
+                            if (post_type.option == "post") {
+                                if (c && c.IsFeedByAPSOs == 1 && c.FeedType == "Post") {
+                                    commentCount++;
+                                    let intent = c.Post_ID + `_${c.Topic || "MIF"}` + "_intent_" + c.Subject.replaceAll(" ", "_")
+                                    classifications.push({
+                                        "intent": intent,
+                                        "score": 1
+                                    })
+                                } else {
+                                    data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showPostDetails" : "intent_action_showPostDetails", `I am sorry! I cannot find any post by APSOs`)
+                                }
+                            } else if (post_type.option == "query") {
+                                if (c && c.IsFeedByAPSOs == 1 && c.FeedType == "Query") {
+                                    commentCount++;
+                                    let intent = c.Post_ID + `_${c.Topic || "MIF"}` + "_intent_" + c.Subject.replaceAll(" ", "_")
+                                    classifications.push({
+                                        "intent": intent,
+                                        "score": 1
+                                    })
+                                } else {
+                                    data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showPostDetails" : "intent_action_showPostDetails", `I am sorry! I cannot find any query by APSOs`)
+                                }
                             }
                         })
                         data.commentCount = commentCount
@@ -828,20 +864,46 @@ async function loadActions(manager, jsonArray, classifications) {
 
         manager.addAction("intent_showListOfExperts", 'showListOfExperts', [], async (data) => {
             if (data) {
+                let entities = data.entities;
+                let category = entities.filter((e) => {
+                    return e.entity === "category"
+                })[0]
+                
                 let expertList = await getListOfExperts();
-                if (expertList.length > 0) {
-                    let expertString = `There are ${expertList.length} experts in MIF.`
-                    expertString += " Below are the list of experts:\n"
-                    expertString += "<ul style='padding: revert; '>"
-                    expertList.map((e) => {
-                        expertString += "<li>"
-                        expertString += `${e.Name} (${e.Category})`
-                        expertString += "</li>"
+                
+                if (category) {
+                    let expertListByCategory = expertList.filter((e)=>{
+                        return e.Category.includes(category.sourceText)
                     })
-                    expertString += "</ul>"
-                    data = generateActionDataResponse(data, "intent_action_showListOfExperts", expertString)
+                    if (expertListByCategory.length > 0) {
+                        let expertString = `There are ${expertListByCategory.length} experts in ${category.sourceText} category.`
+                        expertString += " Below are the list of experts:\n"
+                        expertString += "<ul style='padding: revert; '>"
+                        expertListByCategory.map((e) => {
+                            expertString += "<li>"
+                            expertString += `${e.Name}`
+                            expertString += "</li>"
+                        })
+                        expertString += "</ul>"
+                        data = generateActionDataResponse(data, "intent_action_showListOfExperts", expertString)
+                    } else {
+                        data = generateActionDataResponse(data, "intent_action_showListOfExperts", `There are no experts available in ${category.sourceText} category.`)
+                    }
                 } else {
-                    data = generateActionDataResponse(data, "intent_action_showListOfExperts", "There are no experts available in MIF")
+                    if (expertList.length > 0) {
+                        let expertString = `There are ${expertList.length} experts in MIF.`
+                        expertString += " Below are the list of experts:\n"
+                        expertString += "<ul style='padding: revert; '>"
+                        expertList.map((e) => {
+                            expertString += "<li>"
+                            expertString += `${e.Name} (${e.Category})`
+                            expertString += "</li>"
+                        })
+                        expertString += "</ul>"
+                        data = generateActionDataResponse(data, "intent_action_showListOfExperts", expertString)
+                    } else {
+                        data = generateActionDataResponse(data, "intent_action_showListOfExperts", "There are no experts available in MIF")
+                    }
                 }
             }
             data.classifications = classifications;
@@ -876,16 +938,8 @@ async function loadActions(manager, jsonArray, classifications) {
         manager.addAction("intent_showWeeklyQuizAnswerList", 'showWeeklyQuizAnswerList', [], async (data) => {
             if (data) {
                 let weeklyQuizList = await getWeeklyQuizAnswers();
-                if (weeklyQuizList.length > 0) {
-                    let weeklyQuizString = `In MIF, ${weeklyQuizList.length} members have answered correctly in weekly quiz.`
-                    weeklyQuizString += " Below are the list of members:\n"
-                    weeklyQuizString += "<ul style='padding: revert; '>"
-                    weeklyQuizList.map((e) => {
-                        weeklyQuizString += "<li>"
-                        weeklyQuizString += `${e.Name}`
-                        weeklyQuizString += "</li>"
-                    })
-                    weeklyQuizString += "</ul>"
+                if (weeklyQuizList.length > 0 && weeklyQuizList[0].Count > 0) {
+                    let weeklyQuizString = `In MIF, ${weeklyQuizList[0].Count} members have answered correctly in weekly quiz.`
                     data = generateActionDataResponse(data, "intent_action_showWeeklyQuizAnswerList", weeklyQuizString)
                 } else {
                     data = generateActionDataResponse(data, "intent_action_showWeeklyQuizAnswerList", "I am not able to find anyone who answered weekly quiz")
