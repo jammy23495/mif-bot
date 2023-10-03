@@ -106,7 +106,7 @@ async function loadActions(manager, jsonArray, classifications) {
                                             "score": 1
                                         })
                                     } else {
-                                        data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showPostDetails" : "intent_action_showPostDetails", `I am sorry! I cannot find the posts on ${post_description.sourceText || "the question you asked"}`)
+                                        data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showPostDetails" : "intent_action_showPostDetails", `I am sorry! I couldn't find any posts on ${post_description.sourceText || "the question you asked"}`)
                                     }
                                 }
                             } else if (post_type && post_type.option == "query") {
@@ -126,7 +126,7 @@ async function loadActions(manager, jsonArray, classifications) {
                                             "score": 1
                                         })
                                     } else {
-                                        data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showPostDetails" : "intent_action_showPostDetails", `I am sorry! I cannot find the queries on ${post_description.sourceText || "the question you asked"}`)
+                                        data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showPostDetails" : "intent_action_showPostDetails", `I am sorry! I couldn't find any queries on ${post_description.sourceText || "the question you asked"}`)
                                     }
                                 }
                             } else {
@@ -1232,38 +1232,80 @@ async function loadActions(manager, jsonArray, classifications) {
 
         manager.addAction("intent_showTotalPostTypeCount", 'showTotalPostTypeCount', [], async (data) => {
             if (data) {
-                if (data) {
-                    if (data && data.entities.length > 0) {
-                        let entities = data.entities;
-                        classifications.push({
-                            "intent": "intent_showTotalPostTypeCount",
-                            "score": 1
-                        })
-                        let post_type = entities.filter((e) => {
-                            return e.entity === "post_type"
-                        })[0]
+                if (data && data.entities.length > 0) {
+                    let entities = data.entities;
+                    classifications.push({
+                        "intent": "intent_showTotalPostTypeCount",
+                        "score": 1
+                    })
+                    let post_type = entities.filter((e) => {
+                        return e.entity === "post_type"
+                    })[0]
 
-                        let mifData = await getDistinctMIFBotData();
+                    let mifData = await getDistinctMIFBotData();
 
-                        let totalPostData = mifData.filter((m) => {
-                            return m.FeedType == "Post"
-                        })
-                        let totalQueryData = mifData.filter((m) => {
-                            return m.FeedType == "Query"
-                        })
+                    let totalPostData = mifData.filter((m) => {
+                        return m.FeedType == "Post"
+                    })
+                    let totalQueryData = mifData.filter((m) => {
+                        return m.FeedType == "Query"
+                    })
 
-                        if (post_type) {
-                            if (post_type.option == "post") {
-                                data = generateActionDataResponse(data, "intent_action_showTotalPostTypeCount", `There are ${totalPostData.length} total posts in MIF`)
-                            } else if (post_type.option == "query") {
-                                data = generateActionDataResponse(data, "intent_action_showTotalPostTypeCount", `There are ${totalQueryData.length} total queries in MIF`)
-                            }
-                        } else {
-                            data = generateActionDataResponse(data, "intent_action_showTotalPostTypeCount", `I am soory. i couldn't find any ${post_type.sourceText || "posts/queries"} related your search`)
+                    if (post_type) {
+                        if (post_type.option == "post") {
+                            data = generateActionDataResponse(data, "intent_action_showTotalPostTypeCount", `There are ${totalPostData.length} total posts in MIF`)
+                        } else if (post_type.option == "query") {
+                            data = generateActionDataResponse(data, "intent_action_showTotalPostTypeCount", `There are ${totalQueryData.length} total queries in MIF`)
                         }
+                    } else {
+                        data = generateActionDataResponse(data, "intent_action_showTotalPostTypeCount", `I am sorry. i couldn't find any ${post_type.sourceText || "posts/queries"} related your search`)
                     }
                 }
             }
+
+            data.classifications = classifications;
+        })
+
+        //-------------------------------------------showCommentOnPostBy------------------------------------------------------------
+
+        manager.addAction("intent_showCommentOnPostBy", 'showCommentOnPostBy', [], async (data) => {
+            if (data) {
+                if (data && data.entities.length > 0) {
+                    let entities = data.entities;
+                    classifications.push({
+                        "intent": "intent_showCommentOnPostBy",
+                        "score": 1
+                    })
+                    let post_field = entities.filter((e) => {
+                        return e.entity === "post_field"
+                    })[0]
+                    let post_number = entities.filter((e) => {
+                        return e.entity === "post_number"
+                    })[0]
+
+                    let mifData = await getMIFData();
+
+                    if (post_field && post_number) {
+                        let commentPosts = mifData.filter((m) => {
+                            return m.QueryNumber.toString() == post_number.sourceText.replace(/[^0-9]/g, "") && m.Comment_By != null
+                        })
+                        if (commentPosts && commentPosts.length > 0) {
+                            let commentString = `<div style='padding: revert'>There are ${commentPosts.length} comments on post ${post_number.sourceText.replace(/[^0-9]/g, "")}. Here are the people who commented:`
+                            commentString += "<ul>"
+                            commentPosts.map((t) => {
+                                commentString += `<li>${t.Comment_By}</li>`
+                            })
+                            commentString += "</ul></div>"
+                            data = generateActionDataResponse(data, "intent_action_showCommentOnPostBy", commentString)
+                        } else {
+                            data = generateActionDataResponse(data, "intent_action_showCommentOnPostBy", `I am sorry. I couldn't find any comments on post ${post_number.sourceText.replace(/[^0-9]/g, "")}`)
+                        }
+                    } else {
+                        data = generateActionDataResponse(data, "intent_action_showCommentOnPostBy", getRandomFallbackAnswers(), true)
+                    }
+                }
+            }
+
             data.classifications = classifications;
         })
 
