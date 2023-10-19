@@ -120,46 +120,6 @@ async function qna(question, manager, summarizer) {
     };
 }
 
-async function generateAnswer(answer, offlineSummarizer) {
-    try {
-        let answer_summary = ""
-
-        let answer_length = answer.split(/[.?!]/g).filter(Boolean).length;
-
-        //Perform Summarization
-        if (answer_length > 3) {
-            let internet = await checkInternet()
-
-            // Using huggingfacejs inference if internet is available
-            if (internet && process.env.runOffline.toLocaleLowerCase() === "false") {
-                console.log("Running on Huggingface online inference")
-                let response = await summarize(answer)
-                answer_summary = response ? response.summary_text : ""
-            }
-            // Using Transformersjs if internet isn't available
-            else {
-                console.log("Running on Transformers offline pipeline")
-                let response = await offlineSummarizer(answer)
-                answer_summary = response && response.length > 0 ? response[0].summary_text : ""
-            }
-        } else {
-            answer_summary = answer
-        }
-
-        return {
-            answer_summary: answer_summary,
-            isGreet: false,
-            isFallback: true
-        }
-    } catch (error) {
-        return {
-            answer_summary: "I am sorry! I don't know about this. Please ask questions related to forum.",
-            isGreet: true,
-            isFallback: true
-        }
-    }
-}
-
 async function getDataByPOSTID(id) {
     let {
         getMIFData
