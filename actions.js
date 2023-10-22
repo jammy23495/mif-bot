@@ -30,10 +30,12 @@ let {
 } = require("./entitiesUtterances")
 
 
-async function loadActions(manager, jsonArray, classifications) {
-    jsonArray = await getMIFData();
+async function loadActions(manager) {
+    let jsonArray = await getMIFData();
+    let classifications = [];
     try {
         let categories = await getListOfCategories();
+
         categories = categories.map((c) => {
             return c.Name
         })
@@ -47,7 +49,6 @@ async function loadActions(manager, jsonArray, classifications) {
         //-------------------------------------------showPostDetails------------------------------------------------------------
 
         manager.addAction("intent_showPostDetails", 'showPostDetails', [], async (data) => {
-            let jsonArray = await getMIFData()
             classifications = []
             if (data && data.entities.length > 0) {
                 let entities = data.entities;
@@ -75,6 +76,7 @@ async function loadActions(manager, jsonArray, classifications) {
 
                 let allMIFData = await getMIFData();
                 let mifData = [...new Map(allMIFData.map(item => [item["Post_ID"], item])).values()]
+
                 //Get post/query based on category 
                 if (category && post_type) {
                     //Get Posts
@@ -104,16 +106,28 @@ async function loadActions(manager, jsonArray, classifications) {
                                 data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showPostDetails" : "intent_action_showPostDetails", `I am sorry! I cannot find any queries in ${category.sourceText || "this category"}`)
                             }
                         })
-                    } 
+                    }
+                    //Get Input
+                    else if (post_type.option == "input") {
+                        mifData.filter(async (c) => {
+                            if (c && c.Category && c.Category.toLowerCase().trim().includes(category.sourceText.toLowerCase().trim())) {
+                                let intent = c.Post_ID + `_${c.Topic || "MIF"}` + "_intent_" + c.Subject.replaceAll(" ", "_")
+                                classifications.push({
+                                    "intent": intent,
+                                    "score": 1
+                                })
+                            } else {
+                                data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showPostDetails" : "intent_action_showPostDetails", `I am sorry! I cannot find any discussions in ${category.sourceText || "this category"}`)
+                            }
+                        })
+                    }
                 }
-                //If post description is present
+                //Get Data based on Post Description
                 else if (post_description) {
-                    let allMIFData = await getMIFData();
-                    let allMIFDistinctData = [...new Map(allMIFData.map(item => [item["Post_ID"], item])).values()]
-                    let allMIFPostData = allMIFDistinctData.filter((e) => {
+                    let allMIFPostData = mifData.filter((e) => {
                         return e.FeedType == "Post"
                     })
-                    let allMIFQueryData = allMIFDistinctData.filter((e) => {
+                    let allMIFQueryData = mifData.filter((e) => {
                         return e.FeedType == "Query"
                     })
                     let tokens = await tokenize(post_description.sourceText)
@@ -140,7 +154,9 @@ async function loadActions(manager, jsonArray, classifications) {
                                         data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showPostDetails" : "intent_action_showPostDetails", `I am sorry! I couldn't find any posts on ${post_description.sourceText || "the question you asked"}`)
                                     }
                                 }
-                            } else if (post_type && post_type.option == "query") {
+                            }
+                            //Get data for query
+                            else if (post_type && post_type.option == "query") {
                                 for (let j = 0; j < allMIFQueryData.length; j++) {
                                     let availableTokens = 0;
                                     let context = filterString(allMIFQueryData[j].Subject) + filterString(allMIFQueryData[j].Question);
@@ -160,35 +176,59 @@ async function loadActions(manager, jsonArray, classifications) {
                                         data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showPostDetails" : "intent_action_showPostDetails", `I am sorry! I couldn't find any queries on ${post_description.sourceText || "the question you asked"}`)
                                     }
                                 }
-                            } else {
-                                data = await generateActionDataResponse(data, "intent_action_showPostDetails", `The question you asked is incorrect. Try asking "Any post on <specific topic>"`)
                             }
-                        }
-                        //Get Data for Query
-                        else if (post_field.option == "comment") {
-                            let commentCount = 0;
-                            for (let j = 0; j < allMIFData.length; j++) {
-                                let availableTokens = 0;
-                                let context = filterString(allMIFData[j].Comment);
-                                for (let i = 0; i < tokens.length; i++) {
-                                    if (context && context.toLowerCase().includes(tokens[i].toLowerCase())) {
-                                        availableTokens++;
+                            //Get data for input
+                            else if (post_type && post_type.option == "input") {
+                                for (let j = 0; j < mifData.length; j++) {
+                                    let availableTokens = 0;
+                                    let context = filterString(mifData[j].Subject) + filterString(mifData[j].Question);
+                                    for (let i = 0; i < tokens.length; i++) {
+                                        if (context && context.toLowerCase().includes(tokens[i].toLowerCase())) {
+                                            availableTokens++;
+                                        }
+                                    }
+                                    let score = (availableTokens / (tokens.length)) || 0;
+                                    if (score > 0.5) {
+                                        let intent = mifData[j].Post_ID + `_${mifData[j].Topic || "MIF"}` + "_intent_" + mifData[j].Subject.replaceAll(" ", "_")
+                                        classifications.push({
+                                            "intent": intent,
+                                            "score": 1
+                                        })
+                                    } else {
+                                        data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showPostDetails" : "intent_action_showPostDetails", `I am sorry! I couldn't find any discussions on ${post_description.sourceText || "the question you asked"}`)
                                     }
                                 }
-                                let score = (availableTokens / (tokens.length)) || 0;
-                                if (score > 0.5) {
-                                    let intent = allMIFData[j].Post_ID + `_${allMIFData[j].Topic || "MIF"}` + "_intent_" + allMIFData[j].Subject.replaceAll(" ", "_")
-                                    commentCount++;
-                                    classifications.push({
-                                        "intent": intent,
-                                        "score": 1
-                                    })
-
-                                    data.commentCount = commentCount
-                                } else {
-                                    data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showPostDetails" : "intent_action_showPostDetails", `I am sorry! I cannot find any comments on ${post_description.sourceText || "the question you asked"}`)
-                                }
                             }
+                            //Get comments
+                            else if (post_field && post_field.option == "comment") {
+                                let commentCount = 0;
+                                for (let j = 0; j < allMIFData.length; j++) {
+                                    let availableTokens = 0;
+                                    let context = filterString(allMIFData[j].Comment);
+                                    for (let i = 0; i < tokens.length; i++) {
+                                        if (context && context.toLowerCase().includes(tokens[i].toLowerCase())) {
+                                            availableTokens++;
+                                        }
+                                    }
+                                    let score = (availableTokens / (tokens.length)) || 0;
+                                    if (score > 0.5) {
+                                        let intent = allMIFData[j].Post_ID + `_${allMIFData[j].Topic || "MIF"}` + "_intent_" + allMIFData[j].Subject.replaceAll(" ", "_")
+                                        commentCount++;
+                                        classifications.push({
+                                            "intent": intent,
+                                            "score": 1
+                                        })
+
+                                        data.commentCount = commentCount
+                                    } else {
+                                        data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showPostDetails" : "intent_action_showPostDetails", `I am sorry! I cannot find any comments on ${post_description.sourceText || "the question you asked"}`)
+                                    }
+                                }
+                            } else {
+                                data = await generateActionDataResponse(data, "intent_action_showPostDetails", `The question you asked is incorrect. Try asking "Any post/query/discussions/comments on <specific topic>"`)
+                            }
+                        } else {
+                            data = await generateActionDataResponse(data, "intent_action_showPostDetails", `The question you asked is incorrect. Try asking "Any post/query/discussions/comments on <specific topic>"`)
                         }
                     }
 
@@ -201,7 +241,7 @@ async function loadActions(manager, jsonArray, classifications) {
                     //Get Comments
                     if (post_field.option == "comment") {
                         let commentCount = 0;
-                        jsonArray.filter(async (c) => {
+                        allMIFData.filter(async (c) => {
                             if (c && c.Comment_By && c.Comment_By.toLowerCase().includes(answered_by.sourceText.toLowerCase())) {
                                 commentCount++;
                                 let intent = c.Post_ID + `_${c.Topic || "MIF"}` + "_intent_" + c.Subject.replaceAll(" ", "_")
@@ -214,17 +254,15 @@ async function loadActions(manager, jsonArray, classifications) {
                             }
                         })
                         data.commentCount = commentCount
-                        console.log("Comment Count: ", commentCount)
                     }
                 }
                 //Get Comments by person type
                 else if (answered_by_person_type && post_field) {
-                    jsonArray = [...new Map(jsonArray.map(item => [item["Post_ID"], item])).values()]
                     //Get Comments
                     if (post_field.option == "comment") {
                         let commentCount = 0;
                         if (answered_by_person_type.option == "COM") {
-                            jsonArray.filter(async (c) => {
+                            allMIFData.filter(async (c) => {
                                 if (c && c.IsCOMCommented == 1) {
                                     commentCount++;
                                     let intent = c.Post_ID + `_${c.Topic || "MIF"}` + "_intent_" + c.Subject.replaceAll(" ", "_")
@@ -238,7 +276,7 @@ async function loadActions(manager, jsonArray, classifications) {
                             })
                             data.commentCount = commentCount
                         } else if (answered_by_person_type.option == "Expert") {
-                            jsonArray.filter(async (c) => {
+                            allMIFData.filter(async (c) => {
                                 if (c && c.IsExpertCommented == 1) {
                                     commentCount++;
                                     let intent = c.Post_ID + `_${c.Topic || "MIF"}` + "_intent_" + c.Subject.replaceAll(" ", "_")
@@ -252,7 +290,7 @@ async function loadActions(manager, jsonArray, classifications) {
                             })
                             data.commentCount = commentCount
                         } else if (answered_by_person_type.option == "APSOs") {
-                            jsonArray.filter(async (c) => {
+                            allMIFData.filter(async (c) => {
                                 if (c && c.IsAPSOsCommented == 1) {
                                     commentCount++;
                                     let intent = c.Post_ID + `_${c.Topic || "MIF"}` + "_intent_" + c.Subject.replaceAll(" ", "_")
@@ -270,14 +308,11 @@ async function loadActions(manager, jsonArray, classifications) {
                 }
                 //Get Post/Query by person type
                 else if (answered_by_person_type && post_type) {
-                    //Get Comments
-                    let commentCount = 0;
-                    jsonArray = [...new Map(jsonArray.map(item => [item["Post_ID"], item])).values()]
+                    //Get COM Data
                     if (answered_by_person_type.option == "COM") {
-                        jsonArray.filter(async (c) => {
+                        mifData.filter(async (c) => {
                             if (post_type.option == "post") {
                                 if (c && c.IsFeedByCOM == 1 && c.FeedType == "Post") {
-                                    commentCount++;
                                     let intent = c.Post_ID + `_${c.Topic || "MIF"}` + "_intent_" + c.Subject.replaceAll(" ", "_")
                                     classifications.push({
                                         "intent": intent,
@@ -288,7 +323,6 @@ async function loadActions(manager, jsonArray, classifications) {
                                 }
                             } else if (post_type.option == "query") {
                                 if (c && c.IsFeedByCOM == 1 && c.FeedType == "Query") {
-                                    commentCount++;
                                     let intent = c.Post_ID + `_${c.Topic || "MIF"}` + "_intent_" + c.Subject.replaceAll(" ", "_")
                                     classifications.push({
                                         "intent": intent,
@@ -297,14 +331,24 @@ async function loadActions(manager, jsonArray, classifications) {
                                 } else {
                                     data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showPostDetails" : "intent_action_showPostDetails", `I am sorry! I cannot find any query by COM`)
                                 }
+                            } else if (post_type.option == "input") {
+                                if (c && c.IsFeedByCOM == 1) {
+                                    let intent = c.Post_ID + `_${c.Topic || "MIF"}` + "_intent_" + c.Subject.replaceAll(" ", "_")
+                                    classifications.push({
+                                        "intent": intent,
+                                        "score": 1
+                                    })
+                                } else {
+                                    data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showPostDetails" : "intent_action_showPostDetails", `I am sorry! I cannot find any discussions by COM`)
+                                }
                             }
                         })
-                        data.commentCount = commentCount
-                    } else if (answered_by_person_type.option == "Expert") {
-                        jsonArray.filter(async (c) => {
+                    }
+                    //Get Expert Data
+                    else if (answered_by_person_type.option == "Expert") {
+                        mifData.filter(async (c) => {
                             if (post_type.option == "post") {
                                 if (c && c.IsFeedByExpert == 1 && c.FeedType == "Post") {
-                                    commentCount++;
                                     let intent = c.Post_ID + `_${c.Topic || "MIF"}` + "_intent_" + c.Subject.replaceAll(" ", "_")
                                     classifications.push({
                                         "intent": intent,
@@ -315,7 +359,16 @@ async function loadActions(manager, jsonArray, classifications) {
                                 }
                             } else if (post_type.option == "query") {
                                 if (c && c.IsFeedByExpert == 1 && c.FeedType == "Query") {
-                                    commentCount++;
+                                    let intent = c.Post_ID + `_${c.Topic || "MIF"}` + "_intent_" + c.Subject.replaceAll(" ", "_")
+                                    classifications.push({
+                                        "intent": intent,
+                                        "score": 1
+                                    })
+                                } else {
+                                    data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showPostDetails" : "intent_action_showPostDetails", `I am sorry! I cannot find any query by Expert`)
+                                }
+                            } else if (post_type.option == "input") {
+                                if (c && c.IsFeedByExpert == 1) {
                                     let intent = c.Post_ID + `_${c.Topic || "MIF"}` + "_intent_" + c.Subject.replaceAll(" ", "_")
                                     classifications.push({
                                         "intent": intent,
@@ -326,12 +379,12 @@ async function loadActions(manager, jsonArray, classifications) {
                                 }
                             }
                         })
-                        data.commentCount = commentCount
-                    } else if (answered_by_person_type.option == "APSOs") {
-                        jsonArray.filter(async (c) => {
+                    }
+                    //Get APSOs Data
+                    else if (answered_by_person_type.option == "APSOs") {
+                        mifData.filter(async (c) => {
                             if (post_type.option == "post") {
                                 if (c && c.IsFeedByAPSOs == 1 && c.FeedType == "Post") {
-                                    commentCount++;
                                     let intent = c.Post_ID + `_${c.Topic || "MIF"}` + "_intent_" + c.Subject.replaceAll(" ", "_")
                                     classifications.push({
                                         "intent": intent,
@@ -342,7 +395,16 @@ async function loadActions(manager, jsonArray, classifications) {
                                 }
                             } else if (post_type.option == "query") {
                                 if (c && c.IsFeedByAPSOs == 1 && c.FeedType == "Query") {
-                                    commentCount++;
+                                    let intent = c.Post_ID + `_${c.Topic || "MIF"}` + "_intent_" + c.Subject.replaceAll(" ", "_")
+                                    classifications.push({
+                                        "intent": intent,
+                                        "score": 1
+                                    })
+                                } else {
+                                    data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showPostDetails" : "intent_action_showPostDetails", `I am sorry! I cannot find any query by APSOs`)
+                                }
+                            } else if (post_type.option == "input") {
+                                if (c && c.IsFeedByAPSOs == 1) {
                                     let intent = c.Post_ID + `_${c.Topic || "MIF"}` + "_intent_" + c.Subject.replaceAll(" ", "_")
                                     classifications.push({
                                         "intent": intent,
@@ -353,15 +415,13 @@ async function loadActions(manager, jsonArray, classifications) {
                                 }
                             }
                         })
-                        data.commentCount = commentCount
                     }
-
                 }
                 //Get Post and Queries of a person
                 else if (answered_by && post_type) {
                     //Get Posts
                     if (post_type.option == "post") {
-                        jsonArray.filter(async (c) => {
+                        mifData.filter(async (c) => {
                             if (c && c.SubmittedBy && c.SubmittedBy.toLowerCase().trim().includes(answered_by.sourceText.toLowerCase().trim()) && c.FeedType.toLowerCase().includes("post")) {
                                 let intent = c.Post_ID + `_${c.Topic || "MIF"}` + "_intent_" + c.Subject.replaceAll(" ", "_")
                                 classifications.push({
@@ -375,7 +435,7 @@ async function loadActions(manager, jsonArray, classifications) {
                     }
                     //Get Queries
                     else if (post_type.option == "query") {
-                        jsonArray.filter(async (c) => {
+                        mifData.filter(async (c) => {
                             if (c && c.SubmittedBy && c.SubmittedBy.toLowerCase().trim().includes(answered_by.sourceText.toLowerCase().trim()) && c.FeedType.toLowerCase().includes("query")) {
                                 let intent = c.Post_ID + `_${c.Topic || "MIF"}` + "_intent_" + c.Subject.replaceAll(" ", "_")
                                 classifications.push({
@@ -386,10 +446,10 @@ async function loadActions(manager, jsonArray, classifications) {
                                 data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showPostDetails" : "intent_action_showPostDetails", `I am sorry! I cannot find any queries by ${answered_by.sourceText || "this person"}`)
                             }
                         })
-                    } 
-                    //Get Queries
+                    }
+                    //Get Inputs
                     else if (post_type.option == "input") {
-                        jsonArray.filter(async (c) => {
+                        mifData.filter(async (c) => {
                             if (c && c.SubmittedBy && c.SubmittedBy.toLowerCase().trim().includes(answered_by.sourceText.toLowerCase().trim())) {
                                 let intent = c.Post_ID + `_${c.Topic || "MIF"}` + "_intent_" + c.Subject.replaceAll(" ", "_")
                                 classifications.push({
@@ -397,14 +457,14 @@ async function loadActions(manager, jsonArray, classifications) {
                                     "score": 1
                                 })
                             } else {
-                                data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showPostDetails" : "intent_action_showPostDetails", `I am sorry! I cannot find any inputs by ${answered_by.sourceText || "this person"}`)
+                                data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showPostDetails" : "intent_action_showPostDetails", `I am sorry! I cannot find any discussions by ${answered_by.sourceText || "this person"}`)
                             }
                         })
-                    } 
+                    }
                 }
                 //Get post by post number
                 else if (post_number) {
-                    jsonArray.filter(async (c) => {
+                    mifData.filter(async (c) => {
                         if (c && c.QueryNumber && c.QueryNumber.toString() == post_number.sourceText.replace(/[^0-9]/g, "")) {
                             let intent = c.Post_ID + `_${c.Topic || "MIF"}` + "_intent_" + c.Subject.replaceAll(" ", "_")
                             classifications.push({
@@ -472,12 +532,20 @@ async function loadActions(manager, jsonArray, classifications) {
                     return e.IsFeedByCOM === 1 && e.FeedType == "Query"
                 })
 
+                let numberOfCOMAllPosts = jsonArray.filter((e) => {
+                    return e.IsFeedByCOM === 1
+                })
+
                 let numberOfExpertPost = jsonArray.filter((e) => {
                     return e.IsFeedByExpert === 1 && e.FeedType == "Post"
                 })
 
                 let numberOfExpertQuery = jsonArray.filter((e) => {
                     return e.IsFeedByExpert === 1 && e.FeedType == "Query"
+                })
+
+                let numberOfExpertAllPosts = jsonArray.filter((e) => {
+                    return e.IsFeedByExpert === 1
                 })
 
                 let numberOfAPSOsPost = jsonArray.filter((e) => {
@@ -488,12 +556,18 @@ async function loadActions(manager, jsonArray, classifications) {
                     return e.IsFeedByAPSOs === 1 && e.FeedType == "Query"
                 })
 
+                let numberOfAPSOsAllPosts = jsonArray.filter((e) => {
+                    return e.IsFeedByAPSOs === 1
+                })
+
                 //Check for COM Posts category
                 if (answered_by_person_type.option.includes("COM")) {
                     if (post_type.option == "post") {
                         data = generateActionDataResponse(data, "intent_action_showCountByPersonType", numberOfCOMPost.length > 0 ? `I found ${numberOfCOMPost.length} COM Posts in MIF` : "There are no COM posts available in MIF")
                     } else if (post_type.option == "query") {
                         data = generateActionDataResponse(data, "intent_action_showCountByPersonType", numberOfCOMQuery.length > 0 ? `I found ${numberOfCOMQuery.length} COM Queries in MIF` : "There are no COM queries available in MIF")
+                    } else if (post_type.option == "input") {
+                        data = generateActionDataResponse(data, "intent_action_showCountByPersonType", numberOfCOMAllPosts.length > 0 ? `I found ${numberOfCOMAllPosts.length} COM discussions in MIF` : "There are no COM discussions available in MIF")
                     }
                 }
                 //Check for Expert Posts category
@@ -502,6 +576,8 @@ async function loadActions(manager, jsonArray, classifications) {
                         data = generateActionDataResponse(data, "intent_action_showCountByPersonType", numberOfExpertPost.length > 0 ? `I found ${numberOfExpertPost.length} Expert Posts in MIF` : "There are no Expert posts available in MIF")
                     } else if (post_type.option == "query") {
                         data = generateActionDataResponse(data, "intent_action_showCountByPersonType", numberOfExpertQuery.length > 0 ? `I found ${numberOfExpertQuery.length} Expert Queries in MIF` : "There are no Expert queries available in MIF")
+                    } else if (post_type.option == "input") {
+                        data = generateActionDataResponse(data, "intent_action_showCountByPersonType", numberOfExpertAllPosts.length > 0 ? `I found ${numberOfExpertAllPosts.length} Expert discussions in MIF` : "There are no Expert discussions available in MIF")
                     }
                 }
                 //Check for APSOs Posts category
@@ -510,8 +586,10 @@ async function loadActions(manager, jsonArray, classifications) {
                         data = generateActionDataResponse(data, "intent_action_showCountByPersonType", numberOfAPSOsPost.length > 0 ? `I found ${numberOfAPSOsPost.length} APSOs Posts in MIF` : "There are no APSOs posts available in MIF")
                     } else if (post_type.option == "query") {
                         data = generateActionDataResponse(data, "intent_action_showCountByPersonType", numberOfAPSOsQuery.length > 0 ? `I found ${numberOfAPSOsQuery.length} APSOs Queries in MIF` : "There are no APSOs queries available in MIF")
+                    } else if (post_type.option == "input") {
+                        data = generateActionDataResponse(data, "intent_action_showCountByPersonType", numberOfAPSOsAllPosts.length > 0 ? `I found ${numberOfAPSOsAllPosts.length} APSOs discussions in MIF` : "There are no APSOs discussions available in MIF")
                     }
-                }
+                } 
             }
             data.classifications = classifications;
         })
@@ -519,7 +597,7 @@ async function loadActions(manager, jsonArray, classifications) {
 
         //-------------------------------------------showPersonTypeLikePost------------------------------------------------------------
 
-        manager.addAction("intent_showPersonTypeLikePost", 'showPersonTypeLikePost', [], async (data) => {
+        manager.addAction("intent_showPersonTypeLikePost", 'showPersonTypeLikePost', [], async (data) => { 
             if (data) {
                 if (data && data.entities.length > 0) {
                     classifications.push({
@@ -576,7 +654,6 @@ async function loadActions(manager, jsonArray, classifications) {
                                 data = generateActionDataResponse(data, "intent_action_showPersonTypeLikePost", numberAPSOCommentedList.length > 0 ? `There are ${numberAPSOCommentedList.length} comments by APSOs in MIF` : "There are no comments by APSOs in MIF")
                             }
                         }
-
                     } else {
                         data = generateActionDataResponse(data, "intent_action_showPersonTypeLikePost", getRandomFallbackAnswers(), true)
                     }
@@ -1324,7 +1401,7 @@ async function loadActions(manager, jsonArray, classifications) {
         })
 
     } catch (error) {
-        data.classifications = classifications;
+        console.log(error)
     }
 
 }

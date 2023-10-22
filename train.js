@@ -19,10 +19,9 @@ async function train(manager) {
         let jsonArray = await getFAQs();
         let sqlData = await getMIFData();
         jsonArray = [...jsonArray, ...sqlData]
-        let classifications = []
 
         //Load Actions & Entities
-        await loadActions(manager, jsonArray, classifications)
+        await loadActions(manager)
 
         let allSubjects = []
 

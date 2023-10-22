@@ -26,7 +26,7 @@ async function loadEntities(manager) {
 
     manager.addNerRuleOptionTexts('en', 'post_type', 'post', ["Posts", "post", "posts", "Post"]);
     manager.addNerRuleOptionTexts('en', 'post_type', 'query', ["Query", "query", "Queries", "queries"]);
-    manager.addNerRuleOptionTexts('en', 'post_type', 'input', ["Input", "input", "Inputs", "inputs"]);
+    manager.addNerRuleOptionTexts('en', 'post_type', 'input', ["Input", "input", "Inputs", "inputs", "Discussions", "Discussion", "Thread", "Threads"]);
 
     manager.addNerRuleOptionTexts('en', 'answered_by_person_type', 'COM', ["COM", "com"]);
     manager.addNerRuleOptionTexts('en', 'answered_by_person_type', 'Expert', ["expert", "experts", "Subject Matter Expert", "SME", "SME's", "SMEs"]);

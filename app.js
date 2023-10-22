@@ -62,12 +62,9 @@ let manager;
     });
 
     manager = dock.get('nlp');
-    let jsonArray = await getFAQs();
-    let sqlData = await getMIFData();
-    jsonArray = [...jsonArray, ...sqlData]
-    let classifications = []
+
     //Load Actions & Entities
-    await loadActions(manager, jsonArray, classifications)
+    await loadActions(manager)
 
 })();
 
