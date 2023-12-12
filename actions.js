@@ -234,6 +234,8 @@ async function loadActions(manager) {
 
                     if (classifications.length === 0) {
                         data = await generateActionDataResponse(data, "intent_action_showPostDetails", `I am sorry! I cannot find the ${post_type.sourceText || post_field.sourceText} on ${post_description.sourceText || "the question you asked"}`)
+                    } else if (classifications.length > 0) {
+                        data = await generateActionDataResponse(data, classifications.length > 0 ? "intent_showPostDetails" : "intent_action_showPostDetails", `I am sorry! I couldn't find any posts on ${post_description.sourceText || "the question you asked"}`)
                     }
                 }
                 //Get Comments of a person
@@ -589,7 +591,7 @@ async function loadActions(manager) {
                     } else if (post_type.option == "input") {
                         data = generateActionDataResponse(data, "intent_action_showCountByPersonType", numberOfAPSOsAllPosts.length > 0 ? `I found ${numberOfAPSOsAllPosts.length} APSOs discussions in MIF` : "There are no APSOs discussions available in MIF")
                     }
-                } 
+                }
             }
             data.classifications = classifications;
         })
@@ -597,7 +599,7 @@ async function loadActions(manager) {
 
         //-------------------------------------------showPersonTypeLikePost------------------------------------------------------------
 
-        manager.addAction("intent_showPersonTypeLikePost", 'showPersonTypeLikePost', [], async (data) => { 
+        manager.addAction("intent_showPersonTypeLikePost", 'showPersonTypeLikePost', [], async (data) => {
             if (data) {
                 if (data && data.entities.length > 0) {
                     classifications.push({
